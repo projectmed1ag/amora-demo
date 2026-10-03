@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Демонстрация выбора номера, дат и гостей в A’MORE Collection." />
+    <meta name="description" content="Демонстрация выбора хаусбота, дат и гостей в A’MORE Collection." />
     <meta name="theme-color" content="#ffffff" />
     <title>Бронирование — Можайское водохранилище — A’MORE Collection</title>
     <link rel="icon" href="data:;base64,iVBORw0KGgo=" />
@@ -32,7 +32,7 @@
       </div>
       <nav class="site-nav" id="site-menu" aria-label="Разделы сайта">
         <a data-page-link href="./about.html">Об отеле</a>
-        <a data-page-link href="./rooms.html" class="is-current-section">Номера</a>
+        <a data-page-link href="./rooms.html" class="is-current-section">Хаусботы</a>
         <a data-page-link href="./spaces.html">Досуг</a>
         <a data-page-link href="./gallery.html">Галерея</a>
         <a data-page-link href="./location.html">Локация</a>
@@ -42,16 +42,16 @@
 
     <main id="content" class="interior-page" tabindex="-1">
 <section class="page-heading booking-heading" id="top" aria-labelledby="page-title">
-    <nav class="breadcrumbs" aria-label="Хлебные крошки"><a data-page-link href="./?city=mozhaysk">Главная</a><span aria-hidden="true">/</span><a data-page-link href="./rooms.html?city=mozhaysk">Номера</a><span aria-hidden="true">/</span><span aria-current="page">Бронирование</span></nav>
+    <nav class="breadcrumbs" aria-label="Хлебные крошки"><a data-page-link href="./?city=mozhaysk">Главная</a><span aria-hidden="true">/</span><a data-page-link href="./rooms.html?city=mozhaysk">Хаусботы</a><span aria-hidden="true">/</span><span aria-current="page">Бронирование</span></nav>
     <p class="eyebrow">Можайское водохранилище · Ваше путешествие</p><h1 id="page-title">Бронирование.</h1>
     <p class="page-lead">Выберите даты и гостей — соберём детали вашего отдыха.</p>
   </section>
-  <p class="demo-notice">Демо-версия. Бронь не создаётся, данные не отправляются в отель. Цены и наличие номеров пока не подключены.</p>
+  <p class="demo-notice">Демо-версия. Бронь не создаётся, данные не отправляются в отель. Цены и наличие хаусботов пока не подключены.</p>
   <div class="booking-layout">
     <div class="booking-main">
       <form id="booking-form" novalidate>
-        <fieldset><legend><span>01</span> Номер и гости</legend>
-          <div class="form-row"><div class="form-field"><label for="booking-room">Категория номера</label><select name="room" id="booking-room"><option value="standard" selected>Стандарт · до 2 гостей</option><option value="comfort">Комфорт · до 2 гостей</option><option value="junior-suite">Полулюкс · до 3 гостей</option><option value="suite">Люкс · до 4 гостей</option></select></div>
+        <fieldset><legend><span>01</span> Хаусбот и гости</legend>
+          <div class="form-row"><div class="form-field"><label for="booking-room">Категория хаусбота</label><select name="room" id="booking-room"><option value="standard" selected>Стандарт · до 2 гостей</option><option value="comfort">Комфорт · до 2 гостей</option><option value="junior-suite">Полулюкс · до 3 гостей</option><option value="suite">Люкс · до 4 гостей</option></select></div>
           <div class="form-field"><label for="booking-guests">Гостей, включая детей</label><select name="guests" id="booking-guests" aria-describedby="error-guests"><option value="1">1</option><option value="2" selected>2</option><option value="3" disabled>3</option><option value="4" disabled>4</option></select><p class="field-error" id="error-guests" hidden></p></div></div>
           <p id="capacity-notice" class="form-hint" aria-live="polite"></p>
         </fieldset>
