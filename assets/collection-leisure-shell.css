@@ -1,0 +1,64 @@
+@font-face { font-family: 'Cormorant Garamond'; src: url('../fonts/cormorant-400-cyrillic.woff2') format('woff2'); font-style: normal; font-weight: 400; font-display: swap; unicode-range: U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116; }
+@font-face { font-family: 'Cormorant Garamond'; src: url('../fonts/cormorant-400-latin.woff2') format('woff2'); font-style: normal; font-weight: 400; font-display: swap; unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF, U+FFFD; }
+.collection-leisure-page { --paper: #f3efe5; --surface: #f3efe5; --ink: #18231b; --muted: #62645b; --line: #d7d0c1; --green: #18231b; --accent: #97794b; --serif: 'Cormorant Garamond', Georgia, serif; --mf-gutter: clamp(24px,4.1vw,80px); background: var(--paper); color: var(--ink); font-family: Georgia, 'Times New Roman', serif; -webkit-font-smoothing: antialiased; }
+.collection-leisure-page #content { max-width: none; width: 100%; padding: 0; margin: 0; }
+.collection-leisure-page :is(h1,h2,h3) { margin: 0; font-family: var(--serif); font-weight: 400; letter-spacing: -.045em; text-transform: none; }
+.collection-leisure-page p { margin: 0; }
+.collection-leisure-page a { color: inherit; }
+.collection-leisure-page :is(a,button):focus-visible { outline: 2px solid currentColor; outline-offset: 5px; }
+.collection-leisure-page .site-header { height: auto; min-height: 0; position: relative; top: auto; background: var(--paper); color: var(--ink); }
+.collection-leisure-page .header-main { display: grid; grid-template-columns: 1fr max-content 1fr; align-items: center; height: 62px; padding: 7px 2.9vw; border-color: var(--line); }
+.collection-leisure-page .header-booking { display: inline-flex; position: static; justify-self: start; align-items: center; min-height: 32px; padding: 5px 22px; background: var(--accent); color: #fff; border: 0; border-radius: 0; font: 400 14px/1.3 Georgia,serif; }
+.collection-leisure-page .header-booking svg { display: none; }
+.collection-leisure-page .site-logo { position: static; transform: none; display: flex; flex-direction: column; gap: 1px; color: var(--ink); }
+.collection-leisure-page .site-logo .brand-name { font: 400 38px/1 var(--serif); letter-spacing: .16em; padding-left: .16em; }
+.collection-leisure-page .site-logo .brand-collection { font: 400 8px/1.3 Georgia,serif; letter-spacing: .6em; padding-left: .6em; }
+.collection-leisure-page .site-logo .brand-collection::before, .collection-leisure-page .site-logo .brand-collection::after { display: none; }
+.collection-leisure-page .header-controls { justify-self: end; position: static; }
+.collection-leisure-page .destination-trigger { width: auto; max-width: none; min-height: 44px; padding: 0; color: inherit; }
+.collection-leisure-page .destination-trigger>svg { display: none; }
+.collection-leisure-page .destination-trigger-copy { display: flex; flex-direction: column; gap: 0; font: 400 12px/1.4 Georgia,serif; text-align: right; }
+.collection-leisure-page .destination-trigger-label { color: inherit; font: 400 10px/1.4 Georgia,serif; letter-spacing: .03em; text-transform: none; text-decoration: underline; text-underline-offset: 3px; }
+.collection-leisure-page .mobile-destination { display: none; }
+.collection-leisure-page .site-nav { display: flex; position: static; justify-content: center; align-items: center; min-height: 32px; padding: 0 24px; gap: 30px; border-color: var(--line); background: var(--paper); box-shadow: none; }
+.collection-leisure-page .site-nav a { min-height: 32px; padding: 6px 0; border: 0; font: 400 13px/1.3 Georgia,serif; }
+.collection-leisure-page .site-nav a[aria-current="page"] { color: inherit; text-decoration: underline; text-underline-offset: 6px; }
+.collection-leisure-page .site-nav .nav-booking { display: none; }
+.collection-leisure-page .collection-footer { display: grid; grid-template-columns: 1fr auto auto; max-width: none; min-height: 88px; gap: 26px; margin: 0; padding: 14px 3.8vw; border-top: 1px solid var(--line); background: var(--paper); color: var(--ink); align-items: center; }
+.collection-leisure-page .collection-footer .footer-wordmark { display: flex; flex-direction: column; align-items: start; gap: 2px; font: 400 30px/1 var(--serif); letter-spacing: .02em; }
+.collection-leisure-page .collection-footer .footer-wordmark small { font: 400 7px/1.4 Georgia,serif; letter-spacing: .6em; }
+.collection-leisure-page .collection-footer p { color: inherit; font: 400 12px/1.3 Georgia,serif; border-left: 1px solid #b1ab9d; padding-left: 24px; }
+.collection-leisure-page .collection-footer-message a { display: inline-block; min-height: 26px; padding-top: 5px; text-decoration: underline; text-underline-offset: 3px; }
+@media (min-width: 1300px) {
+  .collection-leisure-page .header-main { height: 80px; }
+  .collection-leisure-page .site-logo .brand-name { font-size: 46px; }
+  .collection-leisure-page .site-logo .brand-collection { font-size: 9px; }
+  .collection-leisure-page .site-nav, .collection-leisure-page .site-nav a { min-height: 40px; }
+  .collection-leisure-page .site-nav a { font-size: 15px; }
+  .collection-leisure-page .destination-trigger-copy { font-size: 14px; }
+  .collection-leisure-page .header-booking { min-height: 38px; font-size: 16px; }
+  .collection-leisure-page .collection-footer { min-height: 112px; }
+}
+@media (max-width: 700px) {
+  .collection-leisure-page .header-main { height: 76px; padding: 10px 20px; grid-template-columns: 1fr auto; }
+  .collection-leisure-page .header-booking { display: none; }
+  .collection-leisure-page .site-logo { align-items: start; justify-self: start; gap: 3px; }
+  .collection-leisure-page .site-logo .brand-name { font-size: 28px; letter-spacing: .12em; padding: 0; }
+  .collection-leisure-page .site-logo .brand-collection { font-size: 7px; letter-spacing: .4em; padding: 0; }
+  .collection-leisure-page .header-controls { display: flex; align-items: center; gap: 16px; }
+  .collection-leisure-page .destination-trigger { min-height: 44px; }
+  .collection-leisure-page #selected-destination { display: none; }
+  .collection-leisure-page .destination-trigger-label { font-size: 13px; }
+  .collection-leisure-page .menu-toggle { display: flex; color: var(--ink); }
+  .collection-leisure-page .menu-line { background: currentColor; }
+  .collection-leisure-page .site-nav { position: absolute; top: 76px; left: 0; right: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 0 24px; padding: 12px 24px 24px; max-height: calc(100svh - 76px); overflow: auto; border-bottom: 1px solid var(--line); }
+  .collection-leisure-page .site-nav a { font-size: 16px; min-height: 46px; }
+  .collection-leisure-page .site-nav .nav-booking { grid-column: 1 / -1; display: flex; background: var(--accent); color: #fff; margin-top: 12px; }
+  .collection-leisure-page .collection-footer { grid-template-columns: 1fr 1fr; gap: 18px; padding: 26px 24px; }
+  .collection-leisure-page .collection-footer .footer-wordmark { grid-column: 1 / -1; }
+  .collection-leisure-page .collection-footer p { font-size: 11px; padding-left: 0; border: 0; }
+  .collection-leisure-page .collection-footer .collection-footer-message { padding-left: 18px; border-left: 1px solid var(--line); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .collection-leisure-page *, .collection-leisure-page *::before, .collection-leisure-page *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
