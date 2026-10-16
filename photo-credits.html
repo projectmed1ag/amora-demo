@@ -3,22 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#090909" />
+    <meta name="theme-color" content="#f6f3ed" />
     <title>Изображения — A’MORE Collection</title>
     <style>
-      .credits-page { min-height: 100svh; padding: 88px max(20px, calc((100vw - 980px) / 2)); background: #f4f0e7; }
-      .credits-page h1 { max-width: 760px; margin: 0 0 28px; font: 600 clamp(56px, 8vw, 110px)/.92 Spectral, Georgia, serif; text-transform: uppercase; }
-      .credits-page > p { max-width: 680px; font-size: 18px; line-height: 1.7; }
-      .credits-back { display: inline-flex; margin-bottom: 54px; font-size: 13px; font-weight: 700; text-decoration: none; border-bottom: 2px solid #ffd20a; }
-      .credits-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 64px; }
-      .credits-card { padding: 28px; background: #fff; border-top: 5px solid #ffd20a; }
-      .credits-card h2 { margin: 0 0 22px; font: 600 34px/1 Spectral, Georgia, serif; text-transform: uppercase; }
-      .credits-card ul { display: grid; gap: 16px; padding: 0; margin: 0; list-style: none; }
-      .credits-card li { font-size: 13px; line-height: 1.55; }
-      .credits-card a { font-weight: 700; }
-      @media (max-width: 700px) { .credits-page { padding-top: 36px; } .credits-grid { grid-template-columns: 1fr; margin-top: 40px; } }
+      .credits-page { width: 100%; max-width: none; min-height: 100svh; margin: 0; padding: 60px var(--g) 80px; background: #f6f3ed; color: #23261f; }
+      .credits-page h1 { max-width: 1000px; margin: 0 0 32px; font: 400 clamp(58px, 7.8vw, 120px)/.92 Cormorant, Georgia, serif; letter-spacing: -.045em; text-transform: none; }
+      .credits-page > p { max-width: 760px; font: 16px/1.75 Arial, sans-serif; color: #64675f; }
+      .credits-back { display: inline-flex; align-items: center; min-height: 44px; margin-bottom: 50px; font: 14px/1.5 Arial, sans-serif; text-decoration: underline; text-underline-offset: 6px; border: 0; }
+      .credits-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 70px; margin-top: 60px; }
+      .credits-card { padding: 28px 0 0; background: transparent; border-top: 1px solid #23261f40; }
+      .credits-card h2 { margin: 0 0 28px; font: 400 clamp(40px, 4vw, 64px)/1 Cormorant, Georgia, serif; letter-spacing: -.035em; text-transform: none; }
+      .credits-card ul { display: grid; gap: 20px; padding: 0; margin: 0; list-style: none; }
+      .credits-card li { font: 13px/1.7 Arial, sans-serif; }
+      .credits-card a { font-weight: 400; text-decoration: underline; text-underline-offset: 4px; }
+      @media (max-width: 700px) { .credits-page { padding-top: 26px; } .credits-back { margin-bottom: 32px; } .credits-grid { grid-template-columns: 1fr; gap: 38px; margin-top: 40px; } }
     </style>
     <link rel="stylesheet" crossorigin href="./assets/styles-B5T6wf-2.css">
+    <link rel="stylesheet" href="./assets/collection-home.css?v=home-1">
   </head>
   <body>
     <main class="credits-page">

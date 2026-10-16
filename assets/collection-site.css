@@ -1,0 +1,113 @@
+.collection-location-page .location-hero { min-height: 660px; height: 49vw; max-height: 850px; }
+.location-hero .home-hero-bottom { grid-template-columns: minmax(0, 1fr) 300px; gap: 50px; }
+.location-hero h1 { font-size: clamp(70px, 7.8vw, 132px); }
+.location-hero-lead { font: 400 16px/1.7 Arial, sans-serif; }
+.collection-location-page .location-description { display: grid; grid-template-columns: .8fr 1.5fr; gap: 80px; padding: 70px var(--g); }
+.collection-location-page .location-description > .eyebrow { padding-top: 10px; color: #686b61; font: 11px/1.5 Arial, sans-serif; text-transform: uppercase; letter-spacing: .14em; }
+.collection-location-page .location-description h2 { max-width: 800px; margin: 0 0 30px; font: 400 clamp(54px, 5.6vw, 90px)/.95 Cormorant, Georgia, serif; letter-spacing: -.045em; }
+.collection-location-page .location-description p:not(.eyebrow) { max-width: 640px; font: 16px/1.75 Arial, sans-serif; }
+.collection-location-page .location-description .location-note { margin-top: 30px; padding: 18px 0 0; border-top: 1px solid #23261f30; color: #64675f; font-size: 13px; }
+.collection-location-page .collection-next { display: flex; align-items: center; justify-content: space-between; gap: 40px; margin: 0 var(--g); padding: 38px 0; border-top: 1px solid #23261f30; }
+.collection-next h2 { font-size: clamp(46px, 5.5vw, 84px); line-height: .95; }
+.collection-next .home-link { flex: none; }
+
+.collection-site-leisure { font-family: Arial, sans-serif; }
+.collection-site-leisure .cl-overview, .collection-site-leisure .cl-detail { --cl-paper: #f6f3ed; --cl-ink: #23261f; --cl-dark: #1c241b; font-family: Arial, sans-serif; }
+.collection-site-leisure h1, .collection-site-leisure h2, .collection-site-leisure h3 { font-family: Cormorant, Georgia, serif; font-weight: 400; }
+.collection-site-leisure.collection-shell .cl-intro { align-items: end; justify-content: space-between; gap: 50px; min-height: 660px; height: 49vw; max-height: 850px; padding: 140px var(--g) 64px; color: #fff; }
+.collection-site-leisure .cl-intro-photo { object-position: center; }
+.collection-site-leisure .cl-intro::before { background: linear-gradient(180deg, #0b140b15, #0b140b10 35%, #0b140be6); }
+.collection-site-leisure.collection-shell .cl-intro h1 { font-size: clamp(78px, 8.1vw, 132px); line-height: .89; letter-spacing: -.045em; }
+.collection-site-leisure.collection-shell .cl-intro-aside { position: static; flex: 0 0 270px; font: 16px/1.65 Arial, sans-serif; text-shadow: none; color: #fff; }
+.collection-site-leisure .cl-intro-aside::after { display: none; }
+.collection-site-leisure .cl-intro-aside > p { margin: 0; font: inherit; color: inherit; }
+.collection-site-leisure .cl-intro-aside > span { display: block; margin-top: 22px; font-size: 12px; opacity: .8; }
+.collection-site-leisure .cl-primary-row, .collection-site-leisure .cl-winter-row { gap: 1px; background: #f6f3ed; }
+.collection-site-leisure .cl-panel { height: clamp(420px, 35vw, 610px); }
+.collection-site-leisure .cl-panel-copy { padding: 30px clamp(24px, 3.2vw, 60px) 26px; }
+.collection-site-leisure.collection-shell .cl-panel h2 { font-size: clamp(40px, 4.1vw, 64px); }
+.collection-site-leisure.collection-shell .cl-panel p { margin-top: 10px; font: 14px/1.5 Arial, sans-serif; }
+.collection-site-leisure .cl-link { gap: 14px; font: 14px/1.5 Arial, sans-serif; }
+.collection-site-leisure .cl-panel .cl-link { margin-top: 12px; }
+.collection-site-leisure .cl-story { display: grid; grid-template-columns: 42% 58%; min-height: 490px; border-top: 1px solid #f6f3ed; }
+.collection-site-leisure .cl-story-photo, .collection-site-leisure .cl-story-events .cl-story-photo { position: static; inset: auto; min-height: 490px; grid-column: 2; grid-row: 1; }
+.collection-site-leisure .cl-story-copy, .collection-site-leisure .cl-story-events .cl-story-copy { position: static; width: auto; grid-column: 1; grid-row: 1; padding: 50px var(--g); }
+.collection-site-leisure .cl-story-edge { display: none; }
+.collection-site-leisure.collection-shell .cl-story h2, .collection-site-leisure.collection-shell .cl-story-events h2 { font-size: clamp(64px, 7vw, 108px); line-height: .85; }
+.collection-site-leisure.collection-shell .cl-story p, .collection-site-leisure.collection-shell .cl-story-garden p { font: 16px/1.65 Arial, sans-serif; white-space: normal; margin-top: 24px; }
+.collection-site-leisure .cl-story-link, .collection-site-leisure .cl-story-events .cl-story-link { color: inherit; margin-top: 20px; }
+.collection-site-leisure .cl-story-events { grid-template-columns: 58% 42%; }
+.collection-site-leisure .cl-story-events .cl-story-photo { grid-column: 1; }
+.collection-site-leisure .cl-story-events .cl-story-copy { grid-column: 2; }
+.collection-site-leisure .cl-winter-heading { padding: 40px var(--g) 32px; min-height: 0; }
+.collection-site-leisure.collection-shell .cl-winter-heading h2 { font-size: clamp(56px, 6vw, 94px); line-height: .95; }
+.collection-site-leisure.collection-shell .cl-winter-heading p { font: 16px/1.6 Arial, sans-serif; margin-top: 14px; }
+.collection-site-leisure .cl-winter-panel { height: clamp(360px, 30vw, 520px); }
+.collection-site-leisure.collection-shell .cl-winter-panel h3 { font-size: clamp(32px, 3.7vw, 57px); }
+.collection-site-leisure .cl-winter-panel .cl-link { font: inherit; }
+
+.collection-site-leisure .cl-detail-hero { min-height: 660px; height: 49vw; max-height: 850px; color: #fff; }
+.collection-site-leisure .cl-detail-photo { inset: 0; }
+.collection-site-leisure .cl-detail-hero::before { content: ''; position: absolute; z-index: -1; inset: 0; background: linear-gradient(180deg, #0b140b15, #0b140b40 30%, #0b140be6); }
+.collection-site-leisure .cl-detail-heading { width: 100%; min-height: 100%; height: 100%; padding: 110px var(--g) 55px; background: transparent; }
+.collection-site-leisure .cl-detail-edge, .collection-site-leisure .cl-detail-heading::after { display: none; }
+.collection-site-leisure .cl-back { font: 14px/1.5 Arial, sans-serif; }
+.collection-site-leisure .cl-detail-title-copy { padding-top: 30px; }
+.collection-site-leisure.collection-shell .cl-detail-heading h1 { font-size: clamp(82px, 8.7vw, 142px); line-height: .87; letter-spacing: -.045em; }
+.collection-site-leisure.collection-shell .cl-detail-title-copy > p { max-width: 590px; margin-top: 24px; color: #fff; font: 17px/1.65 Arial, sans-serif; }
+.collection-site-leisure .cl-detail-body { padding: 54px var(--g) 28px; }
+.collection-site-leisure .cl-detail-number { font: 12px/1.5 Arial, sans-serif; color: #c9cbbf; }
+.collection-site-leisure.collection-shell .cl-detail-items h2 { font-size: clamp(38px, 3.8vw, 60px); line-height: .95; }
+.collection-site-leisure.collection-shell .cl-detail-items article > p { font: 16px/1.75 Arial, sans-serif; }
+.collection-site-leisure.collection-shell .cl-detail-single .cl-detail-items article > p { max-width: 960px; font: 23px/1.6 Arial, sans-serif; }
+.collection-site-leisure.collection-shell .cl-season-note { font: 13px/1.65 Arial, sans-serif; }
+.collection-site-leisure .cl-detail-actions .cl-link { font-size: 14px; }
+
+@media (min-width: 701px) and (max-width: 1100px) {
+  .location-hero .home-hero-bottom { grid-template-columns: 1fr; gap: 26px; }
+  .location-hero-lead { max-width: 580px; }
+  .collection-location-page .location-description { grid-template-columns: .6fr 1.5fr; gap: 30px; padding-block: 50px; }
+  .collection-site-leisure.collection-shell .cl-intro { gap: 30px; }
+  .collection-site-leisure.collection-shell .cl-intro h1 { font-size: 8vw; }
+  .collection-site-leisure.collection-shell .cl-intro-aside { flex-basis: 220px; font-size: 15px; }
+  .collection-site-leisure .cl-story-copy, .collection-site-leisure .cl-story-events .cl-story-copy { padding: 36px; }
+}
+@media (max-width: 700px) {
+  .collection-location-page .location-hero { min-height: 0; height: 86svh; max-height: 900px; }
+  .location-hero .home-hero-bottom { display: flex; flex-direction: column; align-items: start; justify-content: end; gap: 25px; padding-bottom: 36px; }
+  .location-hero h1 { font-size: clamp(43px, 12.1vw, 78px); line-height: .95; }
+  .location-hero-lead { font-size: 14px; line-height: 1.65; }
+  .collection-location-page .location-description { grid-template-columns: 1fr; gap: 25px; padding: 38px var(--g); }
+  .collection-location-page .location-description h2 { font-size: 48px; }
+  .collection-location-page .location-description p:not(.eyebrow) { font-size: 15px; }
+  .collection-location-page .collection-next { align-items: start; flex-direction: column; gap: 22px; }
+  .collection-next h2 { font-size: 51px; }
+  .collection-site-leisure.collection-shell .cl-intro { display: flex; flex-direction: column; justify-content: end; align-items: start; min-height: 0; height: 86svh; max-height: 900px; gap: 28px; padding: 120px var(--g) 36px; }
+  .collection-site-leisure.collection-shell .cl-intro h1 { font-size: clamp(49px, 13.3vw, 85px); line-height: .92; }
+  .collection-site-leisure.collection-shell .cl-intro-aside { flex-basis: auto; font-size: 15px; }
+  .collection-site-leisure .cl-intro-aside > span { display: none; }
+  .collection-site-leisure .cl-panel { height: clamp(390px, 110vw, 590px); }
+  .collection-site-leisure .cl-panel-copy { padding: 28px var(--g); }
+  .collection-site-leisure.collection-shell .cl-panel h2 { font-size: 49px; }
+  .collection-site-leisure.collection-shell .cl-panel p { font-size: 15px; }
+  .collection-site-leisure .cl-story, .collection-site-leisure .cl-story-events { display: flex; flex-direction: column; min-height: 0; }
+  .collection-site-leisure .cl-story-photo, .collection-site-leisure .cl-story-events .cl-story-photo { min-height: 0; height: 78vw; }
+  .collection-site-leisure .cl-story-copy, .collection-site-leisure .cl-story-events .cl-story-copy { padding: 36px var(--g); }
+  .collection-site-leisure.collection-shell .cl-story h2, .collection-site-leisure.collection-shell .cl-story-events h2 { font-size: 68px; }
+  .collection-site-leisure.collection-shell .cl-story p, .collection-site-leisure.collection-shell .cl-story-garden p { font-size: 15px; margin-top: 22px; }
+  .collection-site-leisure .cl-story .cl-link { font-size: 14px; }
+  .collection-site-leisure .cl-winter-heading { padding: 36px var(--g) 28px; }
+  .collection-site-leisure.collection-shell .cl-winter-heading h2 { font-size: 56px; }
+  .collection-site-leisure.collection-shell .cl-winter-heading p { font-size: 15px; }
+  .collection-site-leisure .cl-winter-panel { height: 94vw; min-height: 340px; }
+  .collection-site-leisure.collection-shell .cl-winter-panel h3 { font-size: 43px; }
+  .collection-site-leisure .cl-detail-hero { display: block; min-height: 0; height: 86svh; max-height: 900px; }
+  .collection-site-leisure .cl-detail-photo { position: absolute; inset: 0; z-index: -2; height: 100%; }
+  .collection-site-leisure .cl-detail-heading { padding: 100px var(--g) 36px; min-height: 100%; }
+  .collection-site-leisure.collection-shell .cl-detail-heading h1 { font-size: clamp(64px, 17vw, 100px); }
+  .collection-site-leisure.collection-shell .cl-detail-title-copy > p { font-size: 16px; }
+  .collection-site-leisure .cl-detail-body { padding: 36px var(--g) 22px; }
+  .collection-site-leisure.collection-shell .cl-detail-items h2 { font-size: 46px; }
+  .collection-site-leisure.collection-shell .cl-detail-items article > p { font-size: 15px; }
+  .collection-site-leisure.collection-shell .cl-detail-single .cl-detail-items article > p { font-size: 20px; }
+}

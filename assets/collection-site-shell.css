@@ -1,0 +1,10 @@
+.collection-site-page { --mf-gutter: var(--g); --paper: #f6f3ed; --ink: #23261f; --serif: Cormorant, Georgia, serif; }
+.home-nav a.is-current-section { text-decoration: underline; text-underline-offset: 6px; }
+.collection-site-page .home-header-light { position: relative; color: #23261f; background: #f6f3ed; border-bottom: 1px solid #23261f26; }
+.collection-site-page .home-header-light.menu-open { color: #f6f3ed; background: #1c241b; }
+.collection-site-page .home-header-light .home-menu { color: inherit; }
+.collection-site-page .home-header-light.menu-open .home-nav { background: #1c241b; }
+.collection-site-page .home-footer { background: #f6f3ed; color: #23261f; }
+.collection-site-page .home-nav a:focus-visible,
+.collection-site-page .home-menu:focus-visible,
+.collection-site-page .home-header-end > a:focus-visible { outline-offset: -2px; }
