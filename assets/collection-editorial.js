@@ -1,14 +1,21 @@
-import { applyCollectionShell } from './collection-site-shell.js?v=site-1';
+import { applyCollectionShell } from './collection-site-shell.js?v=about-1';
 
 const arrow = '<svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10h22m-6-6 6 6-6 6"/></svg>';
 const close = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 5 14 14M19 5 5 19"/></svg>';
+
+const aboutIntro = 'A’MORE Collection — семейный отель на Можайском водохранилище. Хаусботы у воды, лесные прогулки и занятия для всей семьи — здесь легко наполнить день впечатлениями и оставить время для спокойного отдыха.';
+const aboutParagraphs = [
+  'Прокатитесь на велосипеде, сыграйте в теннис или отправьтесь на рыбалку. Для неспешного дня выбирайте прогулочные тропы и садовые парники, а для активного — подвижные игры с мячом.',
+  'Для детей есть зоопарк, игровая зона и игры, к которым можно присоединиться всей семьёй. Вечером собирайтесь с близкими в шашлычных зонах, а для особого повода выбирайте павильон для мероприятий.',
+  'Зимой у отдыха своё настроение: ватрушки, каток и прогулки на багги. Доступность зимних занятий зависит от погоды.',
+];
 
 function addStyles() {
   if (document.getElementById('collection-editorial-style')) return;
   const link = document.createElement('link');
   link.id = 'collection-editorial-style';
   link.rel = 'stylesheet';
-  link.href = new URL('./collection-editorial.css?v=site-1', import.meta.url).href;
+  link.href = new URL('./collection-editorial.css?v=about-1', import.meta.url).href;
   link.setAttribute('blocking', 'render');
   document.head.append(link);
 }
@@ -50,9 +57,25 @@ function restyleNext(main) {
 }
 
 function enhanceAbout(main) {
+  const heading = main.querySelector('.page-heading');
+  heading.querySelector('h1').innerHTML = 'Семейный отдых.<br>В своём ритме.';
+  heading.querySelector('.page-lead').textContent = aboutIntro;
+  document.title = 'Об отеле — семейный отдых на Можайском водохранилище — A’MORE Collection';
+  document.querySelector('meta[name="description"]').content = aboutIntro;
   const cover = main.querySelector('.page-cover');
-  createHero(main, cover.querySelector('img'), 'about');
+  const hero = createHero(main, cover.querySelector('img'), 'about');
   cover.remove();
+  const introduction = document.createElement('section');
+  introduction.className = 'about-introduction';
+  introduction.setAttribute('aria-labelledby', 'about-family-title');
+  introduction.innerHTML = `<h2 id="about-family-title">Ближе к природе.<br>Ближе друг к другу.</h2>
+    <div class="about-introduction-copy">${aboutParagraphs.map(text => `<p>${text}</p>`).join('')}
+      <nav class="about-introduction-links" aria-label="Узнать больше об отеле">
+        <a class="home-link" href="./spaces.html?city=mozhaysk"><span>Выбрать занятие</span>${arrow}</a>
+        <a class="home-link" href="./location.html?city=mozhaysk"><span>Расположение отеля</span>${arrow}</a>
+      </nav>
+    </div>`;
+  hero.after(introduction);
   main.querySelectorAll('.page-story').forEach((story, index) => {
     story.classList.add('editorial-story');
     if (index % 2) story.classList.add('editorial-story-dark');

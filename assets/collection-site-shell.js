@@ -1,4 +1,4 @@
-export const homeHeader = "\n<a class=\"home-brand\" href=\"./hotel.html?city=mozhaysk\">A’MORE <span>COLLECTION</span></a>\n<nav class=\"home-nav\" id=\"home-nav\" aria-label=\"Разделы сайта\">\n<a href=\"./hotel.html?city=mozhaysk\" aria-current=\"page\">Главная</a>\n<a href=\"./rooms.html?city=mozhaysk\">Хаусботы</a>\n<a href=\"./spaces.html?city=mozhaysk\">Досуг</a>\n<a href=\"./gallery.html?city=mozhaysk\">Галерея</a>\n<a href=\"./location.html?city=mozhaysk\">Об отеле</a>\n</nav>\n<div class=\"home-header-end\"><a href=\"./\">Отели</a><button class=\"home-menu\" type=\"button\" aria-label=\"Открыть меню\" aria-controls=\"home-nav\" aria-expanded=\"false\"><span></span><span></span></button></div>\n";
+export const homeHeader = "\n<a class=\"home-brand\" href=\"./hotel.html?city=mozhaysk\">A’MORE <span>COLLECTION</span></a>\n<nav class=\"home-nav\" id=\"home-nav\" aria-label=\"Разделы сайта\">\n<a href=\"./hotel.html?city=mozhaysk\" aria-current=\"page\">Главная</a>\n<a href=\"./rooms.html?city=mozhaysk\">Хаусботы</a>\n<a href=\"./spaces.html?city=mozhaysk\">Досуг</a>\n<a href=\"./gallery.html?city=mozhaysk\">Галерея</a>\n<a href=\"./about.html?city=mozhaysk\">Об отеле</a>\n</nav>\n<div class=\"home-header-end\"><a href=\"./\">Отели</a><button class=\"home-menu\" type=\"button\" aria-label=\"Открыть меню\" aria-controls=\"home-nav\" aria-expanded=\"false\"><span></span><span></span></button></div>\n";
 export const homeFooter = "<a class=\"home-brand\" href=\"./hotel.html?city=mozhaysk\">A’MORE <span>COLLECTION</span></a><span>Московская область,<br>Можайское водохранилище</span><a class=\"home-link\" href=\"./\"><span>Все отели</span><svg viewBox=\"0 0 28 20\" aria-hidden=\"true\"><path d=\"M2 10h22m-6-6 6 6-6 6\"/></svg></a>";
 export function addCollectionStyle(id, file) {
   if (document.getElementById(id)) return;
@@ -22,7 +22,7 @@ export function applyCollectionShell(page, { light = false } = {}) {
   }
   header.className = `home-header${light ? ' home-header-light' : ''}`;
   header.innerHTML = homeHeader;
-  const active = page === 'about' ? 'location' : page;
+  const active = page === 'location' ? 'about' : page;
   header.querySelectorAll('[aria-current]').forEach(link => link.removeAttribute('aria-current'));
   if (active === 'booking') {
     header.querySelector('a[href*="rooms.html"]').classList.add('is-current-section');
