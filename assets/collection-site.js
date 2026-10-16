@@ -1,4 +1,4 @@
-import { applyCollectionShell, addCollectionStyle } from './collection-site-shell.js?v=site-1';
+import { applyCollectionShell, addCollectionStyle } from './collection-site-shell.js?v=about-1';
 import { renderCollectionLeisure } from './collection-leisure.js?v=leisure-detail-2';
 
 const arrow = '<svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10h22m-6-6 6 6-6 6"/></svg>';
