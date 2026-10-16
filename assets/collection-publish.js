@@ -1,3 +1,4 @@
+import { enhanceCollectionHome } from './collection-home.js?v=home-1';
 import { renderCollectionLeisure } from './collection-leisure.js?v=leisure-detail-2';
 
 const hotelURL = (city) => `./hotel.html?city=${encodeURIComponent(city)}`;
@@ -11,6 +12,11 @@ export function enhanceCollectionPublish(page, city) {
     if (target.pathname !== entryURL.pathname) return;
     link.setAttribute('href', './hotel.html' + target.search + target.hash);
   });
+
+  if (page === 'home' && city === 'mozhaysk') {
+    enhanceCollectionHome();
+    return;
+  }
 
   if (page !== 'spaces' || city !== 'mozhaysk') return;
 
