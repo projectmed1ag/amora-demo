@@ -96,28 +96,40 @@ export function renderLeisureDetails(activity) {
   const items = detail.itemIndexes ? detail.itemIndexes.map((index) => groupItems[index]) : groupItems;
   const overviewURL = `./spaces.html?city=mozhaysk#${detail.overviewId || activity}`;
   const intro = detail.intro || selectedGroups[0].intro;
-  const singleWinter = detail.groupIds.includes('winter') && items.length === 1;
+  const singleItem = items.length === 1;
+  const titleLines = {
+    active: 'Движение<br> и игра.',
+    nature: 'Тропы<br> и берег.',
+    garden: 'Садовые<br> парники.',
+    together: 'Время<br> вместе.',
+    winter: 'Зимние<br> дни.',
+    buggy: 'Багги<br> зимой.',
+  };
 
-  return `<section class="cl-detail${singleWinter ? ' cl-detail-single' : ''}" aria-labelledby="cl-detail-title">
-    <a class="cl-back" href="${overviewURL}"><span aria-hidden="true">←</span> Все занятия</a>
-    <header class="cl-detail-heading">
-      <p class="cl-eyebrow">ДОСУГ · A’MORE COLLECTION</p>
-      <h1 id="cl-detail-title">${escapeHTML(detail.title)}</h1>
-      <p>${escapeHTML(intro)}</p>
-    </header>
-    <div class="cl-detail-grid">
+  return `<section class="cl-detail cl-detail-${activity}${singleItem ? ' cl-detail-single' : ''}" aria-labelledby="cl-detail-title">
+    <div class="cl-detail-hero">
       <figure class="cl-detail-photo">
         <img src="./images/mozhaysk/leisure-${detail.image}.jpg" width="1200" height="800" alt="${escapeHTML(detail.imageAlt)}" fetchpriority="high">
         <figcaption>Атмосфера отдыха · иллюстрация</figcaption>
       </figure>
-      <div class="cl-detail-items">
+      <header class="cl-detail-heading">
+        <a class="cl-back" href="${overviewURL}">${arrow}<span>Все занятия</span></a>
+        <div class="cl-detail-title-copy">
+          <h1 id="cl-detail-title">${titleLines[activity] || escapeHTML(detail.title)}</h1>
+          <p>${escapeHTML(intro)}</p>
+        </div>
+        <svg class="cl-detail-edge" viewBox="0 0 100 340" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d="M0 0H68C22 88 20 145 51 205C75 252 100 295 100 340H0Z"/></svg>
+      </header>
+    </div>
+    <div class="cl-detail-body">
+      <div class="cl-detail-items" data-count="${items.length}">
         ${items.map((item, index) => `<article id="${detail.itemIds[index]}">
-          ${singleWinter ? '' : `<h2>${escapeHTML(item.title)}</h2>`}
+          ${singleItem ? '' : `<span class="cl-detail-number" aria-hidden="true">${String(index + 1).padStart(2, '0')}</span><h2>${escapeHTML(item.title)}</h2>`}
           <p>${escapeHTML(item.description)}</p>
         </article>`).join('')}
-        ${detail.groupIds.includes('winter') ? `<p class="cl-season-note">${escapeHTML(detail.note || seasonNote)}</p>` : ''}
       </div>
+      ${detail.groupIds.includes('winter') ? `<p class="cl-season-note">${escapeHTML(detail.note || seasonNote)}</p>` : ''}
+      <div class="cl-detail-actions"><a class="cl-link" href="${overviewURL}"><span>Все занятия</span>${arrow}</a></div>
     </div>
-    <div class="cl-detail-actions"><a class="cl-link" href="${overviewURL}"><span>Все занятия</span>${arrow}</a></div>
   </section>`;
 }
