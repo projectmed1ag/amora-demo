@@ -1,4 +1,4 @@
-import { renderCollectionLeisure } from './collection-leisure.js?v=publish-1';
+import { renderCollectionLeisure } from './collection-leisure.js?v=leisure-detail-2';
 
 const hotelURL = (city) => `./hotel.html?city=${encodeURIComponent(city)}`;
 
