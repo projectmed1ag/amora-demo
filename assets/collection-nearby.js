@@ -68,6 +68,12 @@ export function enhanceNearbyPlaces(section) {
   const needsTouchControl = () => compact.matches || coarsePointer.matches;
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
   let selected = initialPlace();
+  // The HTML already contains the default place. A saved direct place URL only
+  // updates this small detail panel; the page and map layout stay static.
+  if (buttons.find(button => button.getAttribute('aria-pressed') === 'true')?.dataset.nearbyPlace !== selected.id) {
+    buttons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.nearbyPlace === selected.id)));
+    section.querySelector('#nearby-place-detail').innerHTML = detail(selected);
+  }
   let map, tiles, L, starting, loadTimer, tileErrors = 0, attempts = 0;
   let markers = [];
   let zooming = false, pendingView;
