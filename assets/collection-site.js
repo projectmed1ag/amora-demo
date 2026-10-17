@@ -1,5 +1,6 @@
 import { applyCollectionShell, addCollectionStyle } from './collection-site-shell.js?v=about-1';
-import { renderCollectionLeisure } from './collection-leisure.js?v=leisure-detail-2';
+import { renderCollectionLeisure } from './collection-leisure.js?v=nearby-1';
+import { enhanceNearbyPlaces } from './collection-nearby.js?v=nearby-1';
 
 const arrow = '<svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10h22m-6-6 6 6-6 6"/></svg>';
 
@@ -50,7 +51,7 @@ export function enhanceCollectionSpaces() {
   const detailTitle = main.querySelector('.cl-detail h1')?.textContent.replace(/\.$/, '');
   document.title = `${detailTitle || 'Досуг'} — Можайское водохранилище — A’MORE Collection`;
   document.querySelector('meta[name="description"]').content =
-    'Семейный досуг в A’MORE Collection: велосипеды, теннис, мячи, зоопарк, детская зона и игры, прогулочные тропы, рыбалка, садовые парники, павильон для мероприятий, шашлычные зоны, ватрушки, каток и багги зимой.';
+    'Семейный досуг в A’MORE Collection: велосипеды, теннис, мячи, зоопарк, рыбалка, садовые парники, павильон для мероприятий и зимние занятия. Карта окрестностей Можайского водохранилища: Музей Бородино, Можайск и усадьба Горетово.';
   const intro = main.querySelector('.cl-intro');
   if (intro) {
     const lead = intro.querySelector('.cl-intro-copy > p');
@@ -60,13 +61,30 @@ export function enhanceCollectionSpaces() {
     const tagline = document.createElement('span');
     tagline.innerHTML = oldAside.innerHTML;
     aside.append(lead, tagline);
+    const nearbyLink = document.createElement('a');
+    nearbyLink.className = 'home-link nearby-jump';
+    nearbyLink.href = '#nearby';
+    nearbyLink.innerHTML = `<span>Места рядом</span>${arrow}`;
+    aside.append(nearbyLink);
     oldAside.replaceWith(aside);
+  }
+  if (main.querySelector('#nearby')) {
+    addCollectionStyle('collection-nearby-style', './collection-nearby.css?v=nearby-1');
+    enhanceNearbyPlaces(main.querySelector('#nearby'));
   }
   main.querySelectorAll('.cl-image-note, .cl-detail-photo figcaption').forEach(note => note.remove());
   if (location.hash) {
     let id;
     try { id = decodeURIComponent(location.hash.slice(1)); }
     catch { return; }
-    requestAnimationFrame(() => document.getElementById(id)?.scrollIntoView());
+    const scrollToAnchor = () => document.getElementById(id)?.scrollIntoView({ behavior: 'instant' });
+    if (id === 'nearby') {
+      const style = document.getElementById('collection-nearby-style');
+      const stylesReady = style.sheet ? Promise.resolve() : new Promise(resolve => {
+        style.addEventListener('load', resolve, { once: true });
+        style.addEventListener('error', resolve, { once: true });
+      });
+      stylesReady.then(() => document.fonts.ready).then(() => requestAnimationFrame(scrollToAnchor));
+    } else requestAnimationFrame(scrollToAnchor);
   }
 }
