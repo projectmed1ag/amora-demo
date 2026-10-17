@@ -1,4 +1,4 @@
-import { nearbyPlaces, nearbyBasemap } from './mozhaysk-nearby-data.js?v=nearby-1';
+import { nearbyPlaces, nearbyBasemap } from './mozhaysk-nearby-data.js?v=nearby-photos-1';
 
 // One lazily-created Leaflet instance, four exact-location markers, no routing
 // engine or geolocation. DOM owns the place list and detail; Leaflet owns the
@@ -11,7 +11,12 @@ const initialPlace = () => nearbyPlaces.find(place => place.id === new URLSearch
 const routeURL = place => `https://yandex.ru/maps/?rtext=~${place.coordinates.join(',')}&rtt=auto&z=12`;
 
 function detail(place) {
-  return `<p class="nearby-place-category">${place.category}</p>
+  const photo = place.photo;
+  return `<figure class="nearby-place-photo">
+      <div class="nearby-photo-frame"><img src="${photo.src}" alt="${photo.alt}" width="${photo.width}" height="${photo.height}" loading="lazy" decoding="async"><p class="nearby-photo-fallback" hidden>Фотография временно недоступна</p></div>
+      <figcaption>Фото: <a href="${photo.source}" target="_blank" rel="noopener">${photo.author}, ${photo.year}</a> · <a href="${photo.licenseURL}" target="_blank" rel="noopener">${photo.license}</a></figcaption>
+    </figure>
+    <p class="nearby-place-category">${place.category}</p>
     <h3>${place.title}</h3>
     <p class="nearby-place-description">${place.description}</p>
     <div class="nearby-place-links">
@@ -43,7 +48,7 @@ export function renderNearbyPlaces() {
         <div class="nearby-map-feedback"><p id="nearby-map-help" role="status">Загружаем карту…</p><button type="button" data-nearby-retry hidden>Повторить</button></div>
       </div>
     </div>
-    <p class="nearby-visit-note">Места находятся за пределами отеля. Время работы и условия посещения уточняйте на официальных сайтах.</p>
+    <p class="nearby-visit-note">Места находятся за пределами отеля. Время работы и условия посещения уточняйте на официальных сайтах. <a href="./photo-credits.html#nearby-photos">Фото и лицензии ↗</a></p>
     <p class="sr-only" data-nearby-announcement aria-live="polite" aria-atomic="true"></p>
   </section>`;
 }
@@ -64,6 +69,13 @@ export function enhanceNearbyPlaces(section) {
   let map, tiles, L, starting, loadTimer, tileErrors = 0, attempts = 0;
   let markers = [];
   let zooming = false, pendingView;
+  const detailElement = section.querySelector('#nearby-place-detail');
+  // Keep the text, route and image credit available if a photograph fails.
+  detailElement.addEventListener('error', event => {
+    if (!(event.target instanceof HTMLImageElement)) return;
+    event.target.hidden = true;
+    detailElement.querySelector('.nearby-photo-fallback').hidden = false;
+  }, true);
   // Include the reservoir west of Gorétovo as context, rather than fitting only
   // the town monuments. No unverified hotel pin is added.
   const overviewBounds = [[55.491, 35.60], [55.64, 36.045]];
@@ -98,7 +110,7 @@ export function enhanceNearbyPlaces(section) {
   function selectPlace(place, move = true) {
     selected = place;
     buttons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.nearbyPlace === place.id)));
-    section.querySelector('#nearby-place-detail').innerHTML = detail(place);
+    detailElement.innerHTML = detail(place);
     section.querySelector('[data-nearby-announcement]').textContent = `Выбрано: ${place.title}. Описание и маршрут — под списком мест.`;
     const url = new URL(location.href);
     url.searchParams.set('place', place.id);
