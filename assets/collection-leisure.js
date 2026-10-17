@@ -1,4 +1,5 @@
 import { renderLeisureDetails } from './collection-leisure-details.js?v=leisure-detail-2';
+import { renderNearbyPlaces } from './collection-nearby.js?v=nearby-1';
 
 const arrow = '<svg viewBox="0 0 28 20" aria-hidden="true" focusable="false"><path d="M2 10h22m-6-6 6 6-6 6"/></svg>';
 const detailURL = activity => `./spaces.html?city=mozhaysk&amp;activity=${activity}`;
@@ -50,5 +51,6 @@ export function renderCollectionLeisure() {
       <div class="cl-winter-row">${winterPanels.map((item, index) => panel(item, index, true)).join('')}</div>
       <p class="cl-image-note">Атмосфера отдыха · иллюстрации</p>
     </section>
+    ${renderNearbyPlaces()}
   </div>`;
 }
