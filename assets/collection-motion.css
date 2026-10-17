@@ -1,0 +1,136 @@
+/* Native same-origin page transitions keep normal link navigation intact. */
+@view-transition {
+  navigation: auto;
+}
+
+.home-header,
+.collection-header {
+  view-transition-name: collection-header;
+}
+
+.home-menu-toggle {
+  display: none;
+}
+
+label.home-menu {
+  cursor: pointer;
+}
+
+@media (max-width: 700px) {
+  /* The native checkbox keeps menu navigation usable without JavaScript. */
+  .home-menu-toggle {
+    display: block;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .home-menu-toggle:checked ~ .home-nav {
+    display: grid;
+  }
+
+  .home-menu-toggle:focus-visible ~ .home-header-end .home-menu {
+    outline: 2px solid currentColor;
+    outline-offset: -2px;
+  }
+}
+
+main#content,
+main#hotels {
+  view-transition-name: collection-content;
+}
+
+/* The brief visual crossfade must not consume the visitor's first tap. */
+::view-transition,
+::view-transition-group(*),
+::view-transition-image-pair(*),
+::view-transition-old(*),
+::view-transition-new(*) {
+  pointer-events: none;
+}
+
+::view-transition-group(collection-header),
+::view-transition-group(collection-content),
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  mix-blend-mode: normal;
+}
+
+::view-transition-group(collection-header) {
+  z-index: 2;
+}
+
+/* Show one fully opaque header snapshot, without doubled text or fading. */
+::view-transition-old(collection-header) {
+  display: none;
+}
+
+::view-transition-new(collection-header) {
+  animation: none;
+  opacity: 1;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(collection-content) {
+  animation: collection-content-out 180ms ease-out both;
+  mix-blend-mode: normal;
+}
+
+::view-transition-new(collection-content) {
+  animation: collection-content-in 220ms ease-out both;
+  mix-blend-mode: normal;
+}
+
+@keyframes collection-content-out {
+  to { opacity: 0; }
+}
+
+@keyframes collection-content-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Only JavaScript adds these classes to an image that is still loading.
+   Without JavaScript, every photograph remains visible by default. */
+.home-hero > img.collection-hero-pending {
+  opacity: 0;
+}
+
+.home-hero > img.collection-hero-revealing {
+  animation: collection-hero-in 350ms ease-out both;
+}
+
+@keyframes collection-hero-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: none;
+  }
+
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+
+  .home-hero > img.collection-hero-pending,
+  .home-hero > img.collection-hero-revealing {
+    opacity: 1;
+    animation: none !important;
+  }
+}

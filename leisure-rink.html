@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ru" class="collection-home-root" data-city="mozhaysk">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Семейный досуг в A’MORE Collection: велосипеды, теннис, мячи, зоопарк, рыбалка, садовые парники, павильон для мероприятий и зимние занятия. Карта окрестностей Можайского водохранилища: Музей Бородино, Можайск и усадьба Горетово.">
+    <meta name="theme-color" content="#1c241b">
+    <title>Каток — Можайское водохранилище — A’MORE Collection</title>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    <link rel="preload" href="./fonts/cormorant-400-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="./fonts/cormorant-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" crossorigin="" href="./assets/styles-B5T6wf-2.css">
+    <link rel="stylesheet" href="./assets/collection-leisure-shell.css?v=leisure-detail-2">
+    <link rel="stylesheet" href="./assets/collection-leisure.css?v=leisure-detail-2">
+    <link id="collection-home-style" rel="stylesheet" href="./assets/collection-home.css?v=home-1">
+    <link id="collection-site-shell-style" rel="stylesheet" href="./assets/collection-site-shell.css?v=device-1">
+    <link id="collection-site-style" rel="stylesheet" href="./assets/collection-site.css?v=site-1">
+    <link id="collection-nearby-style" rel="stylesheet" href="./assets/collection-nearby.css?v=device-1">
+    <link rel="stylesheet" href="./assets/collection-motion.css?v=static-1">
+    <style>html[data-collection-redirect] body { visibility: hidden; }</style>
+    <script data-collection-root="./">// Compatibility for saved city and activity URLs. The normal Mozhaysk pages
+// are complete HTML; this script never renders or rebuilds their content.
+(() => {
+  const script = document.currentScript;
+  const root = script.src ? new URL('../', script.src) : new URL(script.dataset.collectionRoot || './', location.href);
+  const url = new URL(location.href);
+  const relative = url.pathname.slice(root.pathname.length);
+  const [folder, nestedFile] = relative.split('/');
+  const cityFolder = ['ruza', 'krasnoyarsk'].includes(folder) ? folder : null;
+  const file = cityFolder ? nestedFile : folder;
+  if (!/^(hotel|rooms|spaces|gallery|about|location|booking|leisure-[a-z]+)\.html$/.test(file || '')) return;
+  const cities = new Map([['moscow', 'mozhaysk'], ['petersburg', 'ruza'], ['mozhaysk', 'mozhaysk'], ['ruza', 'ruza'], ['krasnoyarsk', 'krasnoyarsk']]);
+  const normalize = city => cities.get(city) || null;
+  let saved;
+  try { saved = localStorage.getItem('amore-destination'); } catch { /* Storage is optional. */ }
+  const isLeisureDetail = file.startsWith('leisure-');
+  const city = normalize(url.searchParams.get('city')) || cityFolder || (isLeisureDetail ? 'mozhaysk' : normalize(saved)) || 'mozhaysk';
+  let target = `${city === 'mozhaysk' ? '' : city + '/'}${isLeisureDetail && city !== 'mozhaysk' ? 'spaces.html' : file}`;
+  const activity = url.searchParams.get('activity');
+  if (city === 'mozhaysk' && file === 'spaces.html' && ['active', 'children', 'nature', 'garden', 'together', 'winter', 'tubing', 'rink', 'buggy'].includes(activity)) {
+    target = `leisure-${activity}.html`;
+    url.searchParams.delete('activity');
+  }
+  url.searchParams.set('city', city);
+  const destination = new URL(target, root);
+  destination.search = url.search;
+  destination.hash = url.hash;
+  if (destination.pathname !== location.pathname) {
+    document.documentElement.dataset.collectionRedirect = '';
+    location.replace(destination.href);
+  } else if (url.search !== location.search) {
+    history.replaceState(history.state, '', url);
+  }
+})();
+</script>
+    <script type="module" src="./assets/collection-runtime.js?v=static-1"></script>
+  </head>
+  <body data-page="spaces" class="collection-home-page collection-site-page collection-shell mo-family-page collection-leisure-page collection-site-leisure" data-collection-static="">
+    <a class="skip-link" href="#content">К содержанию</a>
+    <header class="home-header" data-header="">
+<a class="home-brand" href="./hotel.html?city=mozhaysk">A’MORE <span>COLLECTION</span></a>
+<input class="home-menu-toggle" id="home-menu-toggle" type="checkbox" aria-label="Меню разделов" aria-controls="home-nav"><nav class="home-nav" id="home-nav" aria-label="Разделы сайта">
+<a href="./hotel.html?city=mozhaysk">Главная</a>
+<a href="./rooms.html?city=mozhaysk">Хаусботы</a>
+<a href="./spaces.html?city=mozhaysk" aria-current="page">Досуг</a>
+<a href="./gallery.html?city=mozhaysk">Галерея</a>
+<a href="./about.html?city=mozhaysk">Об отеле</a>
+</nav>
+<div class="home-header-end"><a href="./">Отели</a><label class="home-menu" for="home-menu-toggle"><span></span><span></span></label></div>
+</header>
+
+    <main id="content" class="interior-page" tabindex="-1"><section class="cl-detail cl-detail-rink cl-detail-single" aria-labelledby="cl-detail-title">
+    <div class="cl-detail-hero">
+      <figure class="cl-detail-photo">
+        <img src="./images/mozhaysk/leisure-rink.jpg" width="1200" height="800" alt="Зимний каток для отдыха на коньках" fetchpriority="high">
+
+      </figure>
+      <header class="cl-detail-heading">
+        <a class="cl-back" href="./spaces.html?city=mozhaysk#winter"><svg width="22" height="12" viewBox="0 0 22 12" fill="none" aria-hidden="true"><path d="M1 6h19M15 1l5 5-5 5" stroke="currentColor" stroke-width="1.2"></path></svg><span>Все занятия</span></a>
+        <div class="cl-detail-title-copy">
+          <h1 id="cl-detail-title">Каток.</h1>
+          <p>Встречаемся на льду.</p>
+        </div>
+        <svg class="cl-detail-edge" viewBox="0 0 100 340" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d="M0 0H68C22 88 20 145 51 205C75 252 100 295 100 340H0Z"></path></svg>
+      </header>
+    </div>
+    <div class="cl-detail-body">
+      <div class="cl-detail-items" data-count="1">
+        <article id="rink">
+
+          <p>Проведите время на льду с семьёй или друзьями и почувствуйте зимний ритм отдыха.</p>
+        </article>
+      </div>
+      <p class="cl-season-note">Работа катка зависит от погоды. Условия посещения можно уточнить у команды отеля.</p>
+      <div class="cl-detail-actions"><a class="cl-link" href="./spaces.html?city=mozhaysk#winter"><span>Все занятия</span><svg width="22" height="12" viewBox="0 0 22 12" fill="none" aria-hidden="true"><path d="M1 6h19M15 1l5 5-5 5" stroke="currentColor" stroke-width="1.2"></path></svg></a></div>
+    </div>
+  </section></main>
+
+    <footer class="home-footer"><a class="home-brand" href="./hotel.html?city=mozhaysk">A’MORE <span>COLLECTION</span></a><span>Московская область,<br>Можайское водохранилище</span><a class="home-link" href="./"><span>Все отели</span><svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10h22m-6-6 6 6-6 6"></path></svg></a></footer>
+
+
+    <noscript>Сейчас показано Можайское водохранилище. <a href="./">Выбрать другой отель</a>.</noscript>
+
+
+</body>
+</html>
