@@ -7,6 +7,10 @@ import { enhanceCollectionLocation, enhanceCollectionSpaces } from './collection
 // Run after the published app renders so generated breadcrumbs use the same
 // hotel-home route as the static header and footer.
 export function enhanceCollectionPublish(page, city) {
+  // A failed/expired startup keeps the usable legacy page stable. Do not
+  // replace it later if a delayed module eventually finishes downloading.
+  if (document.documentElement.dataset.collectionStartup === 'fallback') return;
+
   const entryURL = new URL('./', location.href);
   document.querySelectorAll('a[data-page-link]').forEach((link) => {
     const target = new URL(link.getAttribute('href'), location.href);
