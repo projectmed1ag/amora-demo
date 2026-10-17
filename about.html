@@ -1,85 +1,93 @@
 <!doctype html>
-<html lang="ru">
+<html lang="ru" class="collection-home-root" data-city="mozhaysk">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="A’MORE Collection — семейный отель на Можайском водохранилище. Хаусботы у воды, лесные прогулки и занятия для всей семьи — здесь легко наполнить день впечатлениями и оставить время для спокойного отдыха." />
-    <meta name="theme-color" content="#ffffff" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A’MORE Collection — семейный отель на Можайском водохранилище. Хаусботы у воды, лесные прогулки и занятия для всей семьи — здесь легко наполнить день впечатлениями и оставить время для спокойного отдыха.">
+    <meta name="theme-color" content="#1c241b">
     <title>Об отеле — семейный отдых на Можайском водохранилище — A’MORE Collection</title>
-    <link rel="icon" href="data:;base64,iVBORw0KGgo=" />
-    <script type="module" crossorigin data-collection-app src="./assets/app-D7NK1Mle.js?v=first-render-1"></script>
-    <link rel="stylesheet" crossorigin href="./assets/styles-B5T6wf-2.css">
-    <style>
-      html[data-collection-startup="pending"] { background: #f6f3ed; }
-      html[data-collection-startup="pending"] body { visibility: hidden; }
-    </style>
-    <script src="./assets/collection-startup.js?v=first-render-1"></script>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    <link rel="preload" href="./fonts/cormorant-400-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="./fonts/cormorant-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" crossorigin="" href="./assets/styles-B5T6wf-2.css">
+    <link id="collection-home-style" rel="stylesheet" href="./assets/collection-home.css?v=home-1">
+    <link id="collection-site-shell-style" rel="stylesheet" href="./assets/collection-site-shell.css?v=device-1">
+    <link id="collection-editorial-style" rel="stylesheet" href="./assets/collection-editorial.css?v=about-1">
+    <link rel="stylesheet" href="./assets/collection-motion.css?v=static-1">
+    <style>html[data-collection-redirect] body { visibility: hidden; }</style>
+    <script data-collection-root="./">// Compatibility for saved city and activity URLs. The normal Mozhaysk pages
+// are complete HTML; this script never renders or rebuilds their content.
+(() => {
+  const script = document.currentScript;
+  const root = script.src ? new URL('../', script.src) : new URL(script.dataset.collectionRoot || './', location.href);
+  const url = new URL(location.href);
+  const relative = url.pathname.slice(root.pathname.length);
+  const [folder, nestedFile] = relative.split('/');
+  const cityFolder = ['ruza', 'krasnoyarsk'].includes(folder) ? folder : null;
+  const file = cityFolder ? nestedFile : folder;
+  if (!/^(hotel|rooms|spaces|gallery|about|location|booking|leisure-[a-z]+)\.html$/.test(file || '')) return;
+  const cities = new Map([['moscow', 'mozhaysk'], ['petersburg', 'ruza'], ['mozhaysk', 'mozhaysk'], ['ruza', 'ruza'], ['krasnoyarsk', 'krasnoyarsk']]);
+  const normalize = city => cities.get(city) || null;
+  let saved;
+  try { saved = localStorage.getItem('amore-destination'); } catch { /* Storage is optional. */ }
+  const isLeisureDetail = file.startsWith('leisure-');
+  const city = normalize(url.searchParams.get('city')) || cityFolder || (isLeisureDetail ? 'mozhaysk' : normalize(saved)) || 'mozhaysk';
+  let target = `${city === 'mozhaysk' ? '' : city + '/'}${isLeisureDetail && city !== 'mozhaysk' ? 'spaces.html' : file}`;
+  const activity = url.searchParams.get('activity');
+  if (city === 'mozhaysk' && file === 'spaces.html' && ['active', 'children', 'nature', 'garden', 'together', 'winter', 'tubing', 'rink', 'buggy'].includes(activity)) {
+    target = `leisure-${activity}.html`;
+    url.searchParams.delete('activity');
+  }
+  url.searchParams.set('city', city);
+  const destination = new URL(target, root);
+  destination.search = url.search;
+  destination.hash = url.hash;
+  if (destination.pathname !== location.pathname) {
+    document.documentElement.dataset.collectionRedirect = '';
+    location.replace(destination.href);
+  } else if (url.search !== location.search) {
+    history.replaceState(history.state, '', url);
+  }
+})();
+</script>
+    <script type="module" src="./assets/collection-runtime.js?v=static-1"></script>
   </head>
-  <body data-page="about">
+  <body data-page="about" class="collection-home-page collection-site-page collection-editorial-page collection-about-page" data-collection-static="">
     <a class="skip-link" href="#content">К содержанию</a>
-    <header class="site-header" data-header>
-      <div class="header-main">
-        <a class="header-booking" data-booking-link data-page-link href="./booking.html">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="5" width="16" height="16" rx="1" /><path d="M8 3v4m8-4v4M4 11h16m-11 5 2 2 4-4" /></svg>
-          <span class="booking-label-full">Забронировать</span><span class="booking-label-short">Бронь</span>
-        </a>
-        <a class="site-logo" data-page-link href="./hotel.html" aria-label="A’MORE Collection — на главную"><span class="brand-name">A’MORE</span><span class="brand-collection">COLLECTION</span></a>
-        <div class="header-controls">
-          <a class="destination-trigger" href="./" aria-label="Все отели A’MORE Collection">
-            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 10c0 6-8 11-8 11S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg>
-            <span class="destination-trigger-copy"><span class="destination-trigger-label">Отели</span><span id="selected-destination">Можайское водохранилище</span></span>
-          </a>
-          <button class="menu-toggle" type="button" aria-label="Открыть меню" aria-expanded="false" aria-controls="site-menu" hidden>
-            <span class="menu-line"></span><span class="menu-line"></span>
-          </button>
-        </div>
-        <a class="mobile-destination" href="./" aria-label="Все отели A’MORE Collection"><span data-selected-mobile>Можайское водохранилище</span></a>
-      </div>
-      <nav class="site-nav" id="site-menu" aria-label="Разделы сайта">
-        <a data-page-link href="./hotel.html">Главная</a>
-        <a data-page-link href="./rooms.html">Хаусботы</a>
-        <a data-page-link href="./spaces.html">Досуг</a>
-        <a data-page-link href="./gallery.html">Галерея</a>
-        <a data-page-link href="./location.html">Об отеле</a>
-        <a class="nav-booking" data-booking-link data-page-link href="./booking.html">Забронировать</a>
-      </nav>
-    </header>
+    <header class="home-header" data-header="">
+<a class="home-brand" href="./hotel.html?city=mozhaysk">A’MORE <span>COLLECTION</span></a>
+<input class="home-menu-toggle" id="home-menu-toggle" type="checkbox" aria-label="Меню разделов" aria-controls="home-nav"><nav class="home-nav" id="home-nav" aria-label="Разделы сайта">
+<a href="./hotel.html?city=mozhaysk">Главная</a>
+<a href="./rooms.html?city=mozhaysk">Хаусботы</a>
+<a href="./spaces.html?city=mozhaysk">Досуг</a>
+<a href="./gallery.html?city=mozhaysk">Галерея</a>
+<a href="./about.html?city=mozhaysk" aria-current="page">Об отеле</a>
+</nav>
+<div class="home-header-end"><a href="./">Отели</a><label class="home-menu" for="home-menu-toggle"><span></span><span></span></label></div>
+</header>
 
-    <main id="content" class="interior-page" tabindex="-1">
-<section class="page-heading" id="top" aria-labelledby="page-title">
-    <nav class="breadcrumbs" aria-label="Хлебные крошки"><a data-page-link href="./hotel.html?city=mozhaysk">Главная</a><span aria-hidden="true">/</span><span aria-current="page">Об отеле</span></nav>
-    <p class="eyebrow">Можайское водохранилище · Об отеле</p>
-    <h1 id="page-title">Семейный отдых. В своём ритме.</h1><p class="page-lead">A’MORE Collection — семейный отель на Можайском водохранилище. Хаусботы у воды, лесные прогулки и занятия для всей семьи — здесь легко наполнить день впечатлениями и оставить время для спокойного отдыха.</p>
-  </section>
-  <figure class="media page-cover"><img src="./images/destinations/mozhaysk.jpg" srcset="./images/mobile/destinations/mozhaysk.jpg 768w, ./images/destinations/mozhaysk.jpg 1536w" sizes="100vw" alt="Бунгало на лесном берегу большого водоёма" fetchpriority="high" /></figure>
-  <section class="page-story">
-    <figure class="media"><img src="./images/rooms/mozhaysk/comfort.jpg" srcset="./images/mobile/rooms/mozhaysk/comfort.jpg 768w, ./images/rooms/mozhaysk/comfort.jpg 1536w" sizes="(max-width: 700px) 100vw, 50vw" alt="Просторная светлая спальня с креслом и угловым окном на водохранилище" loading="lazy" /></figure>
+    <main id="content" class="interior-page" tabindex="-1"><section class="home-hero editorial-hero editorial-about-hero" id="top" aria-labelledby="page-title"><img src="./images/destinations/mozhaysk.jpg" srcset="./images/mobile/destinations/mozhaysk.jpg 768w, ./images/destinations/mozhaysk.jpg 1536w" sizes="100vw" alt="Бунгало на лесном берегу большого водоёма" fetchpriority="high" loading="eager"><div class="home-hero-bottom"><div><p class="home-location">Можайское водохранилище · Об отеле</p><h1 id="page-title">Семейный отдых.<br>В своём ритме.</h1></div><p class="editorial-hero-lead">A’MORE Collection — семейный отель на Можайском водохранилище. Хаусботы у воды, лесные прогулки и занятия для всей семьи — здесь легко наполнить день впечатлениями и оставить время для спокойного отдыха.</p></div></section><section class="about-introduction" aria-labelledby="about-family-title"><h2 id="about-family-title">Ближе к природе.<br>Ближе друг к другу.</h2>
+    <div class="about-introduction-copy"><p>Прокатитесь на велосипеде, сыграйте в теннис или отправьтесь на рыбалку. Для неспешного дня выбирайте прогулочные тропы и садовые парники, а для активного — подвижные игры с мячом.</p><p>Для детей есть зоопарк, игровая зона и игры, к которым можно присоединиться всей семьёй. Вечером собирайтесь с близкими в шашлычных зонах, а для особого повода выбирайте павильон для мероприятий.</p><p>Зимой у отдыха своё настроение: ватрушки, каток и прогулки на багги. Доступность зимних занятий зависит от погоды.</p>
+      <nav class="about-introduction-links" aria-label="Узнать больше об отеле">
+        <a class="home-link" href="./spaces.html?city=mozhaysk"><span>Выбрать занятие</span><svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10h22m-6-6 6 6-6 6"></path></svg></a>
+        <a class="home-link" href="./location.html?city=mozhaysk"><span>Расположение отеля</span><svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10h22m-6-6 6 6-6 6"></path></svg></a>
+      </nav>
+    </div></section>
+
+  <section class="page-story editorial-story">
+    <figure class="media"><img src="./images/rooms/mozhaysk/comfort.jpg" srcset="./images/mobile/rooms/mozhaysk/comfort.jpg 768w, ./images/rooms/mozhaysk/comfort.jpg 1536w" sizes="(max-width: 700px) 100vw, 58vw" alt="Просторная светлая спальня с креслом и угловым окном на водохранилище" loading="lazy"></figure>
     <div class="page-story-copy"><p class="chapter-number">01</p><h2>Хаусботы с видом на природу.</h2><p>Угловое окно, открытый вид на берег и кресло для чтения.</p></div>
-  </section><section class="page-story page-story-reverse">
-    <figure class="media"><img src="./images/hotel/moscow/bungalows/experience/night-firepit.jpg" srcset="./images/mobile/hotel/moscow/bungalows/experience/night-firepit.jpg 1280w, ./images/hotel/moscow/bungalows/experience/night-firepit.jpg 1536w" sizes="(max-width: 700px) 100vw, 50vw" alt="Костровая зона у воды" loading="lazy" /></figure>
+  </section><section class="page-story page-story-reverse editorial-story editorial-story-dark">
+    <figure class="media"><img src="./images/hotel/moscow/bungalows/experience/night-firepit.jpg" srcset="./images/mobile/hotel/moscow/bungalows/experience/night-firepit.jpg 1280w, ./images/hotel/moscow/bungalows/experience/night-firepit.jpg 1536w" sizes="(max-width: 700px) 100vw, 58vw" alt="Костровая зона у воды" loading="lazy"></figure>
     <div class="page-story-copy"><p class="chapter-number">02</p><h2>Вечер у костра.</h2><p>Костровая зона и место для отдыха на берегу.</p></div>
   </section>
-  <aside class="page-next"><h2>Место для вашего отдыха.</h2><a class="primary-action" data-page-link href="./rooms.html?city=mozhaysk">Посмотреть хаусботы</a></aside>
-    </main>
+  <aside class="editorial-next"><h2>Место для вашего отдыха.</h2><a class="home-link" data-page-link="" href="./rooms.html?city=mozhaysk"><span>Посмотреть хаусботы</span><svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10h22m-6-6 6 6-6 6"></path></svg></a></aside></main>
 
-    <footer class="site-footer">
-      <a class="footer-wordmark" data-page-link href="./hotel.html" aria-label="A’MORE Collection — на главную">A’MORE <small>COLLECTION</small></a>
-      <p>Можайское водохранилище · Руза · Красноярск</p>
-      <a class="back-top" href="#top">К началу</a>
-    </footer>
-    <dialog id="destination-dialog" class="destination-dialog" aria-labelledby="destination-title">
-      <button class="destination-close" type="button" data-destination-close aria-label="Закрыть выбор отеля"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg></button>
-      <div class="destination-layout">
-        <div class="destination-preview" aria-hidden="true"><div class="destination-preview-images"></div><span class="destination-preview-index"><span data-destination-index>01</span> / 03</span></div>
-        <div class="destination-panel">
-          <div class="destination-brand" aria-label="A’MORE Collection"><span class="brand-name">A’MORE</span><span class="brand-collection">COLLECTION</span></div>
-          <h2 id="destination-title" tabindex="-1">Отели коллекции</h2>
-          <fieldset class="destination-fieldset"><legend class="sr-only">Отель</legend><div class="destination-options"></div></fieldset>
-          <button class="destination-confirm" type="button" data-destination-confirm>Продолжить</button>
-        </div>
-      </div>
-    </dialog>
-    <p class="sr-only" aria-live="polite" id="city-status"></p>
+    <footer class="home-footer"><a class="home-brand" href="./hotel.html?city=mozhaysk">A’MORE <span>COLLECTION</span></a><span>Московская область,<br>Можайское водохранилище</span><a class="home-link" href="./"><span>Все отели</span><svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10h22m-6-6 6 6-6 6"></path></svg></a></footer>
+
+
     <noscript>Сейчас показано Можайское водохранилище. <a href="./">Выбрать другой отель</a>.</noscript>
-  </body>
+
+
+</body>
 </html>
