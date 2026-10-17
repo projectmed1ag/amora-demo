@@ -1,6 +1,6 @@
-import { applyCollectionShell, addCollectionStyle } from './collection-site-shell.js?v=about-1';
-import { renderCollectionLeisure } from './collection-leisure.js?v=nearby-photos-1';
-import { enhanceNearbyPlaces } from './collection-nearby.js?v=nearby-photos-1';
+import { applyCollectionShell, addCollectionStyle } from './collection-site-shell.js?v=device-1';
+import { renderCollectionLeisure } from './collection-leisure.js?v=device-1';
+import { enhanceNearbyPlaces } from './collection-nearby.js?v=device-1';
 
 const arrow = '<svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10h22m-6-6 6 6-6 6"/></svg>';
 
@@ -69,7 +69,7 @@ export function enhanceCollectionSpaces() {
     oldAside.replaceWith(aside);
   }
   if (main.querySelector('#nearby')) {
-    addCollectionStyle('collection-nearby-style', './collection-nearby.css?v=nearby-photos-1');
+    addCollectionStyle('collection-nearby-style', './collection-nearby.css?v=device-1');
     enhanceNearbyPlaces(main.querySelector('#nearby'));
   }
   main.querySelectorAll('.cl-image-note, .cl-detail-photo figcaption').forEach(note => note.remove());

@@ -1,4 +1,4 @@
-import { applyCollectionShell } from './collection-site-shell.js?v=about-1';
+import { applyCollectionShell } from './collection-site-shell.js?v=device-1';
 
 const arrow = '<svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10h22m-6-6 6 6-6 6"/></svg>';
 const close = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 5 14 14M19 5 5 19"/></svg>';
