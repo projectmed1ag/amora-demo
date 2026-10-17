@@ -43,6 +43,9 @@
 .nearby-map-toolbar button > span { margin-left: 14px; }
 .nearby-map-toolbar button:disabled { opacity: .6; cursor: default; }
 .nearby-map-toolbar [data-nearby-touch] { display: none; }
+.cl-nearby.has-touch-map-controls [data-nearby-touch] { display: block; margin-left: auto; }
+.nearby-map-stage:not(.is-interactive) .nearby-map { touch-action: pan-y; }
+.nearby-map-stage.is-interactive .nearby-map { touch-action: none; }
 .nearby-map .leaflet-control-zoom { border: 1px solid #23261f40; border-radius: 0; box-shadow: none; overflow: visible; }
 .nearby-map .leaflet-control-zoom a { width: 44px; height: 44px; line-height: 44px; border-radius: 0 !important; background: #f6f3ed; color: #23261f; font-weight: 400; }
 .nearby-map .leaflet-control-zoom a:focus-visible { position: relative; z-index: 1; outline-offset: -3px; outline-color: #9b7b44; }
@@ -87,11 +90,8 @@
   .nearby-layout { display: flex; flex-direction: column; gap: 26px; padding-top: 20px; }
   .nearby-map-column { order: -1; }
   .nearby-map-stage { flex: none; min-height: 0; height: 420px; }
-  .nearby-map-stage:not(.is-interactive) .nearby-map { touch-action: pan-y; }
-  .nearby-map-stage.is-interactive .nearby-map { touch-action: none; }
   .nearby-map-toolbar { top: 12px; left: 12px; right: 12px; gap: 6px; }
   .nearby-map-toolbar button { padding-inline: 12px; font-size: 11px; }
-  .nearby-map-toolbar [data-nearby-touch] { display: block; margin-left: auto; }
   .nearby-map-toolbar button > span { margin-left: 7px; }
   .nearby-map .leaflet-control-attribution { max-width: 250px; font-size: 9px; }
   .nearby-place-list button { min-height: 62px; font-size: 14px; }

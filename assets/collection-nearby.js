@@ -63,7 +63,9 @@ export function enhanceNearbyPlaces(section) {
   const overview = section.querySelector('[data-nearby-overview]');
   const touchToggle = section.querySelector('[data-nearby-touch]');
   const buttons = [...section.querySelectorAll('[data-nearby-place]')];
-  const narrow = matchMedia('(max-width: 700px)');
+  const compact = matchMedia('(max-width: 1100px)');
+  const coarsePointer = matchMedia('(any-pointer: coarse)');
+  const needsTouchControl = () => compact.matches || coarsePointer.matches;
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
   let selected = initialPlace();
   let map, tiles, L, starting, loadTimer, tileErrors = 0, attempts = 0;
@@ -135,24 +137,28 @@ export function enhanceNearbyPlaces(section) {
   }
 
   function fitOverview() {
-    const bounds = narrow.matches ? nearbyPlaces.map(place => place.coordinates) : overviewBounds;
+    const bounds = canvas.clientWidth < 600 ? nearbyPlaces.map(place => place.coordinates) : overviewBounds;
     moveCamera(() => map.fitBounds(bounds, { padding: [36, 48], animate: !motion.matches, duration: 0.5 }));
   }
 
   function syncTouch() {
     if (!map) return;
-    const active = !narrow.matches || touchToggle.getAttribute('aria-pressed') === 'true';
+    const guarded = needsTouchControl();
+    const active = !guarded || touchToggle.getAttribute('aria-pressed') === 'true';
     map.dragging[active ? 'enable' : 'disable']();
     map.touchZoom[active ? 'enable' : 'disable']();
+    map.doubleClickZoom[active ? 'enable' : 'disable']();
     stage.classList.toggle('is-interactive', active);
-    touchToggle.textContent = active && narrow.matches ? 'Прокручивать страницу' : 'Двигать карту';
+    section.classList.toggle('has-touch-map-controls', guarded);
+    touchToggle.textContent = active && guarded ? 'Прокручивать страницу' : 'Двигать карту';
   }
 
   touchToggle.addEventListener('click', () => {
     touchToggle.setAttribute('aria-pressed', String(touchToggle.getAttribute('aria-pressed') !== 'true'));
     syncTouch();
   });
-  narrow.addEventListener('change', syncTouch);
+  compact.addEventListener('change', syncTouch);
+  coarsePointer.addEventListener('change', syncTouch);
   overview.addEventListener('click', fitOverview);
 
   function watchTiles() {
@@ -181,9 +187,9 @@ export function enhanceNearbyPlaces(section) {
       map = L.map(canvas, {
         zoomControl: false,
         scrollWheelZoom: false,
-        dragging: !narrow.matches,
-        touchZoom: !narrow.matches,
-        doubleClickZoom: !narrow.matches,
+        dragging: !needsTouchControl(),
+        touchZoom: !needsTouchControl(),
+        doubleClickZoom: !needsTouchControl(),
         minZoom: 8,
         maxZoom: nearbyBasemap.maxZoom,
         zoomAnimation: !motion.matches,

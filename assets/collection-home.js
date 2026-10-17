@@ -1,4 +1,4 @@
-import { applyCollectionShell } from './collection-site-shell.js?v=about-1';
+import { applyCollectionShell } from './collection-site-shell.js?v=device-1';
 const arrow='<svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10h22m-6-6 6 6-6 6"/></svg>';
 const rooms=[
 {id:'standard',title:'Стандарт',image:'standard-houseboat/exterior-day',meta:'До 2 гостей · 24 м²',description:'Светлая спальня с видом на воду и небольшим рабочим столом.'},

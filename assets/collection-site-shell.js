@@ -14,7 +14,7 @@ export function applyCollectionShell(page, { light = false } = {}) {
   document.body.classList.add('collection-home-page', 'collection-site-page');
   document.documentElement.classList.add('collection-home-root');
   addCollectionStyle('collection-home-style', './collection-home.css?v=home-1');
-  addCollectionStyle('collection-site-shell-style', './collection-site-shell.css?v=site-1');
+  addCollectionStyle('collection-site-shell-style', './collection-site-shell.css?v=device-1');
   let header = document.querySelector('.site-header, .home-header');
   if (!header) {
     header = document.createElement('header');
