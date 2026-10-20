@@ -1,5 +1,5 @@
-export const homeHeader = "\n<a class=\"home-brand\" href=\"./hotel.html?city=mozhaysk\">A’MORE <span>COLLECTION</span></a>\n<nav class=\"home-nav\" id=\"home-nav\" aria-label=\"Разделы сайта\">\n<a href=\"./hotel.html?city=mozhaysk\" aria-current=\"page\">Главная</a>\n<a href=\"./rooms.html?city=mozhaysk\">Хаусботы</a>\n<a href=\"./spaces.html?city=mozhaysk\">Досуг</a>\n<a href=\"./gallery.html?city=mozhaysk\">Галерея</a>\n<a href=\"./about.html?city=mozhaysk\">Об отеле</a>\n</nav>\n<div class=\"home-header-end\"><a href=\"./\">Отели</a><button class=\"home-menu\" type=\"button\" aria-label=\"Открыть меню\" aria-controls=\"home-nav\" aria-expanded=\"false\"><span></span><span></span></button></div>\n";
-export const homeFooter = "<a class=\"home-brand\" href=\"./hotel.html?city=mozhaysk\">A’MORE <span>COLLECTION</span></a><span>Московская область,<br>Можайское водохранилище</span><a class=\"home-link\" href=\"./\"><span>Все отели</span><svg viewBox=\"0 0 28 20\" aria-hidden=\"true\"><path d=\"M2 10h22m-6-6 6 6-6 6\"/></svg></a>";
+export const homeHeader = "\n<a class=\"home-brand amore-logo\" href=\"./hotel.html?city=mozhaysk\" aria-label=\"A’MORE Collection — на главную\"><span class=\"brand-name\">A’MORE</span><span class=\"brand-collection\">COLLECTION</span></a>\n<nav class=\"home-nav\" id=\"home-nav\" aria-label=\"Разделы сайта\">\n<a href=\"./hotel.html?city=mozhaysk\" aria-current=\"page\">Главная</a>\n<a href=\"./rooms.html?city=mozhaysk\">Хаусботы</a>\n<a href=\"./spaces.html?city=mozhaysk\">Досуг</a>\n<a href=\"./gallery.html?city=mozhaysk\">Галерея</a>\n<a href=\"./about.html?city=mozhaysk\">Об отеле</a>\n</nav>\n<div class=\"home-header-end\"><a href=\"./\">Отели</a><button class=\"home-menu\" type=\"button\" aria-label=\"Открыть меню\" aria-controls=\"home-nav\" aria-expanded=\"false\"><span></span><span></span></button></div>\n";
+export const homeFooter = "<a class=\"home-brand amore-logo\" href=\"./hotel.html?city=mozhaysk\" aria-label=\"A’MORE Collection — на главную\"><span class=\"brand-name\">A’MORE</span><span class=\"brand-collection\">COLLECTION</span></a><span>Московская область,<br>Можайское водохранилище</span><a class=\"home-link\" href=\"./\"><span>Все отели</span><svg viewBox=\"0 0 28 20\" aria-hidden=\"true\"><path d=\"M2 10h22m-6-6 6 6-6 6\"/></svg></a>";
 export function addCollectionStyle(id, file) {
   if (document.getElementById(id)) return;
   const link = document.createElement('link');
@@ -14,7 +14,8 @@ export function applyCollectionShell(page, { light = false } = {}) {
   document.body.classList.add('collection-home-page', 'collection-site-page');
   document.documentElement.classList.add('collection-home-root');
   addCollectionStyle('collection-home-style', './collection-home.css?v=home-1');
-  addCollectionStyle('collection-site-shell-style', './collection-site-shell.css?v=device-1');
+  addCollectionStyle('collection-site-shell-style', './collection-site-shell.css?v=header-2');
+  addCollectionStyle('collection-brand-style', './collection-brand.css?v=original-1');
   let header = document.querySelector('.site-header, .home-header');
   if (!header) {
     header = document.createElement('header');
