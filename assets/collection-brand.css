@@ -1,0 +1,72 @@
+/* Original A’MORE wordmark from the pre-redesign site (563e554).
+   Brand artwork is locked by the owner. See AGENTS.md before changing it. */
+@font-face {
+  font-family: 'AMore Original Logo';
+  src: url('../fonts/spectral-400-latin.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+.amore-logo {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  gap: 5px;
+  min-height: 44px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.amore-logo .brand-name {
+  margin: 0;
+  padding-left: .15em;
+  font-family: 'AMore Original Logo', Spectral, Georgia, 'Times New Roman', serif;
+  font-size: 33px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.amore-logo .brand-collection {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding-left: .45em;
+  font: 400 8px/1.5 'AMore Original Logo', Spectral, Georgia, 'Times New Roman', serif;
+  letter-spacing: .45em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.amore-logo .brand-collection::before,
+.amore-logo .brand-collection::after {
+  content: '';
+  display: block;
+  flex: none;
+  width: 23px;
+  height: 1px;
+  background: #a89268;
+}
+
+@media (min-width: 701px) and (max-width: 1000px) {
+  .amore-logo .brand-name { font-size: 27px; }
+}
+
+@media (max-width: 700px) {
+  .amore-logo { gap: 4px; }
+  .amore-logo .brand-name { font-size: 24px; letter-spacing: .11em; }
+  .amore-logo .brand-collection { font-size: 6px; letter-spacing: .32em; gap: 5px; }
+  .amore-logo .brand-collection::before,
+  .amore-logo .brand-collection::after { width: 13px; }
+}
+
+@media (max-width: 360px) {
+  .amore-logo .brand-name { font-size: 21px; }
+}
