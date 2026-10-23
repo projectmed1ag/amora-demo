@@ -17,6 +17,14 @@ const services = Object.freeze({
     back: 'Вернуться к ресторану',
     action: 'Забронировать столик',
   },
+  pavilion: {
+    name: 'Аренда павильона',
+    title: 'Аренда павильона.',
+    page: './pavilions.html?city=mozhaysk',
+    description: 'Заявка на аренду павильона для праздника или встречи. Укажите желаемую дату, время и число гостей.',
+    back: 'Вернуться к павильонам',
+    action: 'Оставить заявку на аренду',
+  },
 });
 
 const visitFields = ['service', 'date', 'time', 'guests'];
@@ -46,7 +54,7 @@ function validDate(value) {
 
 function validateVisit(values, now) {
   const errors = {};
-  if (!Object.hasOwn(services, values.service || '')) errors.service = 'Выберите баню или столик в ресторане.';
+  if (!Object.hasOwn(services, values.service || '')) errors.service = 'Выберите услугу.';
   const today = serviceLocalDate(now);
   if (!validDate(values.date)) errors.date = 'Укажите корректную дату посещения.';
   else if (values.date < today) errors.date = 'Дата посещения не может быть в прошлом.';
@@ -59,7 +67,9 @@ function validateVisit(values, now) {
     if (hours * 60 + minutes <= currentMinutes) errors.time = 'Выберите время позже текущего времени по Москве.';
   }
   const guests = Number(values.guests);
-  if (!Number.isInteger(guests) || guests < 1 || guests > 20) errors.guests = 'Укажите целое число гостей от 1 до 20.';
+  if (values.service === 'pavilion') {
+    if (!Number.isSafeInteger(guests) || guests < 1) errors.guests = 'Укажите целое число гостей больше нуля.';
+  } else if (!Number.isInteger(guests) || guests < 1 || guests > 20) errors.guests = 'Укажите целое число гостей от 1 до 20.';
   return errors;
 }
 

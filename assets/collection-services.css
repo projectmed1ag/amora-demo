@@ -358,6 +358,32 @@ body.collection-service-page[data-page] #content #service-visit-summary { margin
   .service-reservation-panel .service-fields { grid-template-columns: minmax(0, 1fr); }
 }
 
+@media (max-width: 700px) {
+  body.collection-service-page:is([data-page='banya'], [data-page='restaurant']) #content .service-heading h1,
+  body.collection-service-page:is([data-page='banya'], [data-page='restaurant']) #content .service-heading-copy,
+  body.collection-service-page:is([data-page='banya'], [data-page='restaurant']) #content .service-description {
+    text-align: center;
+  }
+  body.collection-service-page:is([data-page='banya'], [data-page='restaurant']) #content .service-page-links {
+    justify-content: center;
+  }
+  body.collection-service-page:is([data-page='banya'], [data-page='restaurant']) #content .service-experience {
+    gap: 0;
+    padding: 0;
+  }
+  body.collection-service-page:is([data-page='banya'], [data-page='restaurant']) #content .service-experience > .service-reservation-panel {
+    position: relative;
+    z-index: 1;
+    width: calc(100% - 32px);
+    margin: -36px 16px 0;
+    padding: 28px 20px;
+    background: #fff;
+  }
+  body.collection-service-page:is([data-page='banya'], [data-page='restaurant']) #content .service-reservation-panel > :is(.service-eyebrow, h2, .service-reservation-intro) {
+    text-align: center;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   body.collection-service-page[data-page] #content .service-action { transition: none; }
 }

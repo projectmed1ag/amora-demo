@@ -104,7 +104,7 @@ export function createScreenSwitcher({ main, getTargets, getOffset, onUpdate = (
     interacted = true;
     // Keep one fresh intent while the current scene settles. Repeated commands
     // replace that intent rather than restarting the animation or getting lost.
-    if (movement && !immediate && !reduced.matches && !nativeScrolling.matches) {
+    if (movement && !immediate && !reduced.matches) {
       queued?.resolve(false);
       queued = null;
       if (element === movement.target) return true;
@@ -312,32 +312,32 @@ export function createScreenSwitcher({ main, getTargets, getOffset, onUpdate = (
   }
 
   function touchstart(event) {
-    if (nativeScrolling.matches) {
-      interacted = true;
-      touch = null;
-      // A finger gesture must immediately take over from a tapped chapter link.
-      cancel();
+    const menuOpen = document.querySelector('.home-menu-toggle:checked, .site-header.menu-open, .site-header [aria-expanded="true"]');
+    if (menuOpen || event.touches.length !== 1 || isEditable(event.target)) { touch = null; return; }
+    syncTargets();
+    if (!movement) {
       const selected = fromScroll();
       if (selected && selected !== current) activate(selected);
-      return;
     }
-    if (event.touches.length !== 1 || isEditable(event.target)) { touch = null; return; }
     const point = event.touches[0];
-    touch = { x: point.clientX, y: point.clientY, lastY: point.clientY, target: event.target, blocked: false, reading: false, ignored: false };
+    touch = { x: point.clientX, y: point.clientY, lastY: point.clientY, target: event.target, axis: null, blocked: false, reading: false, ignored: false };
     interacted = true;
   }
 
   function touchmove(event) {
-    if (nativeScrolling.matches) return;
     if (!touch || event.touches.length !== 1) { touch = null; return; }
     const point = event.touches[0];
     const dy = touch.y - point.clientY;
     const dx = touch.x - point.clientX;
-    if (Math.abs(dy) < 8 || Math.abs(dx) > Math.abs(dy)) return;
+    if (!touch.axis) {
+      if (Math.max(Math.abs(dx), Math.abs(dy)) < 8) return;
+      touch.axis = Math.abs(dx) > Math.abs(dy) ? 'horizontal' : 'vertical';
+    }
+    // Horizontal photo gestures and pinch zoom keep their normal owner.
+    if (touch.axis !== 'vertical' || touch.ignored) return;
     const direction = Math.sign(dy);
     if (nestedScroll(touch.target, direction)) { touch.ignored = true; return; }
     syncTargets();
-    if (touch.ignored) { event.preventDefault(); return; }
     if (movement) {
       event.preventDefault();
       touch.blocked = endOf(movement.target) <= startOf(movement.target) + 2 && !!neighbour(direction);
@@ -346,11 +346,10 @@ export function createScreenSwitcher({ main, getTargets, getOffset, onUpdate = (
     if (!touch.blocked && (touch.reading || canRead(direction))) {
       touch.reading = true;
       const delta = touch.lastY - point.clientY;
-      const edge = direction > 0 ? endOf(current) : startOf(current);
-      if (direction > 0 ? scrollY + delta > edge : scrollY + delta < edge) {
-        event.preventDefault();
-        instantScroll(edge);
-      }
+      // Keep a reading gesture inside its tall chapter, including its momentum.
+      // A fresh swipe at the edge advances exactly one chapter, like an arrow.
+      event.preventDefault();
+      instantScroll(Math.max(startOf(current), Math.min(endOf(current), scrollY + delta)));
       touch.lastY = point.clientY;
       return;
     }
@@ -412,22 +411,23 @@ export function createScreenSwitcher({ main, getTargets, getOffset, onUpdate = (
     wheelLatched = false;
     root.classList.toggle('collection-native-scroll', nativeScrolling.matches);
     root.dataset.chapterScroll = nativeScrolling.matches ? 'native' : 'scenes';
-    // Native touch scrolling must not wait for a non-passive document listener.
+    // Only the chapter surface owns vertical swipes. Menus and other pages keep
+    // their native scrolling, and mobile browser chrome never resizes a scene.
     window.removeEventListener('wheel', wheel, gestureOptions);
-    window.removeEventListener('touchmove', touchmove, gestureOptions);
+    main.removeEventListener('touchmove', touchmove, gestureOptions);
+    main.addEventListener('touchmove', touchmove, gestureOptions);
     if (!nativeScrolling.matches) {
       window.addEventListener('wheel', wheel, gestureOptions);
-      window.addEventListener('touchmove', touchmove, gestureOptions);
     }
   }
   syncInputMode();
   listen(nativeScrolling, 'change', syncInputMode);
   removers.push(() => {
     window.removeEventListener('wheel', wheel, gestureOptions);
-    window.removeEventListener('touchmove', touchmove, gestureOptions);
+    main.removeEventListener('touchmove', touchmove, gestureOptions);
   });
   listen(window, 'keydown', keydown);
-  listen(window, 'touchstart', touchstart, { passive: true });
+  listen(main, 'touchstart', touchstart, { passive: true });
   listen(window, 'touchend', touchend, { passive: true });
   listen(window, 'touchcancel', () => { touch = null; }, { passive: true });
   listen(window, 'scroll', () => {

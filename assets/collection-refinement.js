@@ -1,6 +1,7 @@
 // Shared progressive enhancements. Content, ordinary links and the locked
 // A’MORE artwork remain usable without this module.
-import { createScreenSwitcher } from './collection-screen-switcher.js?v=20261023-mobile-scroll-1';
+import { createScreenSwitcher } from './collection-screen-switcher.js?v=20261023-mobile-swipe-1';
+import { initHeadingFormat } from './collection-heading-format.js?v=20261023-local-nav-restored-1';
 
 const headerSelector = '.home-header, .site-header';
 const cityNames = new Set(['mozhaysk', 'ruza', 'krasnoyarsk']);
@@ -37,8 +38,8 @@ function closeMobileMenu(header) {
 const primarySections = [
   ['home-hero', 'home', 'Начало'],
   ['home-stays', 'stays', 'Хаусботы'],
-  ['home-banya', 'banya', 'Баня'],
   ['home-restaurant', 'restaurant', 'Ресторан'],
+  ['home-banya', 'banya', 'Баня'],
   ['home-leisure', 'leisure', 'Развлечения и активный отдых'],
 ];
 const destinationSections = [
@@ -290,6 +291,7 @@ function initializeRefinement() {
   document.fonts?.ready.then(scheduleRefresh);
   if (header && 'ResizeObserver' in window) new ResizeObserver(scheduleRefresh).observe(header);
   scheduleRefresh();
+  initHeadingFormat();
 }
 
 if (document.readyState === 'loading') {

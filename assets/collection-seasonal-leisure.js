@@ -1,4 +1,4 @@
-import { getSeasonForDate, getSeasonActivities, seasonLabels } from './collection-seasons.js?v=20261023-leisure-catalog-1';
+import { getSeasonForDate, getSeasonActivities, seasonLabels } from './collection-seasons.js?v=20261023-local-menu-seasons-1';
 
 const knownSeason = value => Object.hasOwn(seasonLabels, value || '');
 
@@ -60,6 +60,15 @@ function initializeSeasonalLeisure() {
     buttons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.seasonChoice === season)));
     dateInput.value = date;
     overview.dataset.season = season;
+    overview.dispatchEvent(new CustomEvent('collection:leisure-season', { detail: { season } }));
+    overview.querySelectorAll('.entertainment-rental-link').forEach(link => {
+      const target = new URL(link.href, location.href);
+      if (season === 'all') target.searchParams.delete('season');
+      else target.searchParams.set('season', season);
+      if (date) target.searchParams.set('date', date);
+      else target.searchParams.delete('date');
+      link.href = target.href;
+    });
     overview.dataset.seasonReady = '';
     controls.hidden = false;
     status.textContent = `${season === 'all' ? 'Все виды отдыха' : seasonLabels[season]}${date ? ' · по выбранной дате' : ''}. Показано занятий: ${count}.`;
