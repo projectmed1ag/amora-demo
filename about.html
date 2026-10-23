@@ -25,7 +25,7 @@
   const [folder, nestedFile] = relative.split('/');
   const cityFolder = ['ruza', 'krasnoyarsk'].includes(folder) ? folder : null;
   const file = cityFolder ? nestedFile : folder;
-  if (!/^(hotel|rooms|spaces|gallery|about|location|booking|leisure-[a-z]+)\.html$/.test(file || '')) return;
+  if (!/^(hotel|rooms|spaces|about|location|booking|leisure-[a-z]+)\.html$/.test(file || '')) return;
   const cities = new Map([['moscow', 'mozhaysk'], ['petersburg', 'ruza'], ['mozhaysk', 'mozhaysk'], ['ruza', 'ruza'], ['krasnoyarsk', 'krasnoyarsk']]);
   const normalize = city => cities.get(city) || null;
   let saved;
@@ -50,7 +50,7 @@
   }
 })();
 </script>
-    <script type="module" src="./assets/collection-runtime.js?v=20261023-entertainment-2"></script>
+    <script type="module" src="./assets/collection-runtime.js?v=20261023-photo-response-3"></script>
       <link rel="preload" href="./fonts/amore-condensed-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="./assets/collection-refinement.css?v=20261023-entertainment-2">
     <link rel="stylesheet" href="./assets/collection-refinement-pages.css?v=20261023-responsive-1">
@@ -58,7 +58,7 @@
     <script type="module" src="./assets/collection-refinement.js?v=20261023-entertainment-2"></script>
       <link rel="stylesheet" href="./assets/collection-page-motion.css?v=20261022-1">
     <script type="module" src="./assets/collection-page-motion.js?v=20261022-1"></script>
-    <link rel="stylesheet" href="./assets/collection-about.css?v=20261023-image-1">
+    <link rel="stylesheet" href="./assets/collection-about.css?v=20261023-photo-response-3">
   </head>
   <body data-page="about" class="collection-home-page collection-site-page collection-editorial-page collection-about-page" data-collection-static="">
     <a class="skip-link" href="#content">К содержанию</a>
@@ -70,7 +70,6 @@
 <a href="./banya.html?city=mozhaysk">Баня</a>
 <a href="./restaurant.html?city=mozhaysk">Ресторан</a>
 <a href="./spaces.html?city=mozhaysk">Развлечения и активный отдых</a>
-<a href="./gallery.html?city=mozhaysk">Галерея</a>
 <a href="./about.html?city=mozhaysk" aria-current="page">Об отеле</a>
 
 <a class="mobile-hotels-link" href="./">Все отели</a>
@@ -83,7 +82,7 @@
         <div class="about-description-visual">
           <h1 id="page-title">Об отеле.</h1>
           <figure class="about-description-photo">
-            <img src="./images/hotel/moscow/bungalows/hero-wide-day.jpg" srcset="./images/mobile/hotel/moscow/bungalows/hero-wide-day.jpg 1152w, ./images/hotel/moscow/bungalows/hero-wide-day.jpg 1535w" sizes="(max-width: 840px) calc(100vw - 40px), (max-width: 900px) 760px, (max-width: 1440px) 30vw, 400px" width="1535" height="1024" alt="Домики с панорамными окнами и террасами на лесном берегу водохранилища" fetchpriority="high" decoding="async">
+            <img src="./images/responsive/rooms/mozhaysk/standard-houseboat/exterior-day-1920.webp" srcset="./images/responsive/rooms/mozhaysk/standard-houseboat/exterior-day-768.webp 768w, ./images/responsive/rooms/mozhaysk/standard-houseboat/exterior-day-1152.webp 1152w, ./images/responsive/rooms/mozhaysk/standard-houseboat/exterior-day-1536.webp 1536w, ./images/responsive/rooms/mozhaysk/standard-houseboat/exterior-day-1920.webp 1920w" sizes="(max-width: 700px) calc(100vw - 40px), (max-width: 1440px) 92vw, 1320px" width="1920" height="1080" alt="Хаусбот с панорамными окнами и открытой террасой на воде у лесного берега" fetchpriority="high" decoding="async">
           </figure>
         </div>
         <div class="about-description-copy">

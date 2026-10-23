@@ -28,7 +28,7 @@
   const [folder, nestedFile] = relative.split('/');
   const cityFolder = ['ruza', 'krasnoyarsk'].includes(folder) ? folder : null;
   const file = cityFolder ? nestedFile : folder;
-  if (!/^(hotel|rooms|spaces|gallery|about|location|booking|leisure-[a-z]+)\.html$/.test(file || '')) return;
+  if (!/^(hotel|rooms|spaces|about|location|booking|leisure-[a-z]+)\.html$/.test(file || '')) return;
   const cities = new Map([['moscow', 'mozhaysk'], ['petersburg', 'ruza'], ['mozhaysk', 'mozhaysk'], ['ruza', 'ruza'], ['krasnoyarsk', 'krasnoyarsk']]);
   const normalize = city => cities.get(city) || null;
   let saved;
@@ -53,7 +53,7 @@
   }
 })();
 </script>
-    <script type="module" src="./assets/collection-runtime.js?v=20261023-entertainment-2"></script>
+    <script type="module" src="./assets/collection-runtime.js?v=20261023-photo-response-3"></script>
       <link rel="preload" href="./fonts/amore-condensed-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="./assets/collection-refinement.css?v=20261023-entertainment-2">
     <link rel="stylesheet" href="./assets/collection-refinement-pages.css?v=20261023-responsive-1">
@@ -61,8 +61,8 @@
     <script type="module" src="./assets/collection-refinement.js?v=20261023-entertainment-2"></script>
       <link rel="stylesheet" href="./assets/collection-page-motion.css?v=20261022-1">
     <script type="module" src="./assets/collection-page-motion.js?v=20261022-1"></script>
-    <link rel="stylesheet" href="./assets/collection-entertainment.css?v=20261023-gallery-2">
-    <script type="module" src="./assets/collection-entertainment-gallery.js?v=20261023-gallery-2"></script>
+    <link rel="stylesheet" href="./assets/collection-entertainment.css?v=20261023-photo-response-3">
+    <script type="module" src="./assets/collection-entertainment-gallery.js?v=20261023-photo-response-3"></script>
     <script type="module" src="./assets/collection-seasonal-leisure.js?v=20261023-entertainment-prose-1"></script>
       <link rel="stylesheet" href="./assets/collection-trip-planner.css?v=20261022-1">
     <script type="module" src="./assets/collection-trip-planner.js?v=20261023-leisure-catalog-1"></script>
@@ -77,7 +77,6 @@
 <a href="./banya.html?city=mozhaysk">Баня</a>
 <a href="./restaurant.html?city=mozhaysk">Ресторан</a>
 <a href="./spaces.html?city=mozhaysk" aria-current="page">Развлечения и активный отдых</a>
-<a href="./gallery.html?city=mozhaysk">Галерея</a>
 <a href="./about.html?city=mozhaysk">Об отеле</a>
 
 <a class="mobile-hotels-link" href="./">Все отели</a>
@@ -87,7 +86,6 @@
 
 <main id="content" class="interior-page" tabindex="-1">
 <div class="entertainment-overview" data-entertainment-overview="">
-<figure class="entertainment-banner"><img src="./images/mozhaysk/leisure-blend-lake.jpg" width="1600" height="533" alt="Лесной берег и отдых у воды" fetchpriority="high"></figure>
 <header class="entertainment-intro" id="top"><h1>Развлечения и активный отдых.</h1><p>Занятия для детей, прокат инвентаря и отдых на природе.</p>
 <a class="entertainment-map-link" href="#nearby">Карта интересных мест рядом <svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10h22m-6-6 6 6-6 6"/></svg></a></header>
 <div class="entertainment-toolbar" data-season-controls="" hidden>
@@ -96,62 +94,62 @@
 <p class="sr-only" id="entertainment-status" data-season-status="" role="status" aria-live="polite">Все виды отдыха</p>
 </div>
 <div class="entertainment-stories"><section class="entertainment-story entertainment-story-wide" id="children" data-entertainment-story="" data-seasons="winter spring summer autumn" aria-labelledby="entertainment-children-title">
-<figure class="entertainment-photo"><img src="./images/mozhaysk/entertainment-gallery-v1/children-01.webp" srcset="./images/mobile/mozhaysk/entertainment-gallery-v1/children-01.webp 768w, ./images/mozhaysk/entertainment-gallery-v1/children-01.webp 1536w" sizes="(max-width: 800px) calc(100vw - 40px), (max-width: 1680px) 54vw, 800px" width="1536" height="1024" alt="Мама с ребёнком собирают деревянный конструктор за столом у леса и водохранилища" loading="lazy" decoding="async"></figure>
+<figure class="entertainment-photo"><img data-gallery-preview="" src="./images/responsive/entertainment/children-01-384.webp" sizes="(max-width: 700px) calc(100vw - 40px), (max-width: 800px) 91.6vw, (max-width: 1680px) 46.59vw, 800px" width="1536" height="1024" alt="Мама с ребёнком собирают деревянный конструктор за столом у леса и водохранилища" loading="lazy" decoding="async" fetchpriority="low"></figure>
 <div class="entertainment-story-copy"><h2 id="entertainment-children-title">Детям</h2><p class="entertainment-description">Для детей доступны <span data-entertainment-activity="Контактный зоопарк" data-seasons="spring summer autumn"><span data-entertainment-separator=""></span>контактный зоопарк</span><span data-entertainment-activity="Детские игровые зоны" data-seasons="spring summer autumn"><span data-entertainment-separator="">, </span>детские игровые зоны</span><span data-entertainment-activity="Развивающие игры" data-seasons="winter spring summer autumn"><span data-entertainment-separator=""> и </span>развивающие игры на внимание, память и логику</span>. Занятия можно чередовать с прогулками и совместными играми на свежем воздухе.</p></div>
 
 </section>
 <section class="entertainment-story" id="firepit" data-entertainment-story="" data-seasons="winter spring summer autumn" aria-labelledby="entertainment-firepit-title">
-<figure class="entertainment-photo"><img src="./images/mozhaysk/entertainment-gallery-v1/firepit-01.webp" srcset="./images/mobile/mozhaysk/entertainment-gallery-v1/firepit-01.webp 768w, ./images/mozhaysk/entertainment-gallery-v1/firepit-01.webp 1536w" sizes="(max-width: 800px) calc(100vw - 40px), (max-width: 1680px) 54vw, 800px" width="1536" height="1024" alt="Костровой круг с деревянными креслами на берегу водохранилища в сумерках" loading="lazy" decoding="async"></figure>
+<figure class="entertainment-photo"><img data-gallery-preview="" src="./images/responsive/entertainment/firepit-01-384.webp" sizes="(max-width: 700px) calc(100vw - 40px), (max-width: 800px) 91.6vw, (max-width: 1680px) 46.59vw, 800px" width="1536" height="1024" alt="Костровой круг с деревянными креслами на берегу водохранилища в сумерках" loading="lazy" decoding="async" fetchpriority="low"></figure>
 <div class="entertainment-story-copy"><h2 id="entertainment-firepit-title">Костровая зона</h2><p class="entertainment-description"><span data-entertainment-activity="Костровая зона" data-seasons="winter spring summer autumn"><span data-entertainment-separator=""></span>Костровая зона на берегу подходит для семейных вечеров, встреч с друзьями и отдыха у огня после прогулок. Здесь можно собраться компанией, пообщаться и поделиться впечатлениями дня</span>.</p></div>
 
 </section>
 <section class="entertainment-story" id="barbecue" data-entertainment-story="" data-seasons="winter spring summer autumn" aria-labelledby="entertainment-barbecue-title">
-<figure class="entertainment-photo"><img src="./images/mozhaysk/entertainment-gallery-v1/barbecue-01.webp" srcset="./images/mobile/mozhaysk/entertainment-gallery-v1/barbecue-01.webp 768w, ./images/mozhaysk/entertainment-gallery-v1/barbecue-01.webp 1536w" sizes="(max-width: 800px) calc(100vw - 40px), (max-width: 1680px) 54vw, 800px" width="1536" height="1024" alt="Семья обедает в деревянной беседке у лесного берега" loading="lazy" decoding="async"></figure>
+<figure class="entertainment-photo"><img data-gallery-preview="" src="./images/responsive/entertainment/barbecue-01-384.webp" sizes="(max-width: 700px) calc(100vw - 40px), (max-width: 800px) 91.6vw, (max-width: 1680px) 46.59vw, 800px" width="1536" height="1024" alt="Семья обедает в деревянной беседке у лесного берега" loading="lazy" decoding="async" fetchpriority="low"></figure>
 <div class="entertainment-story-copy"><h2 id="entertainment-barbecue-title">Беседки и мангалы</h2><p class="entertainment-description">Для отдыха компанией на территории есть <span data-entertainment-activity="Мангалы" data-seasons="winter spring summer autumn"><span data-entertainment-separator=""></span>мангалы для приготовления еды на открытом воздухе</span><span data-entertainment-activity="Беседки" data-seasons="winter spring summer autumn"><span data-entertainment-separator=""> и </span>беседки для пикников и встреч с друзьями</span>. Здесь можно совместить семейный обед или ужин с прогулками и общением.</p></div>
 
 </section>
 <section class="entertainment-story" id="rental" data-entertainment-story="" data-seasons="spring summer autumn" aria-labelledby="entertainment-rental-title"><span class="entertainment-anchor" id="movement" aria-hidden="true"></span><span class="entertainment-anchor" id="active" aria-hidden="true"></span>
-<figure class="entertainment-photo"><img src="./images/mozhaysk/entertainment-gallery-v1/rental-01.webp" srcset="./images/mobile/mozhaysk/entertainment-gallery-v1/rental-01.webp 768w, ./images/mozhaysk/entertainment-gallery-v1/rental-01.webp 1536w" sizes="(max-width: 800px) calc(100vw - 40px), (max-width: 1680px) 54vw, 800px" width="1536" height="1024" alt="Отец с ребёнком готовят велосипеды к прогулке по лесной дорожке" loading="lazy" decoding="async"></figure>
+<figure class="entertainment-photo"><img data-gallery-preview="" src="./images/responsive/entertainment/rental-01-384.webp" sizes="(max-width: 700px) calc(100vw - 40px), (max-width: 800px) 91.6vw, (max-width: 1680px) 46.59vw, 800px" width="1536" height="1024" alt="Отец с ребёнком готовят велосипеды к прогулке по лесной дорожке" loading="lazy" decoding="async" fetchpriority="low"></figure>
 <div class="entertainment-story-copy"><h2 id="entertainment-rental-title">Прокат инвентаря</h2><p class="entertainment-description">Для прогулок и активного отдыха доступны <span data-entertainment-activity="Велосипеды" data-seasons="spring summer autumn"><span data-entertainment-separator=""></span>взрослые и детские велосипеды в аренду</span><span data-entertainment-activity="Настольный теннис" data-seasons="spring summer autumn"><span data-entertainment-separator="">, </span>теннисные столы с инвентарём для игры</span><span data-entertainment-activity="Мячи" data-seasons="spring summer autumn"><span data-entertainment-separator="">, </span>мячи</span><span data-entertainment-activity="Спортивный инвентарь" data-seasons="spring summer autumn"><span data-entertainment-separator=""> и </span>спортивный инвентарь</span>. Выбирайте велопрогулку, партию в настольный теннис или совместную игру на свежем воздухе.</p></div>
 
 </section>
 <section class="entertainment-story" id="routes" data-entertainment-story="" data-seasons="winter spring summer autumn" aria-labelledby="entertainment-routes-title"><span class="entertainment-anchor" id="nature" aria-hidden="true"></span>
-<figure class="entertainment-photo"><img src="./images/mozhaysk/entertainment-gallery-v1/routes-01.webp" srcset="./images/mobile/mozhaysk/entertainment-gallery-v1/routes-01.webp 768w, ./images/mozhaysk/entertainment-gallery-v1/routes-01.webp 1536w" sizes="(max-width: 800px) calc(100vw - 40px), (max-width: 1680px) 54vw, 800px" width="1536" height="1024" alt="Семья гуляет по лесной тропе у водохранилища" loading="lazy" decoding="async"></figure>
+<figure class="entertainment-photo"><img data-gallery-preview="" src="./images/responsive/entertainment/routes-01-384.webp" sizes="(max-width: 700px) calc(100vw - 40px), (max-width: 800px) 91.6vw, (max-width: 1680px) 46.59vw, 800px" width="1536" height="1024" alt="Семья гуляет по лесной тропе у водохранилища" loading="lazy" decoding="async" fetchpriority="low"></figure>
 <div class="entertainment-story-copy"><h2 id="entertainment-routes-title">Пешие и велосипедные тропы</h2><p class="entertainment-description">По территории можно <span data-entertainment-activity="Пешие тропы" data-seasons="winter spring summer autumn"><span data-entertainment-separator=""></span>гулять пешком по тропинкам</span><span data-entertainment-activity="Велотропы" data-seasons="spring summer autumn"><span data-entertainment-separator=""> и </span>кататься по велотропам</span>. По пути можно сделать остановки для отдыха, фотографий и знакомства с природой.</p></div>
 
 </section>
 <section class="entertainment-story" id="fishing" data-entertainment-story="" data-seasons="winter spring summer autumn" aria-labelledby="entertainment-fishing-title">
-<figure class="entertainment-photo"><img src="./images/mozhaysk/entertainment-gallery-v1/fishing-01.webp" srcset="./images/mobile/mozhaysk/entertainment-gallery-v1/fishing-01.webp 768w, ./images/mozhaysk/entertainment-gallery-v1/fishing-01.webp 1536w" sizes="(max-width: 800px) calc(100vw - 40px), (max-width: 1680px) 54vw, 800px" width="1536" height="1024" alt="Летняя рыбалка с удочкой на естественном берегу" loading="lazy" decoding="async"></figure>
+<figure class="entertainment-photo"><img data-gallery-preview="" src="./images/responsive/entertainment/fishing-01-384.webp" sizes="(max-width: 700px) calc(100vw - 40px), (max-width: 800px) 91.6vw, (max-width: 1680px) 46.59vw, 800px" width="1536" height="1024" alt="Летняя рыбалка с удочкой на естественном берегу" loading="lazy" decoding="async" fetchpriority="low"></figure>
 <div class="entertainment-story-copy"><h2 id="entertainment-fishing-title">Рыбалка</h2><p class="entertainment-description"><span data-entertainment-activity="Рыбалка" data-seasons="winter spring summer autumn"><span data-entertainment-separator=""></span>Рыбалка на водохранилище доступна в любое время года — весной, летом, осенью и зимой. Её можно совместить с прогулкой по берегу, отдыхом на природе и семейной поездкой за город</span>.</p></div>
 
 </section>
 <section class="entertainment-story" id="sup" data-entertainment-story="" data-seasons="summer" aria-labelledby="entertainment-sup-title">
-<figure class="entertainment-photo"><img src="./images/mozhaysk/entertainment-gallery-v1/sup-01.webp" srcset="./images/mobile/mozhaysk/entertainment-gallery-v1/sup-01.webp 768w, ./images/mozhaysk/entertainment-gallery-v1/sup-01.webp 1536w" sizes="(max-width: 800px) calc(100vw - 40px), (max-width: 1680px) 54vw, 800px" width="1536" height="1024" alt="Двое взрослых в спасательных жилетах на сапбордах" loading="lazy" decoding="async"></figure>
+<figure class="entertainment-photo"><img data-gallery-preview="" src="./images/responsive/entertainment/sup-01-384.webp" sizes="(max-width: 700px) calc(100vw - 40px), (max-width: 800px) 91.6vw, (max-width: 1680px) 46.59vw, 800px" width="1536" height="1024" alt="Двое взрослых в спасательных жилетах на сапбордах" loading="lazy" decoding="async" fetchpriority="low"></figure>
 <div class="entertainment-story-copy"><h2 id="entertainment-sup-title">SUP-прогулки</h2><p class="entertainment-description"><span data-entertainment-activity="SUP-прогулки" data-seasons="summer"><span data-entertainment-separator=""></span>Летом на водохранилище доступны SUP-прогулки: катание на доске, тренировка равновесия и знакомство с берегом с воды. Прогулку можно включить в день отдыха вместе с семьёй или друзьями</span>.</p></div>
 
 </section>
 <section class="entertainment-story" id="sunbathing" data-entertainment-story="" data-seasons="summer" aria-labelledby="entertainment-sunbathing-title">
-<figure class="entertainment-photo"><img src="./images/mozhaysk/entertainment-gallery-v1/sunbathing-01.webp" srcset="./images/mobile/mozhaysk/entertainment-gallery-v1/sunbathing-01.webp 768w, ./images/mozhaysk/entertainment-gallery-v1/sunbathing-01.webp 1536w" sizes="(max-width: 800px) calc(100vw - 40px), (max-width: 1680px) 54vw, 800px" width="1536" height="1024" alt="Летний отдых на полотенцах на травяном берегу" loading="lazy" decoding="async"></figure>
+<figure class="entertainment-photo"><img data-gallery-preview="" src="./images/responsive/entertainment/sunbathing-01-384.webp" sizes="(max-width: 700px) calc(100vw - 40px), (max-width: 800px) 91.6vw, (max-width: 1680px) 46.59vw, 800px" width="1536" height="1024" alt="Летний отдых на полотенцах на травяном берегу" loading="lazy" decoding="async" fetchpriority="low"></figure>
 <div class="entertainment-story-copy"><h2 id="entertainment-sunbathing-title">Места для загара</h2><p class="entertainment-description"><span data-entertainment-activity="Места для загара" data-seasons="summer"><span data-entertainment-separator=""></span>У воды предусмотрены места для загара, чтения и отдыха на солнце. Летом здесь можно сделать перерыв между прогулками, катанием на SUP и другими занятиями на территории</span>.</p></div>
 
 </section>
 <section class="entertainment-story" id="winter" data-entertainment-story="" data-seasons="winter" aria-labelledby="entertainment-winter-title">
-<figure class="entertainment-photo"><img src="./images/mozhaysk/entertainment-gallery-v1/winter-01.webp" srcset="./images/mobile/mozhaysk/entertainment-gallery-v1/winter-01.webp 768w, ./images/mozhaysk/entertainment-gallery-v1/winter-01.webp 1536w" sizes="(max-width: 800px) calc(100vw - 40px), (max-width: 1680px) 54vw, 800px" width="1536" height="1024" alt="Семья катается на коньках на открытом катке у зимнего леса" loading="lazy" decoding="async"></figure>
+<figure class="entertainment-photo"><img data-gallery-preview="" src="./images/responsive/entertainment/winter-01-384.webp" sizes="(max-width: 700px) calc(100vw - 40px), (max-width: 800px) 91.6vw, (max-width: 1680px) 46.59vw, 800px" width="1536" height="1024" alt="Семья катается на коньках на открытом катке у зимнего леса" loading="lazy" decoding="async" fetchpriority="low"></figure>
 <div class="entertainment-story-copy"><h2 id="entertainment-winter-title">Зимний отдых</h2><p class="entertainment-description">Зимний отдых дополняют <span data-entertainment-activity="Каток" data-seasons="winter"><span data-entertainment-separator=""></span>каток для катания на коньках</span><span data-entertainment-activity="Снегоходы" data-seasons="winter"><span data-entertainment-separator="">, </span>поездки на снегоходах</span><span data-entertainment-activity="Ватрушки" data-seasons="winter"><span data-entertainment-separator=""> и </span>катание на ватрушках</span>. План на день можно составить под интересы компании и текущую погоду.</p></div>
 
 </section>
 <section class="entertainment-story" id="buggy" data-entertainment-story="" data-seasons="winter spring summer autumn" aria-labelledby="entertainment-buggy-title">
-<figure class="entertainment-photo"><img src="./images/mozhaysk/entertainment-gallery-v1/buggy-01.webp" srcset="./images/mobile/mozhaysk/entertainment-gallery-v1/buggy-01.webp 768w, ./images/mozhaysk/entertainment-gallery-v1/buggy-01.webp 1536w" sizes="(max-width: 800px) calc(100vw - 40px), (max-width: 1680px) 54vw, 800px" width="1536" height="1024" alt="Поездка на багги по грунтовой лесной дороге" loading="lazy" decoding="async"></figure>
+<figure class="entertainment-photo"><img data-gallery-preview="" src="./images/responsive/entertainment/buggy-01-384.webp" sizes="(max-width: 700px) calc(100vw - 40px), (max-width: 800px) 91.6vw, (max-width: 1680px) 46.59vw, 800px" width="1536" height="1024" alt="Поездка на багги по грунтовой лесной дороге" loading="lazy" decoding="async" fetchpriority="low"></figure>
 <div class="entertainment-story-copy"><h2 id="entertainment-buggy-title">Багги</h2><p class="entertainment-description"><span data-entertainment-activity="Багги" data-seasons="winter spring summer autumn"><span data-entertainment-separator=""></span>Поездки на багги подойдут любителям техники, движения и активного отдыха на природе. Доступный формат и возможность выезда зависят от погоды и текущих условий</span>.</p></div>
 
 </section>
 <section class="entertainment-story" id="events" data-entertainment-story="" data-seasons="winter spring summer autumn" aria-labelledby="entertainment-events-title"><span class="entertainment-anchor" id="together" aria-hidden="true"></span>
-<figure class="entertainment-photo"><img src="./images/mozhaysk/entertainment-gallery-v1/events-01.webp" srcset="./images/mobile/mozhaysk/entertainment-gallery-v1/events-01.webp 768w, ./images/mozhaysk/entertainment-gallery-v1/events-01.webp 1536w" sizes="(max-width: 800px) calc(100vw - 40px), (max-width: 1680px) 54vw, 800px" width="1536" height="1024" alt="Семейный праздник за столом в деревянном павильоне" loading="lazy" decoding="async"></figure>
+<figure class="entertainment-photo"><img data-gallery-preview="" src="./images/responsive/entertainment/events-01-384.webp" sizes="(max-width: 700px) calc(100vw - 40px), (max-width: 800px) 91.6vw, (max-width: 1680px) 46.59vw, 800px" width="1536" height="1024" alt="Семейный праздник за столом в деревянном павильоне" loading="lazy" decoding="async" fetchpriority="low"></figure>
 <div class="entertainment-story-copy"><h2 id="entertainment-events-title">Павильоны для праздников</h2><p class="entertainment-description"><span data-entertainment-activity="Павильоны для праздников" data-seasons="winter spring summer autumn"><span data-entertainment-separator=""></span>Павильоны на территории подходят для дней рождения, семейных праздников и встреч с друзьями. Здесь можно собрать гостей вместе, а сам праздник дополнить прогулками, играми и отдыхом на природе</span>.</p></div>
 
 </section>
 <section class="entertainment-story entertainment-story-wide" id="garden" data-entertainment-story="" data-seasons="spring summer autumn" aria-labelledby="entertainment-garden-title">
-<figure class="entertainment-photo"><img src="./images/mozhaysk/entertainment-gallery-v1/garden-01.webp" srcset="./images/mobile/mozhaysk/entertainment-gallery-v1/garden-01.webp 768w, ./images/mozhaysk/entertainment-gallery-v1/garden-01.webp 1536w" sizes="(max-width: 800px) calc(100vw - 40px), (max-width: 1680px) 54vw, 800px" width="1536" height="1024" alt="Небольшая теплица и огород в загородном саду" loading="lazy" decoding="async"></figure>
+<figure class="entertainment-photo"><img data-gallery-preview="" src="./images/responsive/entertainment/garden-01-384.webp" sizes="(max-width: 700px) calc(100vw - 40px), (max-width: 800px) 91.6vw, (max-width: 1680px) 46.59vw, 800px" width="1536" height="1024" alt="Небольшая теплица и огород в загородном саду" loading="lazy" decoding="async" fetchpriority="low"></figure>
 <div class="entertainment-story-copy"><h2 id="entertainment-garden-title">Садовые парники</h2><p class="entertainment-description"><span data-entertainment-activity="Садовые парники" data-seasons="spring summer autumn"><span data-entertainment-separator=""></span>Прогулку по территории дополняют садовые парники и знакомство с растениями. Это повод обсудить с детьми сезонные изменения в саду, условия выращивания и роль укрытий для растений</span>.</p></div>
 
 </section></div>
