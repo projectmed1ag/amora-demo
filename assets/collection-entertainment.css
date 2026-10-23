@@ -1,6 +1,4 @@
 /* Alternating photographs beside a heading and connected description. */
-body.collection-entertainment-page[data-page='spaces'] #content .entertainment-banner { margin: 0; height: clamp(170px, 24vw, 360px); overflow: hidden; }
-body.collection-entertainment-page[data-page='spaces'] #content .entertainment-banner img { width: 100%; height: 100%; object-fit: cover; object-position: center; }
 body.collection-entertainment-page[data-page='spaces'] #content .entertainment-intro { padding: 48px var(--page-gutter) 32px; text-align: center; }
 body.collection-entertainment-page[data-page='spaces'] #content .entertainment-intro h1 { max-width: 1200px; margin: 0 auto; font-size: clamp(46px, 5.3vw, 84px); line-height: 1.02; }
 body.collection-entertainment-page[data-page='spaces'] #content .entertainment-intro > p { max-width: 760px; margin: 24px auto 0; color: #747782; font: 400 16px/1.7 var(--body-font); }
@@ -12,7 +10,7 @@ body.collection-entertainment-page[data-page='spaces'] #content .entertainment-s
 body.collection-entertainment-page[data-page='spaces'] #content .entertainment-season-switch button { min-height: 44px; padding: 10px 0; border: 0; border-bottom: 1px solid transparent; background: transparent; color: #747782; font: 400 14px/1.5 var(--body-font); }
 body.collection-entertainment-page[data-page='spaces'] #content .entertainment-season-switch button[aria-pressed='true'] { border-bottom-color: #303442; color: #303442; font-weight: 700; }
 body.collection-entertainment-page[data-page='spaces'] #content .entertainment-date { color: #747782; font: 400 12px/1.5 var(--body-font); }
-body.collection-entertainment-page[data-page='spaces'] #content .entertainment-date input { display: block; width: 100%; min-width: 0; min-height: 44px; margin-top: 6px; padding: 9px 12px; border: 1px solid #e3e4e8; background: #fff; color: #303442; font: 400 15px/1.5 var(--body-font); color-scheme: light; appearance: none; -webkit-appearance: none; }
+body.collection-entertainment-page[data-page='spaces'] #content .entertainment-date input { display: block; width: 100%; min-width: 0; min-height: 44px; margin-top: 6px; padding: 9px 12px; border: 1px solid #e3e4e8; background: #fff; color: #303442; font: 400 16px/1.5 var(--body-font); color-scheme: light; appearance: none; -webkit-appearance: none; }
 body.collection-entertainment-page[data-page='spaces'] #content .entertainment-stories { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(44px, 5.5vw, 88px); width: 100%; max-width: 1680px; margin: 0 auto; padding: 0 var(--page-gutter); }
 body.collection-entertainment-page[data-page='spaces'] #content .entertainment-story { position: relative; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); grid-template-areas: 'photo copy'; align-items: center; gap: clamp(28px, 4.5vw, 76px); min-width: 0; scroll-margin-top: 0; }
 body.collection-entertainment-page[data-page='spaces'] #content .entertainment-story[hidden] { display: none; }
@@ -28,7 +26,6 @@ body.collection-entertainment-page[data-page='spaces'] #content .entertainment-d
 body.collection-entertainment-page[data-page='spaces'] #content .entertainment-description [data-entertainment-activity] { display: inline; font-weight: 400; }
 body.collection-entertainment-page[data-page='spaces'] #content .entertainment-gallery { position: relative; touch-action: pan-y pinch-zoom; }
 body.collection-entertainment-page[data-page='spaces'] #content .entertainment-gallery > img { position: absolute; inset: 0; z-index: 0; }
-body.collection-entertainment-page[data-page='spaces'] #content .entertainment-gallery > .entertainment-gallery-outgoing { z-index: 1; pointer-events: none; }
 body.collection-entertainment-page[data-page='spaces'] #content .entertainment-gallery-controls { position: absolute; z-index: 2; bottom: 12px; left: 50%; display: flex; align-items: center; gap: 4px; padding: 2px; transform: translateX(-50%); background: rgb(30 34 48 / 84%); color: #fff; }
 body.collection-entertainment-page[data-page='spaces'] #content .entertainment-gallery-controls button { display: grid; place-items: center; flex: none; width: 44px; height: 44px; min-height: 44px; padding: 10px; border: 0; background: transparent; color: inherit; touch-action: manipulation; }
 body.collection-entertainment-page[data-page='spaces'] #content .entertainment-gallery-controls button svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.2; }
@@ -45,7 +42,6 @@ body.collection-entertainment-page[data-page='spaces'] #content .entertainment-w
 }
 
 @media (max-width: 700px) {
-  body.collection-entertainment-page[data-page='spaces'] #content .entertainment-banner { height: 170px; }
   body.collection-entertainment-page[data-page='spaces'] #content .entertainment-intro { padding-top: 32px; padding-bottom: 24px; }
   body.collection-entertainment-page[data-page='spaces'] #content .entertainment-intro h1 { font-size: clamp(42px, 10.8vw, 64px); }
   body.collection-entertainment-page[data-page='spaces'] #content .entertainment-intro > p { margin-top: 20px; font-size: 14px; }

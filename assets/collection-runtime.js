@@ -26,7 +26,7 @@ if (toggle && nav) {
 const page = document.body.dataset.page;
 try {
   if (page === 'rooms' || page === 'gallery') {
-    const { initCollectionPhotos } = await import('./collection-photo-runtime.js?v=20261023-photo-demand-1');
+    const { initCollectionPhotos } = await import('./collection-photo-runtime.js?v=20261023-photo-response-3');
     initCollectionPhotos(page);
   } else if (page === 'booking') {
     const { initCollectionBooking } = await import('./collection-booking-runtime.js?v=20261023-capacity-1');

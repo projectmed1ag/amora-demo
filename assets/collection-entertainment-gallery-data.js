@@ -8,7 +8,8 @@ export const entertainmentGalleries = {
       "width": 1536,
       "height": 1024,
       "mobileWidth": 768,
-      "mobileHeight": 512
+      "mobileHeight": 512,
+      "previewSrc": "images/responsive/entertainment/children-01-384.webp"
     },
     {
       "src": "images/mozhaysk/entertainment-gallery-v1/children-02.webp",
@@ -17,7 +18,8 @@ export const entertainmentGalleries = {
       "width": 1536,
       "height": 1024,
       "mobileWidth": 768,
-      "mobileHeight": 512
+      "mobileHeight": 512,
+      "previewSrc": "images/responsive/entertainment/children-02-384.webp"
     },
     {
       "src": "images/mozhaysk/entertainment-gallery-v1/children-03.webp",
@@ -26,7 +28,8 @@ export const entertainmentGalleries = {
       "width": 1536,
       "height": 1024,
       "mobileWidth": 768,
-      "mobileHeight": 512
+      "mobileHeight": 512,
+      "previewSrc": "images/responsive/entertainment/children-03-384.webp"
     }
   ],
   "firepit": [
@@ -37,7 +40,8 @@ export const entertainmentGalleries = {
       "width": 1536,
       "height": 1024,
       "mobileWidth": 768,
-      "mobileHeight": 512
+      "mobileHeight": 512,
+      "previewSrc": "images/responsive/entertainment/firepit-01-384.webp"
     },
     {
       "src": "images/mozhaysk/entertainment-gallery-v1/firepit-02.webp",
@@ -46,7 +50,8 @@ export const entertainmentGalleries = {
       "width": 1536,
       "height": 1024,
       "mobileWidth": 768,
-      "mobileHeight": 512
+      "mobileHeight": 512,
+      "previewSrc": "images/responsive/entertainment/firepit-02-384.webp"
     },
     {
       "src": "images/mozhaysk/entertainment-gallery-v1/firepit-03.webp",
@@ -55,7 +60,8 @@ export const entertainmentGalleries = {
       "width": 1536,
       "height": 1024,
       "mobileWidth": 768,
-      "mobileHeight": 512
+      "mobileHeight": 512,
+      "previewSrc": "images/responsive/entertainment/firepit-03-384.webp"
     }
   ],
   "barbecue": [
@@ -66,7 +72,8 @@ export const entertainmentGalleries = {
       "width": 1536,
       "height": 1024,
       "mobileWidth": 768,
-      "mobileHeight": 512
+      "mobileHeight": 512,
+      "previewSrc": "images/responsive/entertainment/barbecue-01-384.webp"
     },
     {
       "src": "images/mozhaysk/entertainment-gallery-v1/barbecue-02.webp",
@@ -75,7 +82,8 @@ export const entertainmentGalleries = {
       "width": 1536,
       "height": 1024,
       "mobileWidth": 768,
-      "mobileHeight": 512
+      "mobileHeight": 512,
+      "previewSrc": "images/responsive/entertainment/barbecue-02-384.webp"
     },
     {
       "src": "images/mozhaysk/entertainment-gallery-v1/barbecue-03.webp",
@@ -84,7 +92,8 @@ export const entertainmentGalleries = {
       "width": 1536,
       "height": 1024,
       "mobileWidth": 768,
-      "mobileHeight": 512
+      "mobileHeight": 512,
+      "previewSrc": "images/responsive/entertainment/barbecue-03-384.webp"
     }
   ],
   "rental": [
@@ -95,7 +104,8 @@ export const entertainmentGalleries = {
       "width": 1536,
       "height": 1024,
       "mobileWidth": 768,
-      "mobileHeight": 512
+      "mobileHeight": 512,
+      "previewSrc": "images/responsive/entertainment/rental-01-384.webp"
     },
     {
       "src": "images/mozhaysk/entertainment-gallery-v1/rental-02.webp",
@@ -104,7 +114,8 @@ export const entertainmentGalleries = {
       "width": 1536,
       "height": 1024,
       "mobileWidth": 768,
-      "mobileHeight": 512
+      "mobileHeight": 512,
+      "previewSrc": "images/responsive/entertainment/rental-02-384.webp"
     },
     {
       "src": "images/mozhaysk/entertainment-gallery-v1/rental-03.webp",
@@ -113,7 +124,8 @@ export const entertainmentGalleries = {
       "width": 1536,
       "height": 1024,
       "mobileWidth": 768,
-      "mobileHeight": 512
+      "mobileHeight": 512,
+      "previewSrc": "images/responsive/entertainment/rental-03-384.webp"
     }
   ],
   "routes": [
@@ -124,7 +136,8 @@ export const entertainmentGalleries = {
       "width": 1536,
       "height": 1024,
       "mobileWidth": 768,
-      "mobileHeight": 512
+      "mobileHeight": 512,
+      "previewSrc": "images/responsive/entertainment/routes-01-384.webp"
     },
     {
       "src": "images/mozhaysk/entertainment-gallery-v1/routes-02.webp",
@@ -133,7 +146,8 @@ export const entertainmentGalleries = {
       "width": 1536,
       "height": 1024,
       "mobileWidth": 768,
-      "mobileHeight": 512
+      "mobileHeight": 512,
+      "previewSrc": "images/responsive/entertainment/routes-02-384.webp"
     },
     {
       "src": "images/mozhaysk/entertainment-gallery-v1/routes-03.webp",
@@ -142,7 +156,8 @@ export const entertainmentGalleries = {
       "width": 1536,
       "height": 1024,
       "mobileWidth": 768,
-      "mobileHeight": 512
+      "mobileHeight": 512,
+      "previewSrc": "images/responsive/entertainment/routes-03-384.webp"
     }
   ],
   "fishing": [
@@ -153,7 +168,8 @@ export const entertainmentGalleries = {
       "width": 1536,
       "height": 1024,
       "mobileWidth": 768,
-      "mobileHeight": 512
+      "mobileHeight": 512,
+      "previewSrc": "images/responsive/entertainment/fishing-01-384.webp"
     },
     {
       "src": "images/mozhaysk/entertainment-gallery-v1/fishing-02.webp",
@@ -162,7 +178,8 @@ export const entertainmentGalleries = {
       "width": 1536,
       "height": 1024,
       "mobileWidth": 768,
-      "mobileHeight": 512
+      "mobileHeight": 512,
+      "previewSrc": "images/responsive/entertainment/fishing-02-384.webp"
     },
     {
       "src": "images/mozhaysk/entertainment-gallery-v1/fishing-03.webp",
@@ -171,7 +188,8 @@ export const entertainmentGalleries = {
       "width": 1536,
       "height": 1024,
       "mobileWidth": 768,
-      "mobileHeight": 512
+      "mobileHeight": 512,
+      "previewSrc": "images/responsive/entertainment/fishing-03-384.webp"
     }
   ],
   "sup": [
@@ -182,7 +200,8 @@ export const entertainmentGalleries = {
       "width": 1536,
       "height": 1024,
       "mobileWidth": 768,
-      "mobileHeight": 512
+      "mobileHeight": 512,
+      "previewSrc": "images/responsive/entertainment/sup-01-384.webp"
     },
     {
       "src": "images/mozhaysk/entertainment-gallery-v1/sup-02.webp",
@@ -191,7 +210,8 @@ export const entertainmentGalleries = {
       "width": 1536,
       "height": 1024,
       "mobileWidth": 768,
-      "mobileHeight": 512
+      "mobileHeight": 512,
+      "previewSrc": "images/responsive/entertainment/sup-02-384.webp"
     },
     {
       "src": "images/mozhaysk/entertainment-gallery-v1/sup-03.webp",
@@ -200,7 +220,8 @@ export const entertainmentGalleries = {
       "width": 1536,
       "height": 1024,
       "mobileWidth": 768,
-      "mobileHeight": 512
+      "mobileHeight": 512,
+      "previewSrc": "images/responsive/entertainment/sup-03-384.webp"
     }
   ],
   "sunbathing": [
@@ -211,7 +232,8 @@ export const entertainmentGalleries = {
       "width": 1536,
       "height": 1024,
       "mobileWidth": 768,
-      "mobileHeight": 512
+      "mobileHeight": 512,
+      "previewSrc": "images/responsive/entertainment/sunbathing-01-384.webp"
     },
     {
       "src": "images/mozhaysk/entertainment-gallery-v1/sunbathing-02.webp",
@@ -220,7 +242,8 @@ export const entertainmentGalleries = {
       "width": 1536,
       "height": 1024,
       "mobileWidth": 768,
-      "mobileHeight": 512
+      "mobileHeight": 512,
+      "previewSrc": "images/responsive/entertainment/sunbathing-02-384.webp"
     },
     {
       "src": "images/mozhaysk/entertainment-gallery-v1/sunbathing-03.webp",
@@ -229,7 +252,8 @@ export const entertainmentGalleries = {
       "width": 1536,
       "height": 1024,
       "mobileWidth": 768,
-      "mobileHeight": 512
+      "mobileHeight": 512,
+      "previewSrc": "images/responsive/entertainment/sunbathing-03-384.webp"
     }
   ],
   "winter": [
@@ -240,7 +264,8 @@ export const entertainmentGalleries = {
       "width": 1536,
       "height": 1024,
       "mobileWidth": 768,
-      "mobileHeight": 512
+      "mobileHeight": 512,
+      "previewSrc": "images/responsive/entertainment/winter-01-384.webp"
     },
     {
       "src": "images/mozhaysk/entertainment-gallery-v1/winter-02.webp",
@@ -249,7 +274,8 @@ export const entertainmentGalleries = {
       "width": 1536,
       "height": 1024,
       "mobileWidth": 768,
-      "mobileHeight": 512
+      "mobileHeight": 512,
+      "previewSrc": "images/responsive/entertainment/winter-02-384.webp"
     },
     {
       "src": "images/mozhaysk/entertainment-gallery-v1/winter-03.webp",
@@ -258,7 +284,8 @@ export const entertainmentGalleries = {
       "width": 1536,
       "height": 1024,
       "mobileWidth": 768,
-      "mobileHeight": 512
+      "mobileHeight": 512,
+      "previewSrc": "images/responsive/entertainment/winter-03-384.webp"
     }
   ],
   "buggy": [
@@ -269,7 +296,8 @@ export const entertainmentGalleries = {
       "width": 1536,
       "height": 1024,
       "mobileWidth": 768,
-      "mobileHeight": 512
+      "mobileHeight": 512,
+      "previewSrc": "images/responsive/entertainment/buggy-01-384.webp"
     },
     {
       "src": "images/mozhaysk/entertainment-gallery-v1/buggy-02.webp",
@@ -278,7 +306,8 @@ export const entertainmentGalleries = {
       "width": 1536,
       "height": 1024,
       "mobileWidth": 768,
-      "mobileHeight": 512
+      "mobileHeight": 512,
+      "previewSrc": "images/responsive/entertainment/buggy-02-384.webp"
     },
     {
       "src": "images/mozhaysk/entertainment-gallery-v1/buggy-03.webp",
@@ -287,7 +316,8 @@ export const entertainmentGalleries = {
       "width": 1536,
       "height": 1024,
       "mobileWidth": 768,
-      "mobileHeight": 512
+      "mobileHeight": 512,
+      "previewSrc": "images/responsive/entertainment/buggy-03-384.webp"
     }
   ],
   "events": [
@@ -298,7 +328,8 @@ export const entertainmentGalleries = {
       "width": 1536,
       "height": 1024,
       "mobileWidth": 768,
-      "mobileHeight": 512
+      "mobileHeight": 512,
+      "previewSrc": "images/responsive/entertainment/events-01-384.webp"
     },
     {
       "src": "images/mozhaysk/entertainment-gallery-v1/events-02.webp",
@@ -307,7 +338,8 @@ export const entertainmentGalleries = {
       "width": 1536,
       "height": 1024,
       "mobileWidth": 768,
-      "mobileHeight": 512
+      "mobileHeight": 512,
+      "previewSrc": "images/responsive/entertainment/events-02-384.webp"
     },
     {
       "src": "images/mozhaysk/entertainment-gallery-v1/events-03.webp",
@@ -316,7 +348,8 @@ export const entertainmentGalleries = {
       "width": 1536,
       "height": 1024,
       "mobileWidth": 768,
-      "mobileHeight": 512
+      "mobileHeight": 512,
+      "previewSrc": "images/responsive/entertainment/events-03-384.webp"
     }
   ],
   "garden": [
@@ -327,7 +360,8 @@ export const entertainmentGalleries = {
       "width": 1536,
       "height": 1024,
       "mobileWidth": 768,
-      "mobileHeight": 512
+      "mobileHeight": 512,
+      "previewSrc": "images/responsive/entertainment/garden-01-384.webp"
     },
     {
       "src": "images/mozhaysk/entertainment-gallery-v1/garden-02.webp",
@@ -336,7 +370,8 @@ export const entertainmentGalleries = {
       "width": 1536,
       "height": 1024,
       "mobileWidth": 768,
-      "mobileHeight": 512
+      "mobileHeight": 512,
+      "previewSrc": "images/responsive/entertainment/garden-02-384.webp"
     },
     {
       "src": "images/mozhaysk/entertainment-gallery-v1/garden-03.webp",
@@ -345,7 +380,8 @@ export const entertainmentGalleries = {
       "width": 1536,
       "height": 1024,
       "mobileWidth": 768,
-      "mobileHeight": 512
+      "mobileHeight": 512,
+      "previewSrc": "images/responsive/entertainment/garden-03-384.webp"
     }
   ]
 };

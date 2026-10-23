@@ -1,4 +1,4 @@
-import { applyCollectionShell, addCollectionStyle } from './collection-site-shell.js?v=20261023-entertainment-2';
+import { applyCollectionShell, addCollectionStyle } from './collection-site-shell.js?v=20261023-photo-response-3';
 import { renderCollectionLeisure } from './collection-leisure.js?v=device-1';
 import { enhanceNearbyPlaces } from './collection-nearby.js?v=device-1';
 
