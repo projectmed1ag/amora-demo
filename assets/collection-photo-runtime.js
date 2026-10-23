@@ -4,7 +4,7 @@ const initialized = new WeakSet();
 
 function photoFrom(image, title = '') {
   if (!image) return null;
-  const src = image.getAttribute('src');
+  const src = image.dataset.roomSrc || image.getAttribute('src');
   if (!src) return null;
   return { src, alt: image.alt, title: title.trim() || image.alt };
 }
@@ -127,10 +127,12 @@ function initRooms(main) {
     const thumbs = [...gallery.querySelectorAll('[data-room-thumb]')];
     const title = gallery.closest('.room-houseboat')?.querySelector('h2')?.textContent.trim() || 'Хаусбот';
     let current = Math.max(0, records.findIndex(record => record.slide.classList.contains('is-current')));
+    let requested = current;
+    let selection = 0;
     const failed = new Set();
 
-    function select(index) {
-      current = (index + records.length) % records.length;
+    function commit(index) {
+      current = index;
       records.forEach((record, offset) => {
         record.slide.classList.toggle('is-current', offset === current);
         record.slide.setAttribute('aria-hidden', String(offset !== current));
@@ -139,10 +141,49 @@ function initRooms(main) {
         const originalIndex = Number(thumb.dataset.roomThumb ?? offset);
         thumb.setAttribute('aria-pressed', String(originalIndex === records[current].originalIndex));
       });
+      trigger.href = records[current].photo.src;
+    }
+
+    async function select(index) {
+      requested = (index + records.length) % records.length;
+      const target = requested;
+      const token = ++selection;
+      if (target === current) {
+        gallery.removeAttribute('aria-busy');
+        return;
+      }
+      const image = records[target].slide.querySelector('img');
+      // Hidden full-size frames stay in data attributes until requested. Tiny
+      // thumbnails and the current frame remain ordinary, usable HTML images.
+      if (image.dataset.roomSrc) {
+        image.loading = 'eager';
+        if (image.dataset.roomSrcset) image.srcset = image.dataset.roomSrcset;
+        image.src = image.dataset.roomSrc;
+        delete image.dataset.roomSrc;
+        delete image.dataset.roomSrcset;
+      }
+      gallery.setAttribute('aria-busy', 'true');
+      try {
+        if (image.decode) await image.decode();
+        else if (!image.complete) await new Promise((resolve, reject) => {
+          image.addEventListener('load', resolve, { once: true });
+          image.addEventListener('error', reject, { once: true });
+        });
+        if (!image.naturalWidth) throw new Error('Photo unavailable');
+        if (token !== selection) return;
+        failed.delete(target);
+        commit(target);
+        gallery.removeAttribute('aria-busy');
+      } catch {
+        failed.add(target);
+        if (token !== selection) return;
+        gallery.removeAttribute('aria-busy');
+        move(1);
+      }
     }
 
     function move(direction) {
-      let candidate = current;
+      let candidate = requested;
       for (let count = 0; count < records.length; count++) {
         candidate = (candidate + direction + records.length) % records.length;
         if (!failed.has(candidate)) return select(candidate);
@@ -169,11 +210,11 @@ function initRooms(main) {
       }
       image.addEventListener('error', unavailable);
       image.addEventListener('load', () => failed.delete(index));
-      if (image.complete && !image.naturalWidth) unavailable();
+      if (image.getAttribute('src') && image.complete && !image.naturalWidth) unavailable();
     });
     // Photos change only on request. There are no timers to interrupt reading,
     // keyboard focus, reduced-motion preferences, or a background browser tab.
-    select(current);
+    commit(current);
   });
 }
 

@@ -2,7 +2,7 @@
 <html lang="ru" data-city="krasnoyarsk"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Демонстрация выбора номера, дат и гостей в A’MORE Collection.">
+    <meta name="description" content="Выбор номера, дат и гостей в A’MORE Collection.">
     <meta name="theme-color" content="#ffffff">
     <title>Бронирование — Красноярск — A’MORE Collection</title>
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
@@ -11,7 +11,14 @@
 
 
       <script src="../assets/collection-route.js?v=static-1"></script>
-    <script type="module" src="../assets/collection-legacy.js?v=static-1"></script>
+    <script type="module" src="../assets/collection-legacy.js?v=20261023-copy-cleanup-1"></script>
+      <link rel="preload" href="../fonts/amore-condensed-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="../assets/collection-refinement.css?v=20261023-entertainment-2">
+    <link rel="stylesheet" href="../assets/collection-refinement-pages.css?v=20261023-responsive-1">
+    <link rel="stylesheet" href="../assets/collection-navigation.css?v=20261023-chapter-response-1">
+    <script type="module" src="../assets/collection-refinement.js?v=20261023-entertainment-2"></script>
+      <link rel="stylesheet" href="../assets/collection-page-motion.css?v=20261022-1">
+    <script type="module" src="../assets/collection-page-motion.js?v=20261022-1"></script>
   </head>
   <body data-page="booking">
     <a class="skip-link" href="#content">К содержанию</a>
@@ -36,7 +43,7 @@
       <nav class="site-nav" id="site-menu" aria-label="Разделы сайта">
         <a data-page-link="" href="./hotel.html?city=krasnoyarsk">Главная</a>
         <a data-page-link="" href="./rooms.html?city=krasnoyarsk" class="is-current-section">Номера</a>
-        <a data-page-link="" href="./spaces.html?city=krasnoyarsk">Досуг</a>
+        <a data-page-link="" href="./spaces.html?city=krasnoyarsk">Развлечения и активный отдых</a>
         <a data-page-link="" href="./gallery.html?city=krasnoyarsk">Галерея</a>
         <a data-page-link="" href="./location.html?city=krasnoyarsk">Об отеле</a>
         <a class="nav-booking" data-booking-link="" data-page-link="" href="./booking.html?city=krasnoyarsk">Забронировать</a>
@@ -45,10 +52,10 @@
 
     <main id="content" class="interior-page" tabindex="-1"><section class="page-heading booking-heading" id="top" aria-labelledby="page-title">
     <nav class="breadcrumbs" aria-label="Хлебные крошки"><a data-page-link="" href="./hotel.html?city=krasnoyarsk">Главная</a><span aria-hidden="true">/</span><a data-page-link="" href="./rooms.html?city=krasnoyarsk">Номера</a><span aria-hidden="true">/</span><span aria-current="page">Бронирование</span></nav>
-    <p class="eyebrow">Красноярск · Ваше путешествие</p><h1 id="page-title">Бронирование.</h1>
+    <p class="eyebrow">Красноярск · Бронирование</p><h1 id="page-title">Бронирование.</h1>
     <p class="page-lead">Выберите даты и гостей — соберём детали вашего отдыха.</p>
   </section>
-  <p class="demo-notice">Демо-версия. Бронь не создаётся, данные не отправляются в отель. Цены и наличие номеров пока не подключены.</p>
+
   <div class="booking-layout">
     <div class="booking-main">
       <form id="booking-form" novalidate="">
@@ -58,12 +65,12 @@
           <p id="capacity-notice" class="form-hint" aria-live="polite"></p>
         </fieldset>
         <fieldset><legend><span>02</span> Даты отдыха</legend><div class="form-row"><div class="form-field"><label for="booking-checkin">Заезд</label><input id="booking-checkin" name="checkin" type="date" required="" aria-describedby="error-checkin" min="2026-10-17"><p class="field-error" id="error-checkin" hidden=""></p></div><div class="form-field"><label for="booking-checkout">Выезд</label><input id="booking-checkout" name="checkout" type="date" required="" aria-describedby="error-checkout" min="2026-10-18"><p class="field-error" id="error-checkout" hidden=""></p></div></div></fieldset>
-        <fieldset><legend><span>03</span> Ваши контакты</legend><p class="form-hint">Для демонстрации можно использовать вымышленные данные.</p><div class="form-row"><div class="form-field"><label for="booking-name">Имя</label><input id="booking-name" name="name" type="text" required="" aria-describedby="error-name" autocomplete="given-name" maxlength="80"><p class="field-error" id="error-name" hidden=""></p></div><div class="form-field"><label for="booking-email">Email</label><input id="booking-email" name="email" type="email" required="" aria-describedby="error-email" autocomplete="email" maxlength="120"><p class="field-error" id="error-email" hidden=""></p></div></div></fieldset>
+        <fieldset><legend><span>03</span> Ваши контакты</legend><div class="form-row"><div class="form-field"><label for="booking-name">Имя</label><input id="booking-name" name="name" type="text" required="" aria-describedby="error-name" autocomplete="given-name" maxlength="80"><p class="field-error" id="error-name" hidden=""></p></div><div class="form-field"><label for="booking-email">Email</label><input id="booking-email" name="email" type="email" required="" aria-describedby="error-email" autocomplete="email" maxlength="120"><p class="field-error" id="error-email" hidden=""></p></div></div></fieldset>
         <button class="primary-action" type="submit" disabled="">Посмотреть итог</button>
-        <noscript><p>Для работы демо-формы включите JavaScript. Данные формы не отправлены.</p></noscript>
+        <noscript><p>Для заполнения формы включите JavaScript.</p></noscript>
       </form>
       <section id="booking-result" class="booking-result" aria-labelledby="result-title" hidden="">
-        <p class="eyebrow">Предварительный просмотр</p><h2 id="result-title" tabindex="-1">Демо-заявка готова.</h2><p>Бронь не создана. Данные никуда не отправлены.</p>
+        <h2 id="result-title" tabindex="-1">Ваш выбор.</h2>
         <dl id="result-details"></dl><button class="primary-action" type="button" id="edit-booking">Изменить данные</button>
       </section>
     </div>
@@ -71,7 +78,7 @@
       <figure class="media" id="summary-photo" data-room="standard"><img src="../images/rooms/krasnoyarsk/standard.jpg" srcset="../images/mobile/rooms/krasnoyarsk/standard.jpg 768w, ../images/rooms/krasnoyarsk/standard.jpg 1536w" sizes="(max-width: 800px) 100vw, 35vw" alt="Спальня с тёмным деревом и видом на сибирские холмы" fetchpriority="high"></figure>
       <div class="booking-summary-copy"><p class="eyebrow">Красноярск</p><h2 id="summary-room">Стандарт</h2><p id="summary-features">28 м² · до 2 гостей</p>
         <dl><div><dt>Даты</dt><dd id="summary-dates">Выберите даты</dd></div><div><dt>Гости</dt><dd id="summary-guests">2</dd></div><div><dt>Стоимость</dt><dd>Не рассчитана</dd></div></dl>
-        <p class="form-hint">Категории и комплектация показаны для примера.</p>
+
       </div>
     </aside>
   </div></main>

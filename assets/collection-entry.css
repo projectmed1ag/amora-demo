@@ -128,7 +128,11 @@ a:focus-visible { outline: 2px solid var(--ink); outline-offset: 6px; }
   align-items: flex-end;
   overflow: hidden;
   padding: 96px var(--panel-inset) clamp(40px, 7.8vh, 86px);
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
 }
+.hotel:focus-visible { outline: 2px solid var(--ink); outline-offset: -6px; }
 .hotel-picture, .hotel-photo {
   position: absolute;
   inset: 0;
@@ -140,7 +144,8 @@ a:focus-visible { outline: 2px solid var(--ink); outline-offset: 6px; }
   object-fit: cover;
   object-position: 83% center;
   filter: saturate(.85) brightness(.88);
-  transition: transform var(--motion-duration) var(--motion-easing), filter var(--motion-duration) var(--motion-easing);
+  transform: scale(1);
+  transition: transform 850ms var(--motion-easing), filter var(--motion-duration) var(--motion-easing);
 }
 .hotel-ruza .hotel-photo { object-position: 79% center; }
 .hotel-krasnoyarsk .hotel-photo { object-position: 82% center; }
@@ -197,18 +202,6 @@ a:focus-visible { outline: 2px solid var(--ink); outline-offset: 6px; }
   line-height: 1.4;
   text-decoration: none;
 }
-/* Keep one native link per hotel while making the whole panel its hit area. */
-.hotel-link::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  cursor: pointer;
-}
-.hotel-link:focus-visible::after {
-  outline: 2px solid var(--ink);
-  outline-offset: -6px;
-}
 .hotel-link > span:first-child {
   background-image: linear-gradient(currentColor, currentColor);
   background-position: left bottom;
@@ -241,10 +234,10 @@ a:focus-visible { outline: 2px solid var(--ink); outline-offset: 6px; }
   stroke-width: 1.1;
   transition: transform var(--motion-duration) var(--motion-easing);
 }
-.hotel-link:focus-visible .hotel-arrow::before { opacity: 1; transform: scale(1); }
-.hotel-link:focus-visible > span:first-child { background-size: 100% 1px; }
+.hotel:focus-visible .hotel-arrow::before { opacity: 1; transform: scale(1); }
+.hotel:focus-visible .hotel-link > span:first-child { background-size: 100% 1px; }
 @media (hover: hover) and (pointer: fine) {
-  .hotel:hover .hotel-photo { transform: scale(1.05); filter: saturate(.95) brightness(.96); }
+  .hotel:is(:hover, :focus-visible) .hotel-photo { transform: scale(1.05); filter: saturate(.95) brightness(.96); }
   .hotel:hover .hotel-arrow::before { opacity: 1; transform: scale(1); }
   .hotel:hover .hotel-arrow svg { transform: translateX(3px); }
   .hotel:hover .hotel-link > span:first-child { background-size: 100% 1px; }
@@ -295,6 +288,6 @@ a:focus-visible { outline: 2px solid var(--ink); outline-offset: 6px; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; }
-  .hotel:hover .hotel-photo, .hotel:hover .hotel-arrow svg { transform: none; }
+  .hotel:is(:hover, :focus-visible) .hotel-photo, .hotel:hover .hotel-arrow svg { transform: none; }
   .hotel-arrow::before { transform: none; }
 }

@@ -1,4 +1,4 @@
-import { applyCollectionShell } from './collection-site-shell.js?v=device-1';
+import { applyCollectionShell } from './collection-site-shell.js?v=20261023-entertainment-2';
 
 const arrow = '<svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10h22m-6-6 6 6-6 6"/></svg>';
 
@@ -20,7 +20,6 @@ export function enhanceCollectionBooking() {
   // Add only presentation hooks; replacing the form would discard its handlers.
   const main = document.querySelector('#content');
   main.querySelector('.booking-heading').classList.add('collection-booking-heading');
-  main.querySelector('.demo-notice').classList.add('collection-booking-notice');
   main.querySelector('.booking-layout').classList.add('collection-booking-layout');
 
   for (const button of main.querySelectorAll('#booking-form [type="submit"], #edit-booking')) {

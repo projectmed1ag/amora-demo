@@ -1,4 +1,4 @@
-import { leisureGroups, seasonNote } from './mozhaysk-leisure-data.js?v=publish-1';
+import { leisureGroups, seasonNote } from './mozhaysk-leisure-data.js?v=20261023-leisure-catalog-1';
 
 const escapeHTML = (value) => String(value).replace(/[&<>"']/g, (character) => ({
   '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
@@ -42,6 +42,14 @@ const details = {
     image: 'events',
     imageAlt: 'Открытый деревянный павильон со столами рядом с природой',
     itemIds: ['pavilion', 'barbecue'],
+  },
+  firepit: {
+    groupIds: ['firepit'],
+    title: 'Костровая зона.',
+    imageURL: './images/hotel/moscow/bungalows/experience/night-firepit.jpg',
+    imageAlt: 'Костровая зона с креслами на берегу',
+    imageCaption: false,
+    itemIds: ['firepit'],
   },
   winter: {
     groupIds: ['winter'],
@@ -109,8 +117,8 @@ export function renderLeisureDetails(activity) {
   return `<section class="cl-detail cl-detail-${activity}${singleItem ? ' cl-detail-single' : ''}" aria-labelledby="cl-detail-title">
     <div class="cl-detail-hero">
       <figure class="cl-detail-photo">
-        <img src="./images/mozhaysk/leisure-${detail.image}.jpg" width="1200" height="800" alt="${escapeHTML(detail.imageAlt)}" fetchpriority="high">
-        <figcaption>Атмосфера отдыха · иллюстрация</figcaption>
+        <img src="${escapeHTML(detail.imageURL || `./images/mozhaysk/leisure-${detail.image}.jpg`)}" width="1200" height="800" alt="${escapeHTML(detail.imageAlt)}" fetchpriority="high">
+        ${detail.imageCaption === false ? '' : '<figcaption>Атмосфера отдыха · иллюстрация</figcaption>'}
       </figure>
       <header class="cl-detail-heading">
         <a class="cl-back" href="${overviewURL}">${arrow}<span>Все занятия</span></a>

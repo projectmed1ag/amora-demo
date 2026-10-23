@@ -1,0 +1,216 @@
+/* Service menus share the collection typography and keep the original logo. */
+body.collection-service-page[data-page] #content .service-page-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 28px;
+  margin-top: 18px;
+}
+
+body.collection-service-page[data-page] #content .service-page-links a,
+body.collection-service-page[data-page] #content .service-catalog-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: #303442;
+  font: 400 13px/1.5 var(--body-font);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 5px;
+}
+
+body.collection-service-page[data-page] #content .service-catalog {
+  margin: 0 var(--g);
+  padding: 56px 0 64px;
+  border-top: 1px solid #e3e4e8;
+}
+
+body.collection-service-page[data-page] #content .service-catalog-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, .8fr);
+  align-items: end;
+  gap: 24px 8%;
+}
+
+body.collection-service-page[data-page] #content .service-catalog-heading h2,
+body.collection-service-page[data-page] #content .service-menu-booking h2 {
+  font-size: clamp(44px, 4.8vw, 72px);
+  line-height: 1.05;
+}
+
+body.collection-service-page[data-page] #content .service-catalog-heading > p {
+  max-width: 540px;
+  margin: 0;
+  color: #747782;
+  font: 400 15px/1.8 var(--body-font);
+}
+
+body.collection-service-page[data-page] #content .service-catalog-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 30px;
+  margin: 32px 0 40px;
+}
+
+body.collection-service-page[data-page] #content .service-menu-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 52px clamp(32px, 6vw, 96px);
+}
+
+body.collection-service-page[data-page] #content .service-menu-category,
+body.collection-service-page[data-page] #content .service-program-section {
+  min-width: 0;
+  padding-top: 24px;
+  border-top: 1px solid #b9bcc4;
+}
+
+body.collection-service-page[data-page] #content .service-menu-category > h3,
+body.collection-service-page[data-page] #content .service-program-section > h3 {
+  margin: 0 0 12px;
+  font-size: clamp(32px, 3vw, 44px);
+  line-height: 1.1;
+}
+
+body.collection-service-page[data-page] #content .service-menu-items,
+body.collection-service-page[data-page] #content .service-programs {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+body.collection-service-page[data-page] #content .service-menu-item {
+  padding: 22px 0;
+  border-bottom: 1px solid #e3e4e8;
+}
+
+body.collection-service-page[data-page] #content .service-menu-item-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 16px;
+}
+
+body.collection-service-page[data-page] #content .service-menu-name {
+  margin: 0;
+  color: #303442;
+  font: 400 18px/1.45 var(--body-font);
+  letter-spacing: 0;
+  text-transform: none;
+  overflow-wrap: break-word;
+}
+
+body.collection-service-page[data-page] #content .service-menu-price {
+  color: #303442;
+  font: 400 17px/1.45 var(--body-font);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+body.collection-service-page[data-page] #content .service-menu-composition {
+  max-width: 510px;
+  margin: 9px 0 0;
+  color: #747782;
+  font: 400 14px/1.75 var(--body-font);
+}
+
+body.collection-service-page[data-page] #content .service-menu-portion {
+  margin: 8px 0 0;
+  color: #747782;
+  font: 400 12px/1.6 var(--body-font);
+}
+
+body.collection-service-page[data-page] #content .service-program-section {
+  margin-bottom: 48px;
+}
+
+body.collection-service-page[data-page] #content .service-program {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr) auto;
+  align-items: start;
+  gap: 32px;
+  padding: 28px 0;
+  border-bottom: 1px solid #e3e4e8;
+}
+
+body.collection-service-page[data-page] #content .service-program-title h3 {
+  font-size: clamp(30px, 2.6vw, 38px);
+  line-height: 1.15;
+}
+
+body.collection-service-page[data-page] #content .service-program-title p,
+body.collection-service-page[data-page] #content .service-program-price p {
+  margin: 10px 0 0;
+  color: #747782;
+  font: 400 13px/1.6 var(--body-font);
+}
+
+body.collection-service-page[data-page] #content .service-program-description {
+  margin: 0;
+  color: #747782;
+  font: 400 15px/1.8 var(--body-font);
+}
+
+body.collection-service-page[data-page] #content .service-program-price {
+  text-align: right;
+  white-space: nowrap;
+}
+
+body.collection-service-page[data-page] #content .service-program-price > span {
+  color: #303442;
+  font: 400 24px/1.4 var(--body-font);
+  font-variant-numeric: tabular-nums;
+}
+
+body.collection-service-page[data-page] #content .service-menu-booking {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  margin: 0 var(--g);
+  padding: 48px 0 64px;
+  border-top: 1px solid #e3e4e8;
+}
+
+body.collection-service-page[data-page] #content .service-menu-booking p {
+  max-width: 590px;
+  margin: 18px 0 0;
+  color: #747782;
+  font: 400 15px/1.8 var(--body-font);
+}
+
+@media (max-width: 900px) {
+  body.collection-service-page[data-page] #content .service-catalog-heading {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 22px;
+  }
+  body.collection-service-page[data-page] #content .service-program {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 18px 24px;
+  }
+  body.collection-service-page[data-page] #content .service-program-description {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    max-width: 620px;
+  }
+  body.collection-service-page[data-page] #content .service-program-price {
+    grid-column: 2;
+    grid-row: 1;
+  }
+}
+
+@media (max-width: 700px) {
+  body.collection-service-page[data-page] #content .service-catalog { padding-block: 36px 44px; }
+  body.collection-service-page[data-page] #content .service-catalog-nav { gap: 2px 24px; margin-block: 20px 28px; }
+  body.collection-service-page[data-page] #content .service-menu-grid { grid-template-columns: minmax(0, 1fr); gap: 36px; }
+  body.collection-service-page[data-page] #content .service-menu-category { padding-top: 20px; }
+  body.collection-service-page[data-page] #content .service-menu-name { font-size: 16px; }
+  body.collection-service-page[data-page] #content .service-menu-price { font-size: 16px; }
+  body.collection-service-page[data-page] #content .service-menu-item { padding-block: 20px; }
+  body.collection-service-page[data-page] #content .service-menu-item-heading { gap: 12px; }
+  body.collection-service-page[data-page] #content .service-program { gap: 16px; padding-block: 24px; }
+  body.collection-service-page[data-page] #content .service-program-title h3 { font-size: 30px; }
+  body.collection-service-page[data-page] #content .service-program-price > span { font-size: 20px; }
+  body.collection-service-page[data-page] #content .service-program-description { font-size: 14px; }
+  body.collection-service-page[data-page] #content .service-menu-booking { flex-direction: column; align-items: flex-start; gap: 26px; padding-block: 36px 48px; }
+}

@@ -1,8 +1,8 @@
 const rooms = [
-  { id: 'standard', name: 'Стандарт', guests: 2, area: 24, alt: 'Светлая спальня с двуспальной кроватью и окном на воду' },
-  { id: 'comfort', name: 'Комфорт', guests: 2, area: 34, alt: 'Просторная светлая спальня с креслом и угловым окном на водохранилище' },
-  { id: 'junior-suite', name: 'Полулюкс', guests: 3, area: 46, alt: 'Полулюкс у воды со спальной зоной, деревянной перегородкой и диваном' },
-  { id: 'suite', name: 'Люкс', guests: 4, area: 64, alt: 'Светлая гостиная люкса с отдельной спальней и видом на водохранилище' },
+  { id: 'standard', name: 'Стандарт', guests: 2, area: 24, image: 'concept-covers/standard-v1', imageWidth: 1086, alt: 'Хаусбот Стандарт' },
+  { id: 'comfort', name: 'Комфорт', guests: 4, area: 34, image: 'concept-covers/comfort-v1', imageWidth: 1086, alt: 'Хаусбот Комфорт' },
+  { id: 'junior-suite', name: 'Полулюкс', guests: 4, area: 46, image: 'concept-covers/junior-suite-v1', imageWidth: 1086, alt: 'Хаусбот Полулюкс' },
+  { id: 'suite', name: 'Люкс', guests: 6, area: 64, image: 'concept-covers/suite-v1', imageWidth: 1086, alt: 'Хаусбот Люкс' },
 ];
 
 const initializedForms = new WeakSet();
@@ -117,8 +117,8 @@ export function initCollectionBooking() {
       }
       image.alt = room.alt;
       image.sizes = '(max-width: 700px) 100vw, 44vw';
-      image.srcset = `./images/mobile/rooms/mozhaysk/${room.id}.jpg 768w, ./images/rooms/mozhaysk/${room.id}.jpg 1536w`;
-      image.src = `./images/rooms/mozhaysk/${room.id}.jpg`;
+      image.srcset = `./images/mobile/rooms/mozhaysk/${room.image}.jpg 768w, ./images/rooms/mozhaysk/${room.image}.jpg ${room.imageWidth}w`;
+      image.src = `./images/rooms/mozhaysk/${room.image}.jpg`;
       photo.dataset.room = room.id;
     }
     setSummary('summary-room', room.name);

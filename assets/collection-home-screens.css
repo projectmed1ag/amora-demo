@@ -1,0 +1,471 @@
+/* One chapter per screen. Activated by the progressive chapter controller.
+   Short windows retain document scrolling inside a chapter; nothing is clipped. */
+html.collection-screen-mode {
+  --chapter-bottom: 0px;
+  --chapter-height: calc(100dvh - var(--header-height) - var(--chapter-bottom));
+  --chapter-space: clamp(24px, 4vh, 48px);
+  scroll-behavior: auto;
+  scroll-padding-top: var(--header-height);
+  scroll-padding-bottom: var(--chapter-bottom);
+  scrollbar-width: none;
+}
+
+html.collection-screen-mode::-webkit-scrollbar { display: none; }
+html.collection-screen-mode body[data-page='home'] main#content { view-transition-name: none; }
+
+/* A phone's address bar must not resize every chapter during a swipe. The
+   browser owns touch scrolling; chapter buttons and the active label still work. */
+html.collection-screen-mode.collection-native-scroll {
+  --chapter-height: calc(100svh - var(--header-height) - var(--chapter-bottom));
+}
+
+/* Keep the document's scroll range fixed while two real sections move.
+   Temporary layers sit above other chapters and below the header/navigation. */
+html.collection-slide-active body[data-page='home'] main#content {
+  overflow: clip;
+}
+
+html.collection-slide-active body[data-page='home'] main#content > section.is-chapter-moving {
+  position: relative;
+  z-index: 1;
+  background-color: #fff;
+  will-change: transform;
+}
+
+html.collection-screen-mode body[data-page='home'] #content .collection-motion-item,
+html.collection-screen-mode body[data-page='home'] #content .collection-motion-item.is-motion-pending {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+html.collection-screen-mode body[data-page='home'] main#content > section {
+  height: var(--chapter-height);
+  min-height: 400px;
+  max-height: none;
+  margin: 0;
+  scroll-margin-top: 0;
+  overflow: visible;
+}
+
+html.collection-screen-mode body[data-page='home'] main#content :is(h1,h2,h3) {
+  overflow-wrap: normal;
+}
+
+html.collection-screen-mode body[data-page='home'] :is(.home-link,.primary-action) {
+  min-height: 44px;
+  padding: 12px 20px;
+}
+
+/* First and final chapters share a quiet heading and a flexible photograph. */
+html.collection-screen-mode body[data-page='home'] :is(.home-hero,.home-evening,.hero,.panorama,.closing) {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 0;
+  gap: 0;
+}
+
+html.collection-screen-mode body[data-page='home'] :is(.home-hero-bottom,.home-evening > div,.hero-copy,.panorama-copy,.closing-copy) {
+  flex: 0 0 auto;
+  min-height: 0;
+  max-width: none;
+  padding: clamp(24px, 4vh, 44px) var(--g);
+  gap: 16px;
+  text-align: center;
+}
+
+html.collection-screen-mode body[data-page='home'] .home-hero-bottom {
+  flex-direction: column;
+  justify-content: center;
+}
+
+html.collection-screen-mode body[data-page='home'] .home-hero-bottom > div { min-width: 0; max-width: 100%; }
+
+html.collection-screen-mode body[data-page='home'] :is(.home-hero h1,.hero h1) {
+  font-size: clamp(54px, 9vh, 104px);
+  line-height: .9;
+}
+
+html.collection-screen-mode body[data-page='home'] :is(.home-hero-intro > p,.hero-lead) {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+html.collection-screen-mode body[data-page='home'] .hero-lead { margin: 18px auto 0; }
+html.collection-screen-mode body[data-page='home'] .hero-copy .eyebrow { margin-bottom: 16px; }
+html.collection-screen-mode body[data-page='home'] .home-hero-intro .home-link { margin-top: 18px; }
+
+html.collection-screen-mode body[data-page='home'] :is(.home-hero > img,.home-evening > img,.hero-media,.panorama-media,.closing-media) {
+  flex: 1 1 0;
+  min-height: 100px;
+  height: 0;
+  width: 100%;
+  max-height: none;
+  margin: 0;
+  object-fit: cover;
+}
+
+html.collection-screen-mode body[data-page='home'] :is(.home-hero > img,.home-evening > img,.hero-media,.panorama-media,.closing-media) {
+  width: calc(100% - 2 * var(--g));
+  margin: 0 var(--g) var(--chapter-space);
+}
+
+/* The original evening hero used a negative background layer. This photograph
+   is now a normal flex item and must remain above the chapter's white paper. */
+html.collection-screen-mode body[data-page='home'] .home-evening > img { z-index: auto; }
+
+html.collection-screen-mode body[data-page='home'] :is(.hero-media,.panorama-media,.closing-media) img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+html.collection-screen-mode body[data-page='home'] :is(.hero-media,.closing-media) img {
+  position: static;
+  inset: auto;
+  z-index: auto;
+}
+
+html.collection-screen-mode body[data-page='home'] :is(.home-evening h2,.panorama h2,.closing h2) {
+  font-size: clamp(44px, 7vh, 80px);
+}
+
+html.collection-screen-mode body[data-page='home'] :is(.home-evening p,.panorama-copy > p:not(.eyebrow),.closing-copy > p:not(.eyebrow)) {
+  margin: 16px auto;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* Text-only introduction, service chapters and the other destination stories. */
+html.collection-screen-mode body[data-page='home'] main#content > :is(.home-intro,.home-banya,.home-restaurant,.home-water,.editorial) {
+  height: auto;
+  min-height: max(400px, var(--chapter-height));
+}
+
+html.collection-screen-mode body[data-page='home'] :is(.home-intro,.home-banya,.home-restaurant,.home-water,.editorial) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  align-content: center;
+  gap: clamp(28px, 5vw, 72px);
+  padding: var(--chapter-space) var(--g);
+}
+
+html.collection-screen-mode body[data-page='home'] :is(.home-intro,.home-banya,.home-restaurant,.home-water,.editorial) h2 {
+  font-size: clamp(42px, 7vh, 82px);
+  line-height: .98;
+}
+
+html.collection-screen-mode body[data-page='home'] :is(.home-intro,.home-banya,.home-restaurant,.home-water,.editorial) p {
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+html.collection-screen-mode body[data-page='home'] :is(.home-restaurant,.home-water) p,
+html.collection-screen-mode body[data-page='home'] .home-banya-copy > p,
+html.collection-screen-mode body[data-page='home'] .editorial-copy > p:not(.chapter-number) { margin: 20px 0; }
+
+html.collection-screen-mode body[data-page='home'] .home-intro .home-link { margin-top: 24px; }
+
+html.collection-screen-mode body[data-page='home'] :is(.home-service-photo,.home-banya > img,.home-restaurant > img,.home-water > img,.editorial > .media) {
+  display: block;
+  align-self: center;
+  min-height: 0;
+  max-height: none;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  margin: 0;
+  grid-row: auto;
+  transform: none;
+  object-fit: cover;
+  object-position: center;
+}
+
+html.collection-screen-mode body[data-page='home'] :is(.home-service-photo > img,.editorial > .media > img) {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  max-height: none;
+  object-fit: cover;
+}
+
+html.collection-screen-mode body[data-page='home'] .home-service-actions { gap: 10px; margin-top: 24px; }
+html.collection-screen-mode body[data-page='home'] .editorial-copy { min-width: 0; }
+html.collection-screen-mode body[data-page='home'] .chapter-number { margin-bottom: 16px; }
+
+/* Old destination layouts constrained this copy to 43% of the page. */
+html.collection-screen-mode body[data-page='home'] :is(.panorama-copy,.closing-copy) { width: 100%; }
+html.collection-screen-mode body[data-page='home'] .panorama-copy h2 { max-width: none; }
+
+/* Secondary inset images live on the destination detail pages. One story
+   photograph keeps the preview readable within a single chapter. */
+html.collection-screen-mode body[data-page='home'] :is(.editorial-detail,.editorial-ritual) > .media:last-child { display: none; }
+
+/* Four accommodation previews remain available without a long card list. */
+html.collection-screen-mode body[data-page='home'] :is(.home-stays,.home-leisure) {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: var(--chapter-space) var(--g) 24px;
+}
+
+html.collection-screen-mode body[data-page='home'] .home-section-heading {
+  display: flex;
+  flex: none;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  padding: 0;
+}
+
+html.collection-screen-mode body[data-page='home'] .home-section-heading h2 { font-size: clamp(38px, 6vh, 66px); }
+html.collection-screen-mode body[data-page='home'] .home-section-heading .home-link { flex: none; margin: 0; }
+
+html.collection-screen-mode body[data-page='home'] :is(.home-rooms-grid,#home-activities) {
+  flex: 1 1 0;
+  min-height: 0;
+  padding: 0;
+  gap: 22px;
+  grid-template-rows: minmax(0, 1fr);
+}
+
+html.collection-screen-mode body[data-page='home'] .home-rooms-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+html.collection-screen-mode body[data-page='home'] #home-activities { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+html.collection-screen-mode body[data-page='home'] .home-photo-panel { min-width: 0; min-height: 0; overflow: visible; }
+
+html.collection-screen-mode body[data-page='home'] .home-photo-panel > img {
+  flex: 1 1 0;
+  min-height: 80px;
+  height: 0;
+  aspect-ratio: auto;
+  object-fit: cover;
+}
+
+html.collection-screen-mode body[data-page='home'] .home-panel-copy { flex: none; min-width: 0; padding: 16px 0 0; }
+html.collection-screen-mode body[data-page='home'] .home-panel-copy h3 { font-size: clamp(28px, 4vh, 44px); }
+html.collection-screen-mode body[data-page='home'] .home-room-meta { margin: 0 0 8px; font-size: 10px; line-height: 1.4; }
+html.collection-screen-mode body[data-page='home'] .home-panel-copy > p:not(.home-room-meta) { min-height: 0; margin: 10px 0 14px; font-size: 13px; line-height: 1.6; }
+html.collection-screen-mode body[data-page='home'] .home-panel-copy .home-link { margin-top: 14px; }
+html.collection-screen-mode body[data-page='home'] .home-rooms-grid .home-panel-copy > p:not(.home-room-meta) { display: none; }
+html.collection-screen-mode body[data-page='home'] .home-caption { flex: none; margin: 0; padding: 0; font-size: 10px; line-height: 1.4; }
+
+html.collection-screen-mode body[data-page='home'] .home-leisure { gap: 14px; }
+html.collection-screen-mode body[data-page='home'] .home-leisure .home-section-heading > div > p { margin-top: 10px; font-size: 14px; }
+html.collection-screen-mode body[data-page='home'] .home-season-controls { flex: none; gap: 0 22px; padding: 0; }
+html.collection-screen-mode body[data-page='home'] .home-season-controls button { min-height: 44px; padding: 8px 0; }
+html.collection-screen-mode body[data-page='home'] .home-season-note { flex: none; margin: 0; padding: 0; font-size: 10px; line-height: 1.5; }
+html.collection-screen-mode body[data-page='home'] .home-more-leisure { flex: none; padding: 0; }
+
+@media (max-width: 1099px), (max-height: 659px) {
+  html.collection-screen-mode { --chapter-bottom: calc(64px + env(safe-area-inset-bottom, 0px)); }
+}
+
+@media (min-width: 701px) and (max-height: 800px) {
+  html.collection-screen-mode body[data-page='home'] .home-leisure .home-section-heading > div > p,
+  html.collection-screen-mode body[data-page='home'] #home-activities .home-panel-copy > p { display: none; }
+}
+
+/* A portrait tablet has room for a wide photograph above its caption. */
+@media (min-width: 701px) and (max-width: 900px) and (orientation: portrait) {
+  html.collection-screen-mode body[data-page='home'] :is(.home-banya,.home-restaurant,.home-water,.editorial) {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    gap: 24px;
+  }
+  html.collection-screen-mode body[data-page='home'] :is(.home-restaurant,.home-water) > div,
+  html.collection-screen-mode body[data-page='home'] .editorial > .editorial-copy { grid-row: 2; }
+  html.collection-screen-mode body[data-page='home'] :is(.home-restaurant,.home-water) > :is(img,.home-service-photo),
+  html.collection-screen-mode body[data-page='home'] .editorial > .media { grid-row: 1; }
+  html.collection-screen-mode body[data-page='home'] #home-rooms.home-rooms-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  html.collection-screen-mode { --chapter-space: 20px; }
+  html.collection-screen-mode body[data-page='home'] main#content > section { min-height: 380px; }
+  html.collection-screen-mode body[data-page='home'] :is(.home-link,.primary-action) { min-height: 44px; padding: 11px 16px; }
+
+  html.collection-screen-mode body[data-page='home'] :is(.home-hero-bottom,.home-evening > div,.hero-copy,.panorama-copy,.closing-copy) { padding: 24px var(--g); gap: 16px; }
+  html.collection-screen-mode body[data-page='home'] :is(.home-hero h1,.hero h1) { font-size: clamp(44px, 8vh, 68px); }
+  html.collection-screen-mode body[data-page='home'] .home-hero h1 { font-size: clamp(40px, 12.5vw, 60px); }
+  html.collection-screen-mode body[data-page='home'] :is(.home-hero-intro > p,.hero-lead) { font-size: 14px; line-height: 1.6; }
+  html.collection-screen-mode body[data-page='home'] .home-hero-intro .home-link { margin-top: 16px; }
+  html.collection-screen-mode body[data-page='home'] :is(.home-hero > img,.home-evening > img,.hero-media,.panorama-media,.closing-media) { min-height: 100px; }
+  html.collection-screen-mode body[data-page='home'] :is(.home-evening h2,.panorama h2,.closing h2) { font-size: clamp(38px, 7vh, 54px); }
+  html.collection-screen-mode body[data-page='home'] :is(.home-evening p,.panorama-copy > p:not(.eyebrow),.closing-copy > p:not(.eyebrow)) { font-size: 14px; margin: 14px auto; }
+
+  html.collection-screen-mode body[data-page='home'] :is(.home-intro,.home-banya,.home-restaurant,.home-water,.editorial) {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    gap: 22px;
+    padding: var(--chapter-space) var(--g);
+  }
+  html.collection-screen-mode body[data-page='home'] .home-intro { display: flex; flex-direction: column; justify-content: center; align-items: stretch; }
+  html.collection-screen-mode body[data-page='home'] :is(.home-intro,.home-banya,.home-restaurant,.home-water,.editorial) h2 { font-size: clamp(38px, 6.7vh, 54px); }
+  html.collection-screen-mode body[data-page='home'] :is(.home-intro,.home-banya,.home-restaurant,.home-water,.editorial) p { font-size: 14px; line-height: 1.65; }
+  html.collection-screen-mode body[data-page='home'] :is(.home-restaurant,.home-water) > div { grid-row: 2; }
+  html.collection-screen-mode body[data-page='home'] :is(.home-restaurant,.home-water) > :is(img,.home-service-photo) { grid-row: 1; }
+  html.collection-screen-mode body[data-page='home'] .editorial > .media:first-child { grid-row: 1; }
+  html.collection-screen-mode body[data-page='home'] .editorial > .editorial-copy { grid-row: 2; }
+  html.collection-screen-mode body[data-page='home'] .editorial > .media { grid-row: 1; }
+  html.collection-screen-mode body[data-page='home'] :is(.home-service-photo,.home-banya > img,.home-restaurant > img,.home-water > img,.editorial > .media) { min-height: 100px; }
+  html.collection-screen-mode body[data-page='home'] .home-banya-copy { display: block; }
+  html.collection-screen-mode body[data-page='home'] :is(.home-restaurant,.home-water) p,
+  html.collection-screen-mode body[data-page='home'] .home-banya-copy > p,
+  html.collection-screen-mode body[data-page='home'] .editorial-copy > p:not(.chapter-number) { margin: 14px 0; }
+  html.collection-screen-mode body[data-page='home'] .home-service-actions { flex-direction: row; align-items: center; gap: 10px; margin-top: 16px; }
+  html.collection-screen-mode body[data-page='home'] .home-service-actions .home-link { width: auto; font-size: 9px; padding-inline: 12px; }
+  html.collection-screen-mode body[data-page='home'] .home-service-actions .home-link svg { display: none; }
+
+  html.collection-screen-mode body[data-page='home'] main#content > :is(.home-banya,.home-restaurant,.home-water,.editorial) {
+    min-height: max(460px, var(--chapter-height));
+  }
+
+  html.collection-screen-mode body[data-page='home'] :is(.home-stays,.home-leisure) { padding: 20px var(--g) 16px; gap: 12px; }
+  html.collection-screen-mode body[data-page='home'] .home-section-heading { display: flex; gap: 12px; }
+  html.collection-screen-mode body[data-page='home'] .home-section-heading h2 { font-size: 32px; }
+  html.collection-screen-mode body[data-page='home'] .home-section-heading .home-link { padding: 10px; font-size: 9px; letter-spacing: 0; gap: 6px; }
+  html.collection-screen-mode body[data-page='home'] .home-section-heading .home-link svg { display: none; }
+  html.collection-screen-mode body[data-page='home'] #home-rooms.home-rooms-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 12px 16px; }
+  html.collection-screen-mode body[data-page='home'] :is(.home-rooms-grid,#home-activities) { min-height: 0; }
+  html.collection-screen-mode body[data-page='home'] .home-photo-panel > img { min-height: 40px; }
+  html.collection-screen-mode body[data-page='home'] .home-panel-copy { padding: 8px 0 0; }
+  html.collection-screen-mode body[data-page='home'] .home-panel-copy h3 { font-size: 25px; }
+  html.collection-screen-mode body[data-page='home'] .home-room-meta { margin: 0 0 4px; font-size: 9px; line-height: 1.35; }
+  html.collection-screen-mode body[data-page='home'] .home-panel-copy .home-link { min-height: 44px; padding: 8px 10px; margin-top: 8px; font-size: 9px; letter-spacing: .02em; gap: 8px; }
+  html.collection-screen-mode body[data-page='home'] .home-panel-copy .home-link svg { display: none; }
+  html.collection-screen-mode body[data-page='home'] .home-caption { font-size: 9px; line-height: 1.4; }
+
+  html.collection-screen-mode body[data-page='home'] .home-leisure .home-section-heading > div > p,
+  html.collection-screen-mode body[data-page='home'] #home-activities .home-panel-copy > p,
+  html.collection-screen-mode body[data-page='home'] .home-season-controls > span { display: none; }
+  html.collection-screen-mode body[data-page='home'] .home-season-controls { gap: 0 20px; }
+  html.collection-screen-mode body[data-page='home'] .home-season-controls button { font-size: 12px; }
+  html.collection-screen-mode body[data-page='home'] #home-activities { gap: 16px; }
+  html.collection-screen-mode body[data-page='home'] .home-season-note { font-size: 10px; line-height: 1.45; }
+  html.collection-screen-mode body[data-page='home'] .home-more-leisure .home-link { font-size: 10px; }
+}
+
+@media (max-width: 700px) and (max-height: 700px) {
+  html.collection-screen-mode body[data-page='home'] .home-stays { padding-block: 14px; gap: 10px; }
+  html.collection-screen-mode body[data-page='home'] .home-room-meta { display: none; }
+  html.collection-screen-mode body[data-page='home'] .home-section-heading h2 { font-size: 28px; }
+  html.collection-screen-mode body[data-page='home'] .home-rooms-grid { gap: 10px 14px; }
+  html.collection-screen-mode body[data-page='home'] .home-hero h1 { font-size: 44px; }
+  html.collection-screen-mode body[data-page='home'] .home-hero-bottom { padding-block: 18px; gap: 12px; }
+}
+
+/* Keep the different houseboat silhouettes legible on short portrait phones.
+   The scene controller lets this chapter scroll before advancing to the next. */
+@media (max-width: 700px) and (max-height: 700px) and (orientation: portrait) {
+  html.collection-screen-mode body[data-page='home'] main#content > .home-stays { min-height: 600px; }
+  html.collection-screen-mode body[data-page='home'] .home-stays .home-room-meta { display: block; }
+}
+
+@media (max-width: 700px) and (max-height: 620px) {
+  html.collection-screen-mode body[data-page='home'] main#content > .editorial { min-height: 430px; }
+}
+
+/* Landscape phones need normal-sized controls and readable type more than a
+   forced crop. The controller allows the chapter to be read before advancing. */
+@media (orientation: landscape) and (max-height: 659px) {
+  html.collection-screen-mode { --chapter-space: 18px; }
+  html.collection-screen-mode body[data-page='home'] main#content > section { min-height: 324px; }
+  html.collection-screen-mode body[data-page='home'] :is(.home-hero-bottom,.home-evening > div,.hero-copy,.panorama-copy,.closing-copy) { padding-block: 18px; gap: 12px; }
+  html.collection-screen-mode body[data-page='home'] :is(.home-hero h1,.hero h1) { font-size: 44px; }
+  html.collection-screen-mode body[data-page='home'] :is(.home-intro,.home-banya,.home-restaurant,.home-water,.editorial) h2 { font-size: 40px; }
+  html.collection-screen-mode body[data-page='home'] main#content > .home-stays { min-height: 390px; }
+  html.collection-screen-mode body[data-page='home'] main#content > .home-leisure { min-height: 430px; }
+  html.collection-screen-mode body[data-page='home'] main#content > .home-restaurant { min-height: 360px; }
+  html.collection-screen-mode body[data-page='home'] main#content > .panorama { min-height: 410px; }
+}
+
+/* A short landscape phone can scroll through a chapter. Give the photograph
+   its own space instead of squeezing it into the last few pixels. */
+@media (orientation: landscape) and (max-height: 659px) and (max-width: 1000px) {
+  html.collection-screen-mode body[data-page='home'] main#content > :is(.home-hero,.home-evening,.hero,.panorama,.closing) {
+    height: auto;
+    min-height: max(400px, var(--chapter-height));
+  }
+  html.collection-screen-mode body[data-page='home'] :is(.home-hero > img,.home-evening > img,.hero-media,.panorama-media,.closing-media) {
+    flex: none;
+    height: auto;
+    min-height: 220px;
+    aspect-ratio: 2 / 1;
+  }
+}
+
+/* The home page has one family photograph and one link to all activities. */
+body[data-page='home'] .home-leisure-family {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(28px, 5vw, 72px);
+  padding: 48px var(--g);
+}
+html.collection-screen-mode body[data-page='home'] main#content > .home-leisure-family {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  align-content: center;
+  gap: clamp(28px, 5vw, 72px);
+  height: auto;
+  min-height: max(400px, var(--chapter-height));
+  padding: var(--chapter-space) var(--g);
+}
+body[data-page='home'] .home-leisure-family .home-leisure-copy { min-width: 0; }
+body[data-page='home'] .home-leisure-family .home-leisure-copy h2 {
+  margin: 0 0 24px;
+  font-size: clamp(36px, 4.5vw, 70px);
+  line-height: .98;
+}
+body[data-page='home'] .home-leisure-family .home-link { margin: 0; }
+body[data-page='home'] .home-leisure-family .home-leisure-media {
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  margin: 0;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+}
+body[data-page='home'] .home-leisure-family .home-leisure-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 42%;
+  transform: none;
+}
+
+@media (min-width: 1200px) and (max-width: 1399px) {
+  html.collection-screen-mode body[data-page='home'] { padding-bottom: 0; }
+}
+
+@media (min-width: 701px) and (max-width: 1099px) and (orientation: portrait) {
+  body[data-page='home'] .home-leisure-family,
+  html.collection-screen-mode body[data-page='home'] main#content > .home-leisure-family {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+  body[data-page='home'] .home-leisure-family .home-leisure-copy { grid-row: 2; }
+  body[data-page='home'] .home-leisure-family .home-leisure-media { grid-row: 1; }
+  body[data-page='home'] .home-leisure-family .home-leisure-copy h2 { font-size: clamp(38px, 5.4vw, 56px); }
+}
+
+@media (max-width: 700px) {
+  body[data-page='home'] .home-leisure-family,
+  html.collection-screen-mode body[data-page='home'] main#content > .home-leisure-family {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 22px;
+    min-height: max(400px, var(--chapter-height));
+    padding: 20px var(--g);
+  }
+  body[data-page='home'] .home-leisure-family .home-leisure-copy { grid-row: 2; }
+  body[data-page='home'] .home-leisure-family .home-leisure-copy h2 { font-size: clamp(32px, 8.4vw, 48px); }
+  body[data-page='home'] .home-leisure-family .home-leisure-media { grid-row: 1; aspect-ratio: 4 / 3; }
+}

@@ -1,4 +1,4 @@
-import { applyCollectionShell, addCollectionStyle } from './collection-site-shell.js?v=device-1';
+import { applyCollectionShell, addCollectionStyle } from './collection-site-shell.js?v=20261023-entertainment-2';
 import { renderCollectionLeisure } from './collection-leisure.js?v=device-1';
 import { enhanceNearbyPlaces } from './collection-nearby.js?v=device-1';
 
@@ -49,9 +49,9 @@ export function enhanceCollectionSpaces() {
   const main = document.querySelector('#content');
   main.innerHTML = renderCollectionLeisure();
   const detailTitle = main.querySelector('.cl-detail h1')?.textContent.replace(/\.$/, '');
-  document.title = `${detailTitle || 'Досуг'} — Можайское водохранилище — A’MORE Collection`;
+  document.title = `${detailTitle || 'Развлечения и активный отдых'} — Можайское водохранилище — A’MORE Collection`;
   document.querySelector('meta[name="description"]').content =
-    'Семейный досуг в A’MORE Collection: велосипеды, теннис, мячи, зоопарк, рыбалка, садовые парники, павильон для мероприятий и зимние занятия. Карта окрестностей Можайского водохранилища: Музей Бородино, Можайск и усадьба Горетово.';
+    'Развлечения и активный отдых в A’MORE Collection: велосипеды, теннис, мячи, зоопарк, рыбалка, садовые парники, павильон для мероприятий и зимние занятия. Карта окрестностей Можайского водохранилища: Музей Бородино, Можайск и усадьба Горетово.';
   const intro = main.querySelector('.cl-intro');
   if (intro) {
     const lead = intro.querySelector('.cl-intro-copy > p');
