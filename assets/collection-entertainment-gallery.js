@@ -1,8 +1,8 @@
-import { entertainmentGalleries } from './collection-entertainment-gallery-data.js?v=20261023-gallery-2';
+import { entertainmentGalleries } from './collection-entertainment-gallery-data.js?v=20261023-photo-response-3';
 
 const imageRoot = new URL('../', import.meta.url);
-const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
-const sizes = '(max-width: 800px) calc(100vw - 40px), (max-width: 1680px) 54vw, 800px';
+// 1.15 / 2.15 of the desktop row after its gutters and column gap.
+const sizes = '(max-width: 700px) calc(100vw - 40px), (max-width: 800px) 91.6vw, (max-width: 1680px) 46.59vw, 800px';
 
 function setPhotograph(image, photograph) {
   image.sizes = sizes;
@@ -27,15 +27,15 @@ function arrowButton(direction, title) {
 function initializeGallery(story, photographs) {
   if (!Array.isArray(photographs) || photographs.length < 2) return;
   const figure = story.querySelector('.entertainment-photo');
-  const image = figure?.querySelector('img');
+  let image = figure?.querySelector('img');
   if (!figure || !image || figure.dataset.galleryReady !== undefined) return;
   const title = story.querySelector('h2')?.textContent.trim() || 'Развлечения';
   let selected = 0;
   let requested = 0;
   let generation = 0;
   let pointer = null;
-  let transition = null;
-  let outgoing = null;
+  let nearby = false;
+  let visible = false;
   const prepared = new Map();
 
   figure.classList.add('entertainment-gallery');
@@ -45,7 +45,12 @@ function initializeGallery(story, photographs) {
   figure.setAttribute('aria-roledescription', 'галерея');
   figure.setAttribute('aria-label', `Фотографии: ${title}`);
   image.draggable = false;
-  setPhotograph(image, photographs[0]);
+  // Retain the HTML image and its in-flight request. Reassigning src/srcset
+  // during startup needlessly competes with the first requested photograph.
+  const imageClass = image.className;
+  prepared.set(0, image.hasAttribute('data-gallery-preview')
+    ? { preview: image, previewReady: image.complete && image.naturalWidth > 0 }
+    : { full: image, fullReady: image.complete && image.naturalWidth > 0 });
 
   const controls = document.createElement('div');
   controls.className = 'entertainment-gallery-controls';
@@ -64,62 +69,133 @@ function initializeGallery(story, photographs) {
   figure.append(controls, status);
 
   const wrap = index => (index + photographs.length) % photographs.length;
-  function warm(index) {
-    if (!prepared.has(index)) {
-      const preload = new Image();
-      preload.decoding = 'async';
-      setPhotograph(preload, photographs[index]);
-      const ready = preload.decode().catch(error => { prepared.delete(index); throw error; });
-      prepared.set(index, ready);
-    }
+  function recordFor(index) {
+    if (!prepared.has(index)) prepared.set(index, {});
     return prepared.get(index);
   }
 
-  function clearTransition() {
-    transition?.cancel();
-    transition = null;
-    outgoing?.remove();
-    outgoing = null;
+  function decode(image) {
+    if (image.complete && image.naturalWidth) return Promise.resolve(image);
+    return image.decode().then(() => image);
+  }
+
+  function preparePreview(index, priority = 'low') {
+    const record = recordFor(index);
+    if (!record.previewPromise) {
+      const preview = record.preview || new Image();
+      if (!record.preview) {
+        preview.decoding = 'async';
+        preview.fetchPriority = priority;
+        preview.src = new URL(photographs[index].previewSrc, imageRoot).href;
+        preview.alt = photographs[index].alt;
+        preview.width = photographs[index].width;
+        preview.height = photographs[index].height;
+      }
+      record.preview = preview;
+      record.previewPromise = decode(preview).then(() => {
+        record.previewReady = true;
+        return preview;
+      });
+      // Background requests must not produce an unhandled rejection.
+      void record.previewPromise.catch(() => {});
+    }
+    record.preview.fetchPriority = priority;
+    return record.previewPromise;
+  }
+
+  function prepareFull(index, priority = 'low') {
+    const record = recordFor(index);
+    if (!record.full) {
+      record.full = new Image();
+      record.full.decoding = 'async';
+      record.full.loading = 'eager';
+      record.full.fetchPriority = priority;
+      setPhotograph(record.full, photographs[index]);
+    }
+    record.full.fetchPriority = priority;
+    if (record.fullReady && !record.full.complete) {
+      record.fullReady = false;
+      record.fullPromise = null;
+    }
+    if (!record.fullPromise) {
+      record.fullPromise = decode(record.full).then(() => {
+        record.fullReady = true;
+        return record.full;
+      }).catch(error => {
+        record.fullPromise = null;
+        throw error;
+      });
+      void record.fullPromise.catch(() => {});
+    }
+    return record.fullPromise;
+  }
+
+  function warmNeighbours() {
+    if (!nearby || navigator.connection?.saveData) return;
+    const origin = selected;
+    const after = wrap(origin + 1);
+    const before = wrap(origin - 1);
+    // Tiny previews are ready first; only one full neighbour downloads at a
+    // time. Off-screen galleries never start a page-wide preload burst.
+    void Promise.allSettled([preparePreview(after), preparePreview(before)]).then(async () => {
+      if (!visible || selected !== origin) return;
+      const full = await prepareFull(origin).catch(() => null);
+      if (!visible || selected !== origin || requested !== origin) return;
+      if (full && image.hasAttribute('data-gallery-preview')) display(full, origin);
+      await prepareFull(after).catch(() => {});
+      if (visible && selected === origin) await prepareFull(before).catch(() => {});
+    });
+  }
+
+  function display(node, index, preview = false) {
+    if (node === image) return;
+    const old = image;
+    image = node;
+    image.className = imageClass;
+    image.removeAttribute('aria-hidden');
+    image.draggable = false;
+    image.alt = photographs[index].alt;
+    image.toggleAttribute('data-gallery-preview', preview);
+    // Swap already decoded nodes atomically. An animated outgoing overlay can
+    // remain above the new photograph in background Safari windows.
+    old.replaceWith(image);
+    selected = index;
+    figure.dataset.galleryIndex = String(selected);
+    position.textContent = `${selected + 1} / ${photographs.length}`;
+    status.textContent = `${title}: фотография ${selected + 1} из ${photographs.length}`;
   }
 
   async function show(index) {
     requested = wrap(index);
     const target = requested;
     const token = ++generation;
-    if (target === selected) {
-      clearTransition();
-      setPhotograph(image, photographs[selected]);
+    const record = recordFor(target);
+    if (target === selected && !image.hasAttribute('data-gallery-preview')) {
       figure.removeAttribute('aria-busy');
       return;
     }
     figure.setAttribute('aria-busy', 'true');
     try {
-      await warm(target);
-      if (token !== generation) return;
-      clearTransition();
-      outgoing = image.cloneNode();
-      outgoing.className = 'entertainment-gallery-outgoing';
-      outgoing.alt = '';
-      outgoing.setAttribute('aria-hidden', 'true');
-      figure.insertBefore(outgoing, controls);
-      image.loading = 'eager';
-      setPhotograph(image, photographs[target]);
-      await image.decode();
-      if (token !== generation) return;
-      selected = target;
-      figure.dataset.galleryIndex = String(selected);
-      position.textContent = `${selected + 1} / ${photographs.length}`;
-      status.textContent = `${title}: фотография ${selected + 1} из ${photographs.length}`;
-      figure.removeAttribute('aria-busy');
-      if (!reducedMotion.matches && outgoing?.animate) {
-        transition = outgoing.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200, easing: 'ease-out', fill: 'forwards' });
-        await transition.finished.catch(() => {});
+      if (record.fullReady && record.full.complete && record.full.naturalWidth) display(record.full, target);
+      else {
+        // Respond with the selected photograph, even while its sharp version
+        // is still crossing a slow connection. Never show a different frame.
+        const previewReady = preparePreview(target, 'high');
+        if (record.previewReady) display(record.preview, target, true);
+        const fullReady = record.previewReady
+          ? prepareFull(target, 'high')
+          : previewReady.catch(() => {}).then(() => prepareFull(target, 'high'));
+        const first = await Promise.any([previewReady, fullReady]);
+        if (token !== generation) return;
+        display(first, target, first === record.preview);
+        const full = await fullReady;
+        if (token !== generation) return;
+        display(full, target);
       }
-      if (token === generation) clearTransition();
+      figure.removeAttribute('aria-busy');
+      warmNeighbours();
     } catch {
       if (token !== generation) return;
-      clearTransition();
-      setPhotograph(image, photographs[selected]);
       figure.removeAttribute('aria-busy');
       status.textContent = 'Не удалось загрузить фотографию. Попробуйте другую.';
     }
@@ -127,8 +203,13 @@ function initializeGallery(story, photographs) {
 
   previous.addEventListener('click', () => { void show(requested - 1); });
   next.addEventListener('click', () => { void show(requested + 1); });
-  previous.addEventListener('pointerenter', () => { void warm(wrap(requested - 1)).catch(() => {}); });
-  next.addEventListener('pointerenter', () => { void warm(wrap(requested + 1)).catch(() => {}); });
+  const anticipate = direction => {
+    const target = wrap(requested + direction);
+    void preparePreview(target).then(() => prepareFull(target)).catch(() => {});
+  };
+  previous.addEventListener('pointerenter', () => anticipate(-1));
+  next.addEventListener('pointerenter', () => anticipate(1));
+  figure.addEventListener('focusin', warmNeighbours);
   figure.addEventListener('keydown', event => {
     if (event.altKey || event.ctrlKey || event.metaKey || !['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
     event.preventDefault();
@@ -137,8 +218,27 @@ function initializeGallery(story, photographs) {
   figure.addEventListener('pointerdown', event => {
     if (event.pointerType === 'mouse' || event.target.closest('button')) return;
     pointer = { id: event.pointerId, x: event.clientX, y: event.clientY };
+    warmNeighbours();
     figure.setPointerCapture(event.pointerId);
   });
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(entries => {
+      nearby = entries[0].isIntersecting;
+      image.fetchPriority = nearby ? 'high' : 'low';
+      if (nearby) warmNeighbours();
+      else {
+        // Retain only the displayed node off screen, allowing decoded buffers
+        // from previously visited rows to be reclaimed on small devices.
+        for (const index of prepared.keys()) if (index !== selected) prepared.delete(index);
+      }
+    }, { rootMargin: '160px 0px' });
+    observer.observe(figure);
+    const visibleObserver = new IntersectionObserver(entries => {
+      visible = entries[0].isIntersecting;
+      if (visible) warmNeighbours();
+    });
+    visibleObserver.observe(figure);
+  }
   figure.addEventListener('pointercancel', () => { pointer = null; });
   figure.addEventListener('pointerup', event => {
     const gesture = pointer;
@@ -148,7 +248,7 @@ function initializeGallery(story, photographs) {
     const dy = event.clientY - gesture.y;
     if (Math.abs(dx) >= 45 && Math.abs(dx) > Math.abs(dy) * 1.3) void show(requested + (dx < 0 ? 1 : -1));
   });
-  window.addEventListener('pagehide', () => { generation += 1; clearTransition(); figure.removeAttribute('aria-busy'); }, { once: true });
+  window.addEventListener('pagehide', () => { generation += 1; figure.removeAttribute('aria-busy'); }, { once: true });
 }
 
 function initializeEntertainmentGalleries() {

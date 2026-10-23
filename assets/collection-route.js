@@ -8,7 +8,7 @@
   const [folder, nestedFile] = relative.split('/');
   const cityFolder = ['ruza', 'krasnoyarsk'].includes(folder) ? folder : null;
   const file = cityFolder ? nestedFile : folder;
-  if (!/^(hotel|rooms|spaces|gallery|about|location|booking|leisure-[a-z]+)\.html$/.test(file || '')) return;
+  if (!/^(hotel|rooms|spaces|about|location|booking|leisure-[a-z]+)\.html$/.test(file || '')) return;
   const cities = new Map([['moscow', 'mozhaysk'], ['petersburg', 'ruza'], ['mozhaysk', 'mozhaysk'], ['ruza', 'ruza'], ['krasnoyarsk', 'krasnoyarsk']]);
   const normalize = city => cities.get(city) || null;
   let saved;

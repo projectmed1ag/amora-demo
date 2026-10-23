@@ -1,4 +1,4 @@
-import { applyCollectionShell } from './collection-site-shell.js?v=20261023-entertainment-2';
+import { applyCollectionShell } from './collection-site-shell.js?v=20261023-photo-response-3';
 
 const arrow = '<svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10h22m-6-6 6 6-6 6"/></svg>';
 
@@ -15,7 +15,7 @@ function addStyles(id, file) {
 export function enhanceCollectionRooms() {
   applyCollectionShell('rooms');
   document.body.classList.add('collection-rooms-page');
-  addStyles('collection-rooms-style', './collection-rooms.css?v=site-1');
+  addStyles('collection-rooms-style', './collection-rooms.css?v=20261023-photo-response-3');
 
   const main = document.querySelector('#content');
   const articles = [...main.querySelectorAll('.room-houseboat')];

@@ -85,7 +85,7 @@
     ['collection-home-style', './collection-home.css?v=home-1'],
     ['collection-site-shell-style', './collection-site-shell.css?v=device-1'],
   ];
-  if (page === 'rooms') styles.push(['collection-rooms-style', './collection-rooms.css?v=site-1']);
+  if (page === 'rooms') styles.push(['collection-rooms-style', './collection-rooms.css?v=20261023-photo-response-3']);
   if (page === 'booking') styles.push(['collection-booking-style', './collection-booking.css?v=site-1']);
   if (page === 'gallery' || page === 'about') styles.push(['collection-editorial-style', './collection-editorial.css?v=about-1']);
   if (page === 'location' || page === 'spaces') styles.push(['collection-site-style', './collection-site.css?v=site-1']);
