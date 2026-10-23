@@ -3,18 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="Три места, чтобы замедлиться. Откройте отели A’MORE Collection: Можайское водохранилище, Руза и Красноярск." />
+    <meta name="description" content="Отели A’MORE Collection: Можайское водохранилище, Руза и Красноярск." />
     <meta name="theme-color" content="#0b0908" />
     <title>A’MORE Collection — выберите свой отель</title>
     <link rel="preload" href="./fonts/spectral-400-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="icon" href="data:;base64,iVBORw0KGgo=" />
-    <link rel="preload" href="./fonts/cormorant-400-cyrillic.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="./fonts/cormorant-400-latin.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="stylesheet" href="./assets/collection-entry.css?v=divider-1" />
+    <link rel="stylesheet" href="./assets/collection-entry.css?v=20261023-panel-links-1" />
     <link id="collection-brand-style" rel="stylesheet" href="./assets/collection-brand.css?v=original-1">
     <link rel="stylesheet" href="./assets/collection-motion.css?v=static-1" />
+      <link rel="preload" href="./fonts/amore-condensed-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="./assets/collection-refinement.css?v=20261023-panel-links-1">
+    <link rel="stylesheet" href="./assets/collection-refinement-pages.css?v=20261023-responsive-1">
+    <link rel="stylesheet" href="./assets/collection-navigation.css?v=20261023-chapter-response-1">
+    <script type="module" src="./assets/collection-refinement.js?v=20261023-entertainment-2"></script>
+      <link rel="stylesheet" href="./assets/collection-page-motion.css?v=20261022-1">
+    <script type="module" src="./assets/collection-page-motion.js?v=20261022-1"></script>
   </head>
-  <body>
+  <body class="collection-entry-page">
     <a class="skip-link" href="#hotels">К выбору отеля</a>
     <header class="collection-header">
       <a class="collection-brand amore-logo" href="./" aria-label="A’MORE Collection — главная">
@@ -24,48 +29,48 @@
     </header>
     <main class="hotel-collection" id="hotels" tabindex="-1">
       <h1 class="visually-hidden">Отели A’MORE Collection</h1>
-      <article class="hotel hotel-mozhaysk" aria-labelledby="mozhaysk-title">
+      <a class="hotel hotel-mozhaysk" href="./hotel.html?city=mozhaysk" aria-labelledby="mozhaysk-title">
         <picture class="hotel-picture">
-          <img class="hotel-photo" src="./images/destinations/mozhaysk.jpg" width="1536" height="1024" alt="Дом с панорамными окнами и причал на лесном берегу Можайского водохранилища" fetchpriority="high" />
+          <img class="hotel-photo" src="./images/responsive/rooms/mozhaysk/standard-houseboat/exterior-day-1920.webp" srcset="./images/responsive/rooms/mozhaysk/standard-houseboat/exterior-day-768.webp 768w, ./images/responsive/rooms/mozhaysk/standard-houseboat/exterior-day-1152.webp 1152w, ./images/responsive/rooms/mozhaysk/standard-houseboat/exterior-day-1536.webp 1536w, ./images/responsive/rooms/mozhaysk/standard-houseboat/exterior-day-1920.webp 1920w" sizes="(max-width: 600px) and (orientation: portrait) 100vw, max(33.334vw, 177.778svh)" width="1920" height="1080" alt="Хаусбот с открытой террасой на Можайском водохранилище" fetchpriority="high" />
         </picture>
         <div class="hotel-content">
           <p class="hotel-location"><span class="hotel-number" aria-hidden="true">01 /</span> Московская область</p>
           <h2 class="hotel-name" id="mozhaysk-title">Можайское<span class="visually-hidden"> водохранилище</span></h2>
-          <p class="hotel-description">Лесной берег, открытый горизонт<br class="desktop-break" /> и время для себя у большой воды.</p>
-          <a class="hotel-link" href="./hotel.html?city=mozhaysk" aria-label="Подробнее об отеле — Можайское водохранилище">
+          <p class="hotel-description">Хаусботы на Можайском водохранилище.</p>
+          <span class="hotel-link" aria-hidden="true">
             <span>Подробнее об отеле</span>
             <span class="hotel-arrow" aria-hidden="true"><svg viewBox="0 0 28 20" width="24" height="18" aria-hidden="true" focusable="false"><path d="M2 10h22m-6-6 6 6-6 6" /></svg></span>
-          </a>
+          </span>
         </div>
-      </article>
-      <article class="hotel hotel-ruza" aria-labelledby="ruza-title">
+      </a>
+      <a class="hotel hotel-ruza" href="./ruza/hotel.html?city=ruza" aria-labelledby="ruza-title">
         <picture class="hotel-picture">
-          <img class="hotel-photo" src="./images/destinations/ruza.jpg" width="1536" height="1024" alt="Деревянный дом с террасой среди сосен и берёз у тихой воды в Рузе" />
+          <img class="hotel-photo" src="./images/responsive/destinations/ruza-1536.webp" srcset="./images/responsive/destinations/ruza-768.webp 768w, ./images/responsive/destinations/ruza-1152.webp 1152w, ./images/responsive/destinations/ruza-1536.webp 1536w" sizes="(max-width: 600px) and (orientation: portrait) 100vw, max(33.334vw, 150svh)" width="1536" height="1024" alt="Деревянный дом с террасой среди сосен и берёз у тихой воды в Рузе" />
         </picture>
         <div class="hotel-content">
           <p class="hotel-location"><span class="hotel-number" aria-hidden="true">02 /</span> Московская область</p>
           <h2 class="hotel-name" id="ruza-title">Руза</h2>
-          <p class="hotel-description">Неспешные дни среди сосен,<br class="desktop-break" /> лесные прогулки и уютные вечера.</p>
-          <a class="hotel-link" href="./ruza/hotel.html?city=ruza" aria-label="Подробнее об отеле — Руза">
+          <p class="hotel-description">Номера и террасы в Рузе.</p>
+          <span class="hotel-link" aria-hidden="true">
             <span>Подробнее об отеле</span>
             <span class="hotel-arrow" aria-hidden="true"><svg viewBox="0 0 28 20" width="24" height="18" aria-hidden="true" focusable="false"><path d="M2 10h22m-6-6 6 6-6 6" /></svg></span>
-          </a>
+          </span>
         </div>
-      </article>
-      <article class="hotel hotel-krasnoyarsk" aria-labelledby="krasnoyarsk-title">
+      </a>
+      <a class="hotel hotel-krasnoyarsk" href="./krasnoyarsk/hotel.html?city=krasnoyarsk" aria-labelledby="krasnoyarsk-title">
         <picture class="hotel-picture">
-          <img class="hotel-photo" src="./images/destinations/krasnoyarsk.jpg" width="1536" height="1024" alt="Дом на сосновом склоне с видом на широкую реку и горы под Красноярском" />
+          <img class="hotel-photo" src="./images/responsive/destinations/krasnoyarsk-1536.webp" srcset="./images/responsive/destinations/krasnoyarsk-768.webp 768w, ./images/responsive/destinations/krasnoyarsk-1152.webp 1152w, ./images/responsive/destinations/krasnoyarsk-1536.webp 1536w" sizes="(max-width: 600px) and (orientation: portrait) 100vw, max(33.334vw, 150svh)" width="1536" height="1024" alt="Дом на сосновом склоне с видом на широкую реку и горы под Красноярском" />
         </picture>
         <div class="hotel-content">
           <p class="hotel-location"><span class="hotel-number" aria-hidden="true">03 /</span> Красноярский край</p>
           <h2 class="hotel-name" id="krasnoyarsk-title">Красноярск</h2>
-          <p class="hotel-description">Сосновые склоны, простор<br class="desktop-break" /> и отдых вдали от привычного ритма.</p>
-          <a class="hotel-link" href="./krasnoyarsk/hotel.html?city=krasnoyarsk" aria-label="Подробнее об отеле — Красноярск">
+          <p class="hotel-description">Номера в Красноярском крае.</p>
+          <span class="hotel-link" aria-hidden="true">
             <span>Подробнее об отеле</span>
             <span class="hotel-arrow" aria-hidden="true"><svg viewBox="0 0 28 20" width="24" height="18" aria-hidden="true" focusable="false"><path d="M2 10h22m-6-6 6 6-6 6" /></svg></span>
-          </a>
+          </span>
         </div>
-      </article>
+      </a>
     </main>
   </body>
 </html>

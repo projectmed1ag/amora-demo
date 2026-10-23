@@ -3,13 +3,11 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Демонстрация выбора хаусбота, дат и гостей в A’MORE Collection.">
+    <meta name="description" content="Выбор хаусбота, дат и гостей в A’MORE Collection.">
     <meta name="theme-color" content="#f6f3ed">
     <title>Бронирование — Можайское водохранилище — A’MORE Collection</title>
     <link rel="preload" href="./fonts/spectral-400-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
-    <link rel="preload" href="./fonts/cormorant-400-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="./fonts/cormorant-400-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" crossorigin="" href="./assets/styles-B5T6wf-2.css">
     <link id="collection-home-style" rel="stylesheet" href="./assets/collection-home.css?v=home-1">
     <link id="collection-site-shell-style" rel="stylesheet" href="./assets/collection-site-shell.css?v=header-2">
@@ -52,7 +50,16 @@
   }
 })();
 </script>
-    <script type="module" src="./assets/collection-runtime.js?v=static-1"></script>
+    <script type="module" src="./assets/collection-runtime.js?v=20261023-entertainment-2"></script>
+      <link rel="preload" href="./fonts/amore-condensed-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="./assets/collection-refinement.css?v=20261023-entertainment-2">
+    <link rel="stylesheet" href="./assets/collection-refinement-pages.css?v=20261023-responsive-1">
+    <link rel="stylesheet" href="./assets/collection-navigation.css?v=20261023-chapter-response-1">
+    <script type="module" src="./assets/collection-refinement.js?v=20261023-entertainment-2"></script>
+      <link rel="stylesheet" href="./assets/collection-page-motion.css?v=20261022-1">
+    <script type="module" src="./assets/collection-page-motion.js?v=20261022-1"></script>
+      <link rel="stylesheet" href="./assets/collection-trip-planner.css?v=20261022-1">
+    <script type="module" src="./assets/collection-trip-planner.js?v=20261023-leisure-catalog-1"></script>
   </head>
   <body data-page="booking" class="collection-home-page collection-site-page collection-booking-page" data-collection-static="">
     <a class="skip-link" href="#content">К содержанию</a>
@@ -61,42 +68,46 @@
 <input class="home-menu-toggle" id="home-menu-toggle" type="checkbox" aria-label="Меню разделов" aria-controls="home-nav"><nav class="home-nav" id="home-nav" aria-label="Разделы сайта">
 <a href="./hotel.html?city=mozhaysk">Главная</a>
 <a href="./rooms.html?city=mozhaysk" class="is-current-section">Хаусботы</a>
-<a href="./spaces.html?city=mozhaysk">Досуг</a>
+<a href="./banya.html?city=mozhaysk">Баня</a>
+<a href="./restaurant.html?city=mozhaysk">Ресторан</a>
+<a href="./spaces.html?city=mozhaysk">Развлечения и активный отдых</a>
 <a href="./gallery.html?city=mozhaysk">Галерея</a>
 <a href="./about.html?city=mozhaysk">Об отеле</a>
+
+<a class="mobile-hotels-link" href="./">Все отели</a>
 </nav>
 <div class="home-header-end"><a href="./">Отели</a><label class="home-menu" for="home-menu-toggle"><span></span><span></span></label></div>
 </header>
 
     <main id="content" class="interior-page" tabindex="-1"><section class="page-heading booking-heading collection-booking-heading" id="top" aria-labelledby="page-title">
     <nav class="breadcrumbs" aria-label="Хлебные крошки"><a data-page-link="" href="./hotel.html?city=mozhaysk">Главная</a><span aria-hidden="true">/</span><a data-page-link="" href="./rooms.html?city=mozhaysk">Хаусботы</a><span aria-hidden="true">/</span><span aria-current="page">Бронирование</span></nav>
-    <p class="eyebrow">Можайское водохранилище · Ваше путешествие</p><h1 id="page-title">Бронирование.</h1>
-    <p class="page-lead">Выберите даты и гостей — соберём детали вашего отдыха.</p>
+    <p class="eyebrow">Можайское водохранилище · Бронирование</p><h1 id="page-title">Бронирование.</h1>
+    <p class="page-lead">Выберите хаусбот, даты и количество гостей.</p>
   </section>
-  <p class="demo-notice collection-booking-notice">Демо-версия. Бронь не создаётся, данные не отправляются в отель. Цены и наличие хаусботов пока не подключены.</p>
+
   <div class="booking-layout collection-booking-layout">
     <div class="booking-main">
-      <noscript><p class="demo-notice">Чтобы проверить даты и собрать демо-заявку, включите JavaScript. Бронь на этой странице не создаётся.</p></noscript><form id="booking-form" novalidate="">
+      <noscript><p class="form-hint">Для заполнения формы включите JavaScript.</p></noscript><form id="booking-form" novalidate="">
         <fieldset><legend><span>01</span> Хаусбот и гости</legend>
-          <div class="form-row"><div class="form-field"><label for="booking-room">Категория хаусбота</label><select name="room" id="booking-room"><option value="standard" selected="">Стандарт · до 2 гостей</option><option value="comfort">Комфорт · до 2 гостей</option><option value="junior-suite">Полулюкс · до 3 гостей</option><option value="suite">Люкс · до 4 гостей</option></select></div>
-          <div class="form-field"><label for="booking-guests">Гостей, включая детей</label><select name="guests" id="booking-guests" aria-describedby="error-guests"><option value="1">1</option><option value="2" selected="">2</option><option value="3" disabled="">3</option><option value="4" disabled="">4</option></select><p class="field-error" id="error-guests" hidden=""></p></div></div>
+          <div class="form-row"><div class="form-field"><label for="booking-room">Категория хаусбота</label><select name="room" id="booking-room"><option value="standard" selected="">Стандарт · до 2 гостей</option><option value="comfort">Комфорт · до 4 гостей</option><option value="junior-suite">Полулюкс · до 4 гостей</option><option value="suite">Люкс · до 6 гостей</option></select></div>
+          <div class="form-field"><label for="booking-guests">Гостей, включая детей</label><select name="guests" id="booking-guests" aria-describedby="error-guests"><option value="1">1</option><option value="2" selected="">2</option><option value="3" disabled="">3</option><option value="4" disabled="">4</option><option value="5" disabled="">5</option><option value="6" disabled="">6</option></select><p class="field-error" id="error-guests" hidden=""></p></div></div>
           <p id="capacity-notice" class="form-hint" aria-live="polite"></p>
         </fieldset>
         <fieldset><legend><span>02</span> Даты отдыха</legend><div class="form-row"><div class="form-field"><label for="booking-checkin">Заезд</label><input id="booking-checkin" name="checkin" type="date" required="" aria-describedby="error-checkin"><p class="field-error" id="error-checkin" hidden=""></p></div><div class="form-field"><label for="booking-checkout">Выезд</label><input id="booking-checkout" name="checkout" type="date" required="" aria-describedby="error-checkout"><p class="field-error" id="error-checkout" hidden=""></p></div></div></fieldset>
-        <fieldset><legend><span>03</span> Ваши контакты</legend><p class="form-hint">Для демонстрации можно использовать вымышленные данные.</p><div class="form-row"><div class="form-field"><label for="booking-name">Имя</label><input id="booking-name" name="name" type="text" required="" aria-describedby="error-name" autocomplete="given-name" maxlength="80"><p class="field-error" id="error-name" hidden=""></p></div><div class="form-field"><label for="booking-email">Email</label><input id="booking-email" name="email" type="email" required="" aria-describedby="error-email" autocomplete="email" maxlength="120"><p class="field-error" id="error-email" hidden=""></p></div></div></fieldset>
+        <fieldset><legend><span>03</span> Ваши контакты</legend><div class="form-row"><div class="form-field"><label for="booking-name">Имя</label><input id="booking-name" name="name" type="text" required="" aria-describedby="error-name" autocomplete="given-name" maxlength="80"><p class="field-error" id="error-name" hidden=""></p></div><div class="form-field"><label for="booking-email">Email</label><input id="booking-email" name="email" type="email" required="" aria-describedby="error-email" autocomplete="email" maxlength="120"><p class="field-error" id="error-email" hidden=""></p></div></div></fieldset>
         <button class="primary-action" type="submit" disabled><span>Посмотреть итог</span><svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10h22m-6-6 6 6-6 6"></path></svg></button>
-        <noscript><p>Для работы демо-формы включите JavaScript. Данные формы не отправлены.</p></noscript>
+
       </form>
       <section id="booking-result" class="booking-result" aria-labelledby="result-title" hidden="">
-        <p class="eyebrow">Предварительный просмотр</p><h2 id="result-title" tabindex="-1">Демо-заявка готова.</h2><p>Бронь не создана. Данные никуда не отправлены.</p>
+        <h2 id="result-title" tabindex="-1">Ваш выбор.</h2>
         <dl id="result-details"></dl><button class="primary-action" type="button" id="edit-booking"><span>Изменить данные</span><svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10h22m-6-6 6 6-6 6"></path></svg></button>
       </section>
     </div>
     <aside class="booking-summary" aria-label="Ваш выбор">
-      <figure class="media" id="summary-photo" data-room="standard"><img src="./images/rooms/mozhaysk/standard.jpg" srcset="./images/mobile/rooms/mozhaysk/standard.jpg 768w, ./images/rooms/mozhaysk/standard.jpg 1536w" sizes="(max-width: 700px) 100vw, 44vw" alt="Светлая спальня с двуспальной кроватью и окном на воду" fetchpriority="high"></figure>
+      <figure class="media" id="summary-photo" data-room="standard"><img src="./images/rooms/mozhaysk/concept-covers/standard-v1.jpg" srcset="./images/mobile/rooms/mozhaysk/concept-covers/standard-v1.jpg 768w, ./images/rooms/mozhaysk/concept-covers/standard-v1.jpg 1086w" sizes="(max-width: 700px) 100vw, 44vw" width="1086" height="1448" alt="Хаусбот Стандарт" fetchpriority="high"></figure>
       <div class="booking-summary-copy"><p class="eyebrow">Можайское водохранилище</p><h2 id="summary-room">Стандарт</h2><p id="summary-features">24 м² · до 2 гостей</p>
         <dl><div><dt>Даты</dt><dd id="summary-dates">Выберите даты</dd></div><div><dt>Гости</dt><dd id="summary-guests">2</dd></div><div><dt>Стоимость</dt><dd>Не рассчитана</dd></div></dl>
-        <p class="form-hint">Категории и комплектация показаны для примера.</p>
+
       </div>
     </aside>
   </div></main>
