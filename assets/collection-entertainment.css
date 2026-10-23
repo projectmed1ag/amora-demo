@@ -1,0 +1,61 @@
+/* Alternating photographs beside a heading and connected description. */
+body.collection-entertainment-page[data-page='spaces'] #content .entertainment-banner { margin: 0; height: clamp(170px, 24vw, 360px); overflow: hidden; }
+body.collection-entertainment-page[data-page='spaces'] #content .entertainment-banner img { width: 100%; height: 100%; object-fit: cover; object-position: center; }
+body.collection-entertainment-page[data-page='spaces'] #content .entertainment-intro { padding: 48px var(--page-gutter) 32px; text-align: center; }
+body.collection-entertainment-page[data-page='spaces'] #content .entertainment-intro h1 { max-width: 1200px; margin: 0 auto; font-size: clamp(46px, 5.3vw, 84px); line-height: 1.02; }
+body.collection-entertainment-page[data-page='spaces'] #content .entertainment-intro > p { max-width: 760px; margin: 24px auto 0; color: #747782; font: 400 16px/1.7 var(--body-font); }
+body.collection-entertainment-page[data-page='spaces'] #content .entertainment-map-link { display: inline-flex; align-items: center; justify-content: center; gap: 16px; min-height: 44px; margin-top: 18px; color: #303442; font: 400 13px/1.5 var(--body-font); }
+body.collection-entertainment-page[data-page='spaces'] #content .entertainment-map-link svg { width: 24px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.1; }
+body.collection-entertainment-page[data-page='spaces'] #content .entertainment-toolbar { display: grid; grid-template-columns: minmax(0, 1fr) 220px; align-items: end; gap: 20px 32px; margin: 0 var(--page-gutter) 48px; padding: 20px 0; border-top: 1px solid #e3e4e8; border-bottom: 1px solid #e3e4e8; }
+body.collection-entertainment-page[data-page='spaces'] #content .entertainment-toolbar[hidden] { display: none; }
+body.collection-entertainment-page[data-page='spaces'] #content .entertainment-season-switch { display: flex; flex-wrap: wrap; gap: 0 24px; }
+body.collection-entertainment-page[data-page='spaces'] #content .entertainment-season-switch button { min-height: 44px; padding: 10px 0; border: 0; border-bottom: 1px solid transparent; background: transparent; color: #747782; font: 400 14px/1.5 var(--body-font); }
+body.collection-entertainment-page[data-page='spaces'] #content .entertainment-season-switch button[aria-pressed='true'] { border-bottom-color: #303442; color: #303442; font-weight: 700; }
+body.collection-entertainment-page[data-page='spaces'] #content .entertainment-date { color: #747782; font: 400 12px/1.5 var(--body-font); }
+body.collection-entertainment-page[data-page='spaces'] #content .entertainment-date input { display: block; width: 100%; min-width: 0; min-height: 44px; margin-top: 6px; padding: 9px 12px; border: 1px solid #e3e4e8; background: #fff; color: #303442; font: 400 15px/1.5 var(--body-font); color-scheme: light; appearance: none; -webkit-appearance: none; }
+body.collection-entertainment-page[data-page='spaces'] #content .entertainment-stories { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(44px, 5.5vw, 88px); width: 100%; max-width: 1680px; margin: 0 auto; padding: 0 var(--page-gutter); }
+body.collection-entertainment-page[data-page='spaces'] #content .entertainment-story { position: relative; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); grid-template-areas: 'photo copy'; align-items: center; gap: clamp(28px, 4.5vw, 76px); min-width: 0; scroll-margin-top: 0; }
+body.collection-entertainment-page[data-page='spaces'] #content .entertainment-story[hidden] { display: none; }
+/* Filtering seasons changes the visible row numbers, not the visual rhythm. */
+body.collection-entertainment-page[data-page='spaces'] #content .entertainment-story:nth-child(even of .entertainment-story:not([hidden])) { grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); grid-template-areas: 'copy photo'; }
+body.collection-entertainment-page[data-page='spaces'] #content .entertainment-anchor { position: absolute; top: 0; scroll-margin-top: 0; }
+body.collection-entertainment-page[data-page='spaces'] #content .entertainment-photo { grid-area: photo; width: 100%; margin: 0; aspect-ratio: 3 / 2; overflow: hidden; background: #f5f5f7; }
+body.collection-entertainment-page[data-page='spaces'] #content .entertainment-photo img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; transform: none; }
+body.collection-entertainment-page[data-page='spaces'] #content #children .entertainment-photo img { object-position: center 30%; }
+body.collection-entertainment-page[data-page='spaces'] #content .entertainment-story-copy { grid-area: copy; justify-self: center; width: 100%; max-width: 520px; margin: 0; padding: 0; }
+body.collection-entertainment-page[data-page='spaces'] #content .entertainment-story-copy h2 { margin: 0; font-size: clamp(36px, 3.4vw, 56px); line-height: 1.04; text-align: left; overflow-wrap: normal; }
+body.collection-entertainment-page[data-page='spaces'] #content .entertainment-description { margin: 24px 0 0; color: #303442; font: 400 15px/1.8 var(--body-font); }
+body.collection-entertainment-page[data-page='spaces'] #content .entertainment-description [data-entertainment-activity] { display: inline; font-weight: 400; }
+body.collection-entertainment-page[data-page='spaces'] #content .entertainment-gallery { position: relative; touch-action: pan-y pinch-zoom; }
+body.collection-entertainment-page[data-page='spaces'] #content .entertainment-gallery > img { position: absolute; inset: 0; z-index: 0; }
+body.collection-entertainment-page[data-page='spaces'] #content .entertainment-gallery > .entertainment-gallery-outgoing { z-index: 1; pointer-events: none; }
+body.collection-entertainment-page[data-page='spaces'] #content .entertainment-gallery-controls { position: absolute; z-index: 2; bottom: 12px; left: 50%; display: flex; align-items: center; gap: 4px; padding: 2px; transform: translateX(-50%); background: rgb(30 34 48 / 84%); color: #fff; }
+body.collection-entertainment-page[data-page='spaces'] #content .entertainment-gallery-controls button { display: grid; place-items: center; flex: none; width: 44px; height: 44px; min-height: 44px; padding: 10px; border: 0; background: transparent; color: inherit; touch-action: manipulation; }
+body.collection-entertainment-page[data-page='spaces'] #content .entertainment-gallery-controls button svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.2; }
+body.collection-entertainment-page[data-page='spaces'] #content .entertainment-gallery-controls [data-gallery-direction='previous'] svg { transform: rotate(180deg); }
+body.collection-entertainment-page[data-page='spaces'] #content .entertainment-gallery-controls button:focus-visible { outline: 2px solid #fff; outline-offset: -5px; }
+body.collection-entertainment-page[data-page='spaces'] #content .entertainment-gallery-position { min-width: 44px; color: #fff; font: 400 12px/1.4 var(--body-font); font-variant-numeric: tabular-nums; text-align: center; }
+body.collection-entertainment-page[data-page='spaces'] #content .entertainment-weather { margin: 0; padding: 42px var(--page-gutter); color: #747782; font: 400 12px/1.7 var(--body-font); text-align: center; }
+
+@media (max-width: 800px) {
+  body.collection-entertainment-page[data-page='spaces'] #content .entertainment-stories { gap: 44px; }
+  body.collection-entertainment-page[data-page='spaces'] #content .entertainment-story,
+  body.collection-entertainment-page[data-page='spaces'] #content .entertainment-story:nth-child(even of .entertainment-story:not([hidden])) { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'photo' 'copy'; gap: 22px; }
+  body.collection-entertainment-page[data-page='spaces'] #content .entertainment-story-copy { max-width: none; }
+}
+
+@media (max-width: 700px) {
+  body.collection-entertainment-page[data-page='spaces'] #content .entertainment-banner { height: 170px; }
+  body.collection-entertainment-page[data-page='spaces'] #content .entertainment-intro { padding-top: 32px; padding-bottom: 24px; }
+  body.collection-entertainment-page[data-page='spaces'] #content .entertainment-intro h1 { font-size: clamp(42px, 10.8vw, 64px); }
+  body.collection-entertainment-page[data-page='spaces'] #content .entertainment-intro > p { margin-top: 20px; font-size: 14px; }
+  body.collection-entertainment-page[data-page='spaces'] #content .entertainment-map-link { font-size: 12px; gap: 10px; }
+  body.collection-entertainment-page[data-page='spaces'] #content .entertainment-toolbar { grid-template-columns: minmax(0, 1fr); gap: 16px; margin-bottom: 28px; padding-block: 16px; }
+  body.collection-entertainment-page[data-page='spaces'] #content .entertainment-season-switch { justify-content: space-between; flex-wrap: nowrap; gap: 8px; }
+  body.collection-entertainment-page[data-page='spaces'] #content .entertainment-season-switch button { font-size: 12px; }
+  body.collection-entertainment-page[data-page='spaces'] #content .entertainment-date { width: min(100%, 240px); }
+  body.collection-entertainment-page[data-page='spaces'] #content .entertainment-stories { gap: 36px; }
+  body.collection-entertainment-page[data-page='spaces'] #content .entertainment-story-copy h2 { font-size: clamp(34px, 8.4vw, 48px); }
+  body.collection-entertainment-page[data-page='spaces'] #content .entertainment-description { margin-top: 18px; font-size: 14px; line-height: 1.75; }
+  body.collection-entertainment-page[data-page='spaces'] #content .entertainment-weather { padding-block: 30px; font-size: 11px; }
+}

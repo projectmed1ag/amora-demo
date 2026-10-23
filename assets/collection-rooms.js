@@ -1,4 +1,4 @@
-import { applyCollectionShell } from './collection-site-shell.js?v=device-1';
+import { applyCollectionShell } from './collection-site-shell.js?v=20261023-entertainment-2';
 
 const arrow = '<svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10h22m-6-6 6 6-6 6"/></svg>';
 
@@ -34,7 +34,6 @@ export function enhanceCollectionRooms() {
       alt="Панорамный хаусбот с открытой террасой на Можайском водохранилище">
     <div class="home-hero-bottom">
       <h1 id="page-title">Хаусботы<br>у большой воды.</h1>
-      <p class="stays-hero-copy">Четыре категории хаусботов<br>для загородного отдыха.</p>
     </div>`;
   const navigation = document.createElement('section');
   navigation.className = 'stays-navigation';
@@ -62,12 +61,11 @@ export function enhanceCollectionRooms() {
     });
   });
 
-  const note = main.querySelector('.concept-note');
-  main.querySelector('.room-list').after(note);
+  main.querySelector('.concept-note')?.remove();
   const next = main.querySelector('.page-next');
   next.className = 'stays-next';
   next.innerHTML = `<h2>За порогом —<br>целый день.</h2>
-    <a class="home-link" href="./spaces.html?city=mozhaysk"><span>Больше досуга</span>${arrow}</a>`;
+    <a class="home-link" href="./spaces.html?city=mozhaysk"><span>Все развлечения</span>${arrow}</a>`;
 
   if (location.hash) {
     let id;

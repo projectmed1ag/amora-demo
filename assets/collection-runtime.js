@@ -19,17 +19,17 @@ if (toggle && nav) {
     if (event.key === 'Escape' && toggle.checked) { close(); toggle.focus(); }
   });
   header.addEventListener('focusout', event => { if (event.relatedTarget && !header.contains(event.relatedTarget)) close(); });
-  matchMedia('(min-width: 701px)').addEventListener('change', close);
+  matchMedia('(min-width: 1400px)').addEventListener('change', close);
   sync();
 }
 
 const page = document.body.dataset.page;
 try {
   if (page === 'rooms' || page === 'gallery') {
-    const { initCollectionPhotos } = await import('./collection-photo-runtime.js?v=static-1');
+    const { initCollectionPhotos } = await import('./collection-photo-runtime.js?v=20261023-photo-demand-1');
     initCollectionPhotos(page);
   } else if (page === 'booking') {
-    const { initCollectionBooking } = await import('./collection-booking-runtime.js?v=static-1');
+    const { initCollectionBooking } = await import('./collection-booking-runtime.js?v=20261023-capacity-1');
     initCollectionBooking();
   } else if (page === 'spaces' && document.querySelector('#nearby')) {
     const { enhanceNearbyPlaces } = await import('./collection-nearby.js?v=static-1');

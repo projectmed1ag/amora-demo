@@ -1,0 +1,363 @@
+/* Separate service information and local request previews. Brand rules remain
+   entirely in collection-brand.css. */
+body.collection-service-page[data-page] #content .service-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, .8fr);
+  align-items: end;
+  gap: 20px 8%;
+  padding: 36px var(--g) 32px;
+}
+
+body.collection-service-page[data-page] #content .service-breadcrumbs {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+body.collection-service-page[data-page] #content .service-heading h1 {
+  margin: 0;
+  font-size: clamp(64px, 7vw, 106px);
+  line-height: .94;
+  overflow-wrap: normal;
+}
+
+body.collection-service-page[data-page] #content .service-lead {
+  max-width: 480px;
+  margin: 0;
+  color: #747782;
+  font: 400 17px/1.7 var(--body-font);
+}
+
+body.collection-service-page[data-page] #content .service-hero {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  overflow: hidden;
+}
+
+body.collection-service-page[data-page] #content .service-hero img {
+  display: block;
+  position: static;
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  object-fit: cover;
+  object-position: center;
+}
+
+body.collection-service-page[data-page] #content .service-description {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, .8fr);
+  gap: 8%;
+  padding: 64px var(--g);
+}
+
+body.collection-service-page[data-page] #content .service-description h2,
+body.collection-service-page[data-page] #content .service-reservation h2 {
+  max-width: 680px;
+  font-size: clamp(46px, 5.3vw, 78px);
+  line-height: 1;
+}
+
+body.collection-service-page[data-page] #content .service-description p,
+body.collection-service-page[data-page] #content .service-reservation p {
+  max-width: 590px;
+  margin: 0 0 22px;
+  color: #747782;
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+body.collection-service-page[data-page] #content .service-text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  max-width: 100%;
+  min-height: 44px;
+  color: #303442;
+  font: 400 13px/1.5 var(--body-font);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 5px;
+}
+
+.service-text-link svg,
+.service-action svg {
+  flex: none;
+  width: 24px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.1;
+}
+
+body.collection-service-page[data-page] #content .service-reservation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 48px;
+  margin: 0 var(--g);
+  padding: 56px 0 64px;
+  border-top: 1px solid #e3e4e8;
+}
+
+body.collection-service-page[data-page] #content .service-reservation h2 { margin-bottom: 22px; }
+body.collection-service-page[data-page] #content .service-reservation p { margin-bottom: 0; }
+
+body.collection-service-page[data-page] #content .service-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  flex: none;
+  width: fit-content;
+  max-width: 100%;
+  min-height: 52px;
+  padding: 16px 24px;
+  border: 1px solid #303442;
+  border-radius: 0;
+  background: #303442;
+  color: #fff;
+  font: 400 13px/1.45 var(--body-font);
+  letter-spacing: .015em;
+  text-align: center;
+  text-decoration: none;
+  white-space: normal;
+  transition: background 260ms ease, border-color 260ms ease;
+}
+
+body.collection-service-page[data-page] #content .service-action:hover {
+  border-color: #444958;
+  background: #444958;
+}
+
+body.collection-service-page[data-page] #content .service-action:focus-visible {
+  outline: 2px solid #303442;
+  outline-offset: 4px;
+}
+
+body.collection-service-page[data-page] #content .service-action:disabled {
+  opacity: .5;
+  cursor: default;
+}
+
+body.collection-service-page[data-page] #content .service-booking-heading { padding-bottom: 44px; }
+body.collection-service-page[data-page] #content .service-booking-heading h1 { font-size: clamp(60px, 7vw, 106px); }
+
+.service-booking-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, .38fr);
+  gap: clamp(44px, 7vw, 110px);
+  padding: 0 var(--g) 80px;
+}
+
+.service-booking-primary { min-width: 0; }
+
+body.collection-service-page[data-page] #content .service-demo-notice {
+  max-width: 720px;
+  margin: 22px 0 0;
+  padding: 18px 0 0;
+  border-top: 1px solid #e3e4e8;
+  color: #747782;
+  font: 400 13px/1.7 var(--body-font);
+}
+
+#service-request-form { margin: 0; }
+#service-request-form fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
+#service-request-form legend {
+  margin: 0 0 24px;
+  padding: 0;
+  color: #303442;
+  font: 600 38px/1.05 var(--display-font);
+  letter-spacing: .01em;
+  text-transform: uppercase;
+}
+
+.service-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.service-field { display: flex; flex-direction: column; align-items: stretch; gap: 8px; min-width: 0; }
+.service-field-wide { grid-column: 1 / -1; }
+#service-request-form label { color: #303442; font: 400 13px/1.6 var(--body-font); }
+#service-request-form label span { margin-left: 8px; color: #747782; font-size: 12px; }
+#service-request-form :is(input, select, textarea) {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 52px;
+  margin: 0;
+  padding: 13px 14px;
+  border: 1px solid #b9bcc4;
+  border-radius: 0;
+  background: #fff;
+  color: #303442;
+  color-scheme: light;
+  box-shadow: none;
+  font: 400 16px/1.5 var(--body-font);
+}
+#service-request-form select { padding-right: 30px; }
+#service-request-form textarea { min-height: 100px; resize: vertical; }
+.service-phone-control { display: flex; align-items: stretch; min-width: 0; border: 1px solid #b9bcc4; background: #fff; }
+.service-phone-prefix { display: grid; place-items: center; flex: none; width: 52px; color: #303442; font: 400 16px/1.5 var(--body-font); user-select: none; }
+#service-request-form .service-phone-control input { flex: 1; min-width: 0; border: 0; padding-left: 0; }
+.service-phone-control:focus-within { outline: 2px solid #303442; outline-offset: 3px; }
+body.collection-service-page[data-page] #content #service-request-form .service-phone-control input:is(:focus, :focus-visible) { outline: none; }
+.service-phone-control:has(input[aria-invalid='true']) { border-color: #9c342e; }
+#service-request-form :is(input, select, textarea)[aria-invalid="true"] { border-color: #9c342e; }
+body.collection-service-page[data-page] #content .service-field-help {
+  margin: 0;
+  color: #747782;
+  font: 400 12px/1.6 var(--body-font);
+}
+body.collection-service-page[data-page] #content .service-field-error {
+  margin: 0;
+  color: #9c342e;
+  font: 400 12px/1.6 var(--body-font);
+}
+.service-form-errors { margin-bottom: 28px; padding: 16px 20px; border: 1px solid #9c342e; color: #9c342e; }
+.service-form-errors p { margin: 0 0 8px; font-size: 14px; }
+.service-form-errors ul { margin: 0; padding-left: 20px; font-size: 13px; }
+.service-form-errors a { text-decoration: underline; text-underline-offset: 3px; }
+.service-submit-row { display: flex; align-items: center; gap: 24px; margin-top: 24px; }
+body.collection-service-page[data-page] #content .service-submit-row p { max-width: 270px; margin: 0; color: #747782; font-size: 12px; line-height: 1.6; }
+
+.service-booking-aside { align-self: start; padding-top: 28px; border-top: 1px solid #e3e4e8; }
+body.collection-service-page[data-page] #content .service-booking-aside h2 { margin-bottom: 20px; font-size: 40px; }
+body.collection-service-page[data-page] #content .service-booking-aside p { margin: 0 0 20px; color: #747782; font-size: 14px; line-height: 1.8; }
+.service-related-links { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; margin-top: 28px; }
+.service-related-links a { display: inline-flex; align-items: center; min-height: 44px; font-size: 13px; text-decoration: underline; text-underline-offset: 5px; }
+
+.service-request-result { padding-top: 4px; }
+body.collection-service-page[data-page] #content .service-request-result h2 { max-width: 650px; margin: 0 0 24px; font-size: clamp(44px, 5.3vw, 72px); }
+#service-result-title:focus { outline: none; }
+body.collection-service-page[data-page] #content .service-result-notice { margin: 0 0 32px; color: #747782; font-size: 14px; line-height: 1.7; }
+.service-result-details { margin: 0; }
+.service-result-details > div { display: grid; grid-template-columns: minmax(0, .5fr) minmax(0, 1fr); gap: 24px; padding: 17px 0; border-top: 1px solid #e3e4e8; }
+.service-result-details dt { margin: 0; color: #747782; font-size: 13px; }
+.service-result-details dd { min-width: 0; margin: 0; color: #303442; font-size: 15px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.service-result-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 20px 30px; margin-top: 32px; }
+
+.service-experience {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(340px, .85fr);
+  gap: clamp(32px, 5vw, 80px);
+  align-items: start;
+  padding: 0 var(--g) 24px;
+}
+
+.service-experience > .service-hero { align-self: start; }
+.service-reservation-panel { min-width: 0; scroll-margin-top: 0; }
+.service-reservation-panel:focus { outline: none; }
+body.collection-service-page[data-page] #content .service-eyebrow {
+  margin: 0 0 14px;
+  color: #747782;
+  font: 400 11px/1.5 var(--body-font);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+body.collection-service-page[data-page] #content .service-reservation-panel h2 {
+  margin: 0 0 18px;
+  font-size: clamp(42px, 4vw, 60px);
+  line-height: 1;
+}
+body.collection-service-page[data-page] #content .service-reservation-intro {
+  margin: 0 0 24px;
+  color: #747782;
+  font: 400 14px/1.7 var(--body-font);
+}
+.service-steps {
+  display: flex;
+  gap: 26px;
+  margin: 0 0 26px;
+  padding: 0 0 14px;
+  border-bottom: 1px solid #e3e4e8;
+  list-style: none;
+  color: #747782;
+  font: 400 12px/1.6 var(--body-font);
+}
+.service-steps li { display: flex; align-items: center; gap: 8px; }
+.service-steps li[aria-current='step'] { color: #303442; }
+.service-steps span { font-variant-numeric: tabular-nums; }
+.service-steps li[aria-current='step'] span { text-decoration: underline; text-underline-offset: 5px; }
+body.collection-service-page[data-page] #content .service-continue,
+body.collection-service-page[data-page] #content .service-submit-row .service-action { width: 100%; }
+body.collection-service-page[data-page] #content .service-continue { margin-top: 26px; }
+.service-visit-choice { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 22px; }
+body.collection-service-page[data-page] #content #service-visit-summary { margin: 10px 0 0; color: #747782; font: 400 13px/1.7 var(--body-font); }
+.service-edit-link {
+  flex: none;
+  min-height: 44px;
+  padding: 8px 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #303442;
+  font: 400 12px/1.6 var(--body-font);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+.service-edit-link:focus-visible { outline: 2px solid #303442; outline-offset: 4px; }
+#service-request-form .service-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  clip-path: inset(50%);
+  overflow: hidden;
+  white-space: nowrap;
+}
+#service-request-form [hidden],
+.service-reservation-panel [hidden] { display: none !important; }
+
+@media (max-width: 1000px) {
+  .service-experience { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+}
+
+@media (max-width: 700px) {
+  .service-experience { grid-template-columns: minmax(0, 1fr); gap: 32px; padding-bottom: 0; }
+  body.collection-service-page[data-page] #content .service-reservation-panel h2 { font-size: clamp(42px, 11vw, 56px); }
+  .service-visit-choice { flex-wrap: wrap; gap: 0 16px; }
+  .service-reservation-panel .service-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 16px; }
+}
+
+@media (max-width: 1000px) {
+  .service-booking-layout { grid-template-columns: minmax(0, 1fr); gap: 52px; }
+  .service-booking-aside { max-width: 680px; }
+  .service-related-links { flex-direction: row; flex-wrap: wrap; gap: 12px 28px; margin-top: 20px; }
+}
+
+@media (max-width: 700px) {
+  body.collection-service-page[data-page] #content .service-heading { grid-template-columns: minmax(0, 1fr); gap: 22px; padding: 28px var(--g) 34px; }
+  body.collection-service-page[data-page] #content .service-breadcrumbs { margin: 0; }
+  body.collection-service-page[data-page] #content .service-heading h1 { font-size: clamp(60px, 14vw, 90px); }
+  body.collection-service-page[data-page] #content .service-booking-heading h1 { font-size: clamp(50px, 11vw, 74px); }
+  body.collection-service-page[data-page] #content .service-lead { max-width: 100%; font-size: 15px; }
+  body.collection-service-page[data-page] #content .service-description { grid-template-columns: minmax(0, 1fr); gap: 26px; padding: 44px var(--g); }
+  body.collection-service-page[data-page] #content .service-description h2,
+  body.collection-service-page[data-page] #content .service-reservation h2 { font-size: clamp(42px, 10vw, 62px); }
+  body.collection-service-page[data-page] #content .service-reservation { flex-direction: column; align-items: flex-start; gap: 28px; padding: 36px 0 48px; }
+  body.collection-service-page[data-page] #content .service-reservation p,
+  body.collection-service-page[data-page] #content .service-description p { font-size: 15px; }
+  .service-booking-layout { padding-bottom: 48px; }
+  .service-fields { grid-template-columns: minmax(0, 1fr); gap: 22px; }
+  #service-request-form fieldset { margin-bottom: 0; }
+  #service-request-form legend { font-size: 34px; }
+  .service-submit-row { flex-direction: column; align-items: flex-start; gap: 16px; }
+  body.collection-service-page[data-page] #content .service-submit-row p { max-width: none; }
+  .service-result-details > div { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .service-result-actions { flex-direction: column; align-items: flex-start; gap: 16px; }
+}
+
+@media (max-width: 360px) {
+  body.collection-service-page[data-page] #content .service-action { gap: 14px; padding-inline: 18px; }
+  #service-request-form label span { display: block; margin-left: 0; }
+}
+
+@media (max-width: 359px) {
+  .service-reservation-panel .service-fields { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.collection-service-page[data-page] #content .service-action { transition: none; }
+}

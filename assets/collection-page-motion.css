@@ -1,0 +1,127 @@
+/* Motion enhances the existing layout; content is visible without JavaScript. */
+:root {
+  --collection-motion-ease: cubic-bezier(.22, 1, .36, 1);
+}
+
+html,
+html.collection-home-root {
+  scroll-padding-top: calc(var(--header-height, 104px) + 20px);
+}
+
+body[data-page='home'] main#content > section.section-navigation-target {
+  scroll-margin-top: 0;
+}
+
+body #content .collection-motion-item,
+body #hotels .collection-motion-item {
+  opacity: 1;
+  transform: none;
+  transition: opacity 850ms var(--collection-motion-ease),
+    transform 1050ms var(--collection-motion-ease);
+  transition-delay: var(--collection-motion-delay, 0ms);
+}
+
+body #content .collection-motion-item.is-motion-pending,
+body #hotels .collection-motion-item.is-motion-pending {
+  opacity: 0;
+  transform: translate3d(0, 22px, 0);
+}
+
+/* The old destination controller must not stack its own zoom underneath. */
+body #content .reveal.collection-motion-item > img {
+  transform: none;
+  transition: none;
+}
+
+body #content .collection-motion-item:focus-within,
+body #hotels .collection-motion-item:focus-within {
+  opacity: 1;
+  transform: none;
+  transition-delay: 0ms;
+}
+
+.section-navigation-link {
+  transition: color 350ms ease, opacity 350ms ease;
+}
+
+.section-navigation-link > span:last-child {
+  transition: color 350ms ease;
+}
+
+@view-transition { navigation: auto; }
+
+.home-header,
+.collection-header,
+.site-header { view-transition-name: collection-header; }
+
+main#content,
+main#hotels { view-transition-name: collection-content; }
+
+::view-transition,
+::view-transition-group(*),
+::view-transition-image-pair(*),
+::view-transition-old(*),
+::view-transition-new(*) { pointer-events: none; }
+
+::view-transition-group(collection-content),
+::view-transition-group(collection-header),
+::view-transition-old(root),
+::view-transition-new(root) { animation: none; }
+
+::view-transition-old(root),
+::view-transition-new(root) { mix-blend-mode: normal; }
+
+/* The original logo stays steady and fully opaque while the page changes. */
+::view-transition-group(collection-header) { z-index: 2; }
+::view-transition-old(collection-header) { display: none; }
+::view-transition-new(collection-header) { animation: none; opacity: 1; mix-blend-mode: normal; }
+
+::view-transition-old(collection-content) {
+  animation: collection-page-out 380ms cubic-bezier(.4, 0, 1, 1) both;
+  mix-blend-mode: normal;
+}
+
+::view-transition-new(collection-content) {
+  animation: collection-page-in 850ms var(--collection-motion-ease) 60ms both;
+  mix-blend-mode: normal;
+}
+
+@keyframes collection-page-out {
+  to { opacity: 0; transform: translate3d(0, -12px, 0); }
+}
+
+@keyframes collection-page-in {
+  from { opacity: 0; transform: translate3d(0, 22px, 0); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (max-width: 700px) {
+  body #content .collection-motion-item,
+  body #hotels .collection-motion-item {
+    transition-duration: 750ms, 900ms;
+  }
+
+  body #content .collection-motion-item.is-motion-pending,
+  body #hotels .collection-motion-item.is-motion-pending {
+    transform: translate3d(0, 16px, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html,
+  html.collection-home-root { scroll-behavior: auto; }
+
+  body #content .collection-motion-item,
+  body #hotels .collection-motion-item,
+  body #content .collection-motion-item.is-motion-pending,
+  body #hotels .collection-motion-item.is-motion-pending {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  @view-transition { navigation: none; }
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) { animation: none !important; }
+}
