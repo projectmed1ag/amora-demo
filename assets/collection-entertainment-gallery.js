@@ -1,11 +1,11 @@
-import { entertainmentGalleries } from './collection-entertainment-gallery-data.js?v=20261023-photo-response-3';
+import { entertainmentGalleries, getEntertainmentPhotographs } from './collection-entertainment-gallery-data.js?v=20261023-local-menu-seasons-1';
 
 const imageRoot = new URL('../', import.meta.url);
 // 1.15 / 2.15 of the desktop row after its gutters and column gap.
-const sizes = '(max-width: 700px) calc(100vw - 40px), (max-width: 800px) 91.6vw, (max-width: 1680px) 46.59vw, 800px';
+const sizes = '(max-width: 700px) 100vw, (max-width: 800px) 91.6vw, (max-width: 1680px) 46.59vw, 800px';
 
-function setPhotograph(image, photograph) {
-  image.sizes = sizes;
+function setPhotograph(image, photograph, gallerySizes = sizes) {
+  image.sizes = gallerySizes;
   image.srcset = photograph.mobileSrc
     ? `${new URL(photograph.mobileSrc, imageRoot).href} ${photograph.mobileWidth}w, ${new URL(photograph.src, imageRoot).href} ${photograph.width}w`
     : '';
@@ -25,11 +25,16 @@ function arrowButton(direction, title) {
 }
 
 function initializeGallery(story, photographs) {
-  if (!Array.isArray(photographs) || photographs.length < 2) return;
+  if (!Array.isArray(photographs) || !photographs.length) return;
   const figure = story.querySelector('.entertainment-photo');
   let image = figure?.querySelector('img');
   if (!figure || !image || figure.dataset.galleryReady !== undefined) return;
   const title = story.querySelector('h2')?.textContent.trim() || 'Развлечения';
+  const gallerySizes = figure.dataset.gallerySizes || sizes;
+  const overview = story.closest('[data-entertainment-overview]');
+  const keyFor = items => items.map(item => item.src).join('|');
+  let collectionKey = keyFor(photographs);
+  let displayedKey = collectionKey;
   let selected = 0;
   let requested = 0;
   let generation = 0;
@@ -110,7 +115,7 @@ function initializeGallery(story, photographs) {
       record.full.decoding = 'async';
       record.full.loading = 'eager';
       record.full.fetchPriority = priority;
-      setPhotograph(record.full, photographs[index]);
+      setPhotograph(record.full, photographs[index], gallerySizes);
     }
     record.full.fetchPriority = priority;
     if (record.fullReady && !record.full.complete) {
@@ -133,22 +138,22 @@ function initializeGallery(story, photographs) {
   function warmNeighbours() {
     if (!nearby || navigator.connection?.saveData) return;
     const origin = selected;
+    const key = collectionKey;
     const after = wrap(origin + 1);
     const before = wrap(origin - 1);
     // Tiny previews are ready first; only one full neighbour downloads at a
     // time. Off-screen galleries never start a page-wide preload burst.
     void Promise.allSettled([preparePreview(after), preparePreview(before)]).then(async () => {
-      if (!visible || selected !== origin) return;
+      if (!visible || selected !== origin || collectionKey !== key) return;
       const full = await prepareFull(origin).catch(() => null);
-      if (!visible || selected !== origin || requested !== origin) return;
+      if (!visible || selected !== origin || requested !== origin || collectionKey !== key) return;
       if (full && image.hasAttribute('data-gallery-preview')) display(full, origin);
       await prepareFull(after).catch(() => {});
-      if (visible && selected === origin) await prepareFull(before).catch(() => {});
+      if (visible && selected === origin && collectionKey === key) await prepareFull(before).catch(() => {});
     });
   }
 
   function display(node, index, preview = false) {
-    if (node === image) return;
     const old = image;
     image = node;
     image.className = imageClass;
@@ -158,8 +163,9 @@ function initializeGallery(story, photographs) {
     image.toggleAttribute('data-gallery-preview', preview);
     // Swap already decoded nodes atomically. An animated outgoing overlay can
     // remain above the new photograph in background Safari windows.
-    old.replaceWith(image);
+    if (old !== image) old.replaceWith(image);
     selected = index;
+    displayedKey = collectionKey;
     figure.dataset.galleryIndex = String(selected);
     position.textContent = `${selected + 1} / ${photographs.length}`;
     status.textContent = `${title}: фотография ${selected + 1} из ${photographs.length}`;
@@ -170,7 +176,7 @@ function initializeGallery(story, photographs) {
     const target = requested;
     const token = ++generation;
     const record = recordFor(target);
-    if (target === selected && !image.hasAttribute('data-gallery-preview')) {
+    if (target === selected && displayedKey === collectionKey && !image.hasAttribute('data-gallery-preview')) {
       figure.removeAttribute('aria-busy');
       return;
     }
@@ -225,7 +231,10 @@ function initializeGallery(story, photographs) {
     const observer = new IntersectionObserver(entries => {
       nearby = entries[0].isIntersecting;
       image.fetchPriority = nearby ? 'high' : 'low';
-      if (nearby) warmNeighbours();
+      if (nearby) {
+        if (displayedKey !== collectionKey) void show(requested);
+        else warmNeighbours();
+      }
       else {
         // Retain only the displayed node off screen, allowing decoded buffers
         // from previously visited rows to be reclaimed on small devices.
@@ -248,6 +257,26 @@ function initializeGallery(story, photographs) {
     const dy = event.clientY - gesture.y;
     if (Math.abs(dx) >= 45 && Math.abs(dx) > Math.abs(dy) * 1.3) void show(requested + (dx < 0 ? 1 : -1));
   });
+  function updateSeason(season) {
+    const items = getEntertainmentPhotographs(story.id, season);
+    if (!items.length) return;
+    figure.dataset.gallerySeason = season;
+    const key = keyFor(items);
+    controls.hidden = items.length < 2;
+    if (key === collectionKey) return;
+    generation += 1;
+    photographs = items;
+    collectionKey = key;
+    requested = 0;
+    selected = 0;
+    prepared.clear();
+    // Distant rows keep their existing valid node until they approach the
+    // viewport. Only the selected season is downloaded and decoded there.
+    if (nearby || visible || !('IntersectionObserver' in window)) void show(0);
+  }
+  const initialSeason = overview?.dataset.season || new URL(location.href).searchParams.get('season') || 'all';
+  updateSeason(initialSeason);
+  overview?.addEventListener('collection:leisure-season', event => updateSeason(event.detail.season));
   window.addEventListener('pagehide', () => { generation += 1; figure.removeAttribute('aria-busy'); }, { once: true });
 }
 

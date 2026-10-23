@@ -41,10 +41,10 @@ const activities = Object.freeze([
   sourceActivity('rental', 'Настольный теннис', 'spaces.html', 'rental', 'movement', warmSeasons),
   sourceActivity('rental', 'Мячи', 'spaces.html', 'rental', 'movement', warmSeasons),
   sourceActivity('rental', 'Спортивный инвентарь', 'spaces.html', 'rental', 'movement', warmSeasons),
-  sourceActivity('winter', 'Каток', 'spaces.html', 'winter', 'movement', ['winter']),
-  sourceActivity('motor', 'Снегоходы', 'spaces.html', 'winter', 'movement', ['winter']),
+  sourceActivity('winter', 'Каток', 'spaces.html', 'ice-rink', 'movement', ['winter']),
+  sourceActivity('motor', 'Снегоходы', 'spaces.html', 'snowmobiles', 'movement', ['winter']),
   sourceActivity('motor', 'Багги', 'spaces.html', 'buggy', 'movement', allSeasons),
-  sourceActivity('winter', 'Ватрушки', 'spaces.html', 'winter', 'movement', ['winter']),
+  sourceActivity('winter', 'Ватрушки', 'spaces.html', 'tubing', 'movement', ['winter']),
   Object.freeze({
     title: 'SUP-прогулки',
     description: 'Летние прогулки на SUP.',

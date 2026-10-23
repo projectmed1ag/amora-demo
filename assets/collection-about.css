@@ -43,13 +43,23 @@ body.collection-about-page[data-page='about'] #content .about-description-copy >
 }
 @media (max-width: 700px) {
   body.collection-about-page[data-page='about'] #content .about-description {
-    padding-block: 36px 48px;
+    padding: 36px 0 48px;
+  }
+  body.collection-about-page[data-page='about'] #content .about-description h1 {
+    margin-inline: 20px;
+    text-align: center;
   }
   body.collection-about-page[data-page='about'] #content .about-description-photo {
     margin-top: 24px;
   }
   body.collection-about-page[data-page='about'] #content .about-description-copy {
-    margin-top: 28px;
+    position: relative;
+    z-index: 1;
+    width: calc(100% - 32px);
+    margin: -36px 16px 0;
+    padding: 28px 20px;
+    background: #fff;
+    text-align: center;
   }
   body.collection-about-page[data-page='about'] #content .about-description-copy > p {
     font-size: 15px;

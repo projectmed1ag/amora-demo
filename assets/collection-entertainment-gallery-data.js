@@ -385,3 +385,57 @@ export const entertainmentGalleries = {
     }
   ]
 };
+
+// Winter activities have independent galleries; the original first photographs
+// are retained alongside the two additional views of the same activity.
+const generatedPhoto = (season, id, frame = '01') => ({
+  src: `images/mozhaysk/entertainment-seasons-v1/${season}-${id}-${frame}.webp`,
+  mobileSrc: `images/mobile/mozhaysk/entertainment-seasons-v1/${season}-${id}-${frame}.webp`,
+  previewSrc: `images/responsive/entertainment/${season}-${id}-${frame}-384.webp`,
+  alt: `${seasonNames[season]}: ${activityNames[id]}${frame === '01' ? '' : `, вид ${Number(frame)}`}`,
+  width: 1536,
+  height: 1024,
+  mobileWidth: 768,
+  mobileHeight: 512,
+  season,
+});
+const seasonNames = { winter: 'Зима', spring: 'Весна', summer: 'Лето', autumn: 'Осень' };
+const activityNames = {
+  children: 'семейный отдых и детские игры', firepit: 'костровая зона у леса',
+  barbecue: 'беседки и мангалы', rental: 'велосипеды и инвентарь для активного отдыха',
+  routes: 'прогулочная тропа в лесу', fishing: 'рыбалка на водохранилище',
+  buggy: 'поездка на багги', events: 'павильон для семейного праздника',
+  garden: 'садовые парники', 'ice-rink': 'катание на открытом катке',
+  snowmobiles: 'поездка на снегоходе', tubing: 'катание на ватрушках',
+};
+for (const [id, index] of [['ice-rink', 0], ['snowmobiles', 1], ['tubing', 2]]) {
+  entertainmentGalleries[id] = [
+    { ...entertainmentGalleries.winter[index], season: 'winter' },
+    generatedPhoto('winter', id, '02'),
+    generatedPhoto('winter', id, '03'),
+  ];
+}
+
+const seasonalPhotographs = {
+  winter: Object.fromEntries(['children', 'firepit', 'barbecue', 'routes', 'buggy', 'events'].map(id => [id, [generatedPhoto('winter', id)]])),
+  spring: Object.fromEntries(['children', 'firepit', 'barbecue', 'rental', 'routes', 'fishing', 'buggy', 'events', 'garden'].map(id => [id, [generatedPhoto('spring', id)]])),
+  autumn: Object.fromEntries(['children', 'firepit', 'barbecue', 'rental', 'routes', 'buggy', 'events', 'garden'].map(id => [id, [generatedPhoto('autumn', id)]])),
+};
+seasonalPhotographs.winter.fishing = [{ ...entertainmentGalleries.fishing[2], season: 'winter' }];
+seasonalPhotographs.autumn.fishing = [{ ...entertainmentGalleries.fishing[1], season: 'autumn' }];
+
+// A seasonal selection contains only matching photographs, even when fewer
+// than three views exist. “All seasons” retains the three-view manual gallery.
+export function getEntertainmentPhotographs(id, season = 'all') {
+  const base = entertainmentGalleries[id] || [];
+  if (season === 'all') return base;
+  if (['ice-rink', 'snowmobiles', 'tubing'].includes(id)) return season === 'winter' ? base : [];
+  if (season === 'summer') {
+    if (id === 'fishing') return [{ ...base[0], season: 'summer' }];
+    if (id === 'buggy') return base.slice(0, 2);
+    return base;
+  }
+  if (id === 'sup' || id === 'sunbathing') return [];
+  if (season === 'winter' && (id === 'rental' || id === 'garden')) return [];
+  return seasonalPhotographs[season]?.[id] || [];
+}

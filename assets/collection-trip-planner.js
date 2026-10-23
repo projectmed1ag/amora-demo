@@ -1,4 +1,4 @@
-import { getSeasonForDate, getSeasonActivities, seasonLabels } from './collection-seasons.js?v=20261023-leisure-catalog-1';
+import { getSeasonForDate, getSeasonActivities, seasonLabels } from './collection-seasons.js?v=20261023-local-menu-seasons-1';
 
 function leisureURL(season, hash = '') {
   const url = new URL('./spaces.html', location.href);

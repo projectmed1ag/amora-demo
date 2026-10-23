@@ -1,0 +1,112 @@
+/* Pavilion rental uses the collection's photographs, typography and form. */
+body.collection-pavilions-page[data-page='pavilions'] #content .pavilion-heading h1 {
+  font-size: clamp(52px, 6vw, 88px);
+}
+body.collection-pavilions-page[data-page='pavilions'] #content .pavilion-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(340px, 1fr);
+  align-items: start;
+  gap: clamp(32px, 5vw, 76px);
+  padding: 0 var(--g) 72px;
+}
+.pavilion-story { min-width: 0; }
+body.collection-pavilions-page[data-page='pavilions'] #content .pavilion-photo {
+  position: relative;
+  width: 100%;
+  margin: 0;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  background: #f5f5f7;
+  touch-action: pan-y pinch-zoom;
+}
+body.collection-pavilions-page[data-page='pavilions'] #content .pavilion-photo > img {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: none;
+}
+body.collection-pavilions-page[data-page='pavilions'] #content .pavilion-photo > .entertainment-gallery-outgoing {
+  z-index: 1;
+  pointer-events: none;
+}
+.pavilion-photo .entertainment-gallery-controls {
+  position: absolute;
+  z-index: 2;
+  bottom: 12px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px;
+  transform: translateX(-50%);
+  background: rgb(30 34 48 / 84%);
+  color: #fff;
+}
+.pavilion-photo .entertainment-gallery-controls[hidden] { display: none; }
+.pavilion-photo .entertainment-gallery-controls button {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  padding: 10px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  touch-action: manipulation;
+}
+.pavilion-photo .entertainment-gallery-controls button svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.2;
+}
+.pavilion-photo [data-gallery-direction='previous'] svg { transform: rotate(180deg); }
+.pavilion-photo .entertainment-gallery-controls button:focus-visible { outline: 2px solid #fff; outline-offset: -5px; }
+.pavilion-photo .entertainment-gallery-position {
+  min-width: 44px;
+  font: 400 12px/1.4 var(--body-font);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+body.collection-pavilions-page[data-page='pavilions'] #content .pavilion-description {
+  padding-top: 28px;
+}
+body.collection-pavilions-page[data-page='pavilions'] #content .pavilion-description h2 {
+  margin: 0 0 24px;
+  font-size: clamp(38px, 3.5vw, 54px);
+  line-height: 1.05;
+}
+body.collection-pavilions-page[data-page='pavilions'] #content .pavilion-description p {
+  margin: 0 0 20px;
+  font: 400 15px/1.8 var(--body-font);
+}
+@media (max-width: 1000px) {
+  body.collection-pavilions-page[data-page='pavilions'] #content .pavilion-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 48px;
+  }
+  .pavilion-reservation { padding-top: 32px; border-top: 1px solid #e3e4e8; }
+}
+@media (max-width: 700px) {
+  body.collection-pavilions-page[data-page='pavilions'] #content .pavilion-heading h1,
+  body.collection-pavilions-page[data-page='pavilions'] #content .service-heading-copy { text-align: center; }
+  body.collection-pavilions-page[data-page='pavilions'] #content .service-page-links { justify-content: center; }
+  body.collection-pavilions-page[data-page='pavilions'] #content .pavilion-layout { padding: 0 0 48px; }
+  body.collection-pavilions-page[data-page='pavilions'] #content .pavilion-description {
+    position: relative;
+    z-index: 1;
+    width: calc(100% - 32px);
+    margin: -36px 16px 0;
+    padding: 28px 20px;
+    background: #fff;
+    text-align: center;
+  }
+  .pavilion-photo .entertainment-gallery-controls { bottom: 52px; }
+  .pavilion-reservation { margin: 0 20px; }
+  body.collection-pavilions-page[data-page='pavilions'] #content .pavilion-reservation > :is(.service-eyebrow, h2, .service-reservation-intro) { text-align: center; }
+}

@@ -1,8 +1,10 @@
 import { initCollectionMotion } from './collection-motion.js?v=static-1';
+import { initHeadingFormat } from './collection-heading-format.js?v=20261023-local-nav-restored-1';
 
 // Bind controls to the HTML that is already visible. No page shell or primary
 // content is generated here, and ordinary links retain native navigation.
 initCollectionMotion();
+initHeadingFormat();
 const header = document.querySelector('.home-header');
 const toggle = header?.querySelector('.home-menu-toggle');
 const nav = header?.querySelector('.home-nav');

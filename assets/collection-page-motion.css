@@ -48,7 +48,9 @@ body #hotels .collection-motion-item:focus-within {
   transition: color 350ms ease;
 }
 
-@view-transition { navigation: auto; }
+/* Keep the real page interactive immediately after following a menu link.
+   Section reveals below still provide motion without a snapshot hit-test layer. */
+@view-transition { navigation: none; }
 
 .home-header,
 .collection-header,
