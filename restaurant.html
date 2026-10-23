@@ -15,16 +15,16 @@
     <link rel="stylesheet" href="./assets/collection-refinement.css?v=20261023-entertainment-2">
     <link rel="stylesheet" href="./assets/collection-refinement-pages.css?v=20261023-responsive-1">
     <link rel="stylesheet" href="./assets/collection-navigation.css?v=20261023-chapter-response-1">
-    <link rel="stylesheet" href="./assets/collection-page-motion.css?v=20261022-1">
-    <link rel="stylesheet" href="./assets/collection-services.css?v=20261023-responsive-1">
-    <script type="module" src="./assets/collection-runtime.js?v=20261023-photo-response-3"></script>
-    <script type="module" src="./assets/collection-refinement.js?v=20261023-entertainment-2"></script>
+    <link rel="stylesheet" href="./assets/collection-page-motion.css?v=20261023-local-menu-seasons-1">
+    <link rel="stylesheet" href="./assets/collection-services.css?v=20261023-mobile-overlap-1">
+    <script type="module" src="./assets/collection-runtime.js?v=20261023-local-nav-restored-1"></script>
+    <script type="module" src="./assets/collection-refinement.js?v=20261023-mobile-swipe-1"></script>
     <script type="module" src="./assets/collection-page-motion.js?v=20261022-1"></script>
-    <script type="module" src="./assets/collection-services.js?v=20261023-copy-cleanup-1"></script>
+    <script type="module" src="./assets/collection-services.js?v=20261023-local-menu-seasons-1"></script>
     <meta name="description" content="Ресторан A’MORE Collection на Можайском водохранилище: завтраки, горячие блюда, детское меню, десерты и напитки. Меню с ценами и бронирование столика.">
     <title>Ресторан на Можайском водохранилище — A’MORE Collection</title>
       <link rel="stylesheet" href="./assets/collection-trip-planner.css?v=20261022-1">
-    <script type="module" src="./assets/collection-trip-planner.js?v=20261023-leisure-catalog-1"></script>
+    <script type="module" src="./assets/collection-trip-planner.js?v=20261023-local-menu-seasons-1"></script>
     <link rel="stylesheet" href="./assets/collection-service-content.css?v=20261023-menu-1">
   </head>
   <body data-page="restaurant" class="collection-home-page collection-site-page collection-service-page" data-collection-static="">
@@ -34,8 +34,8 @@
 <input class="home-menu-toggle" id="home-menu-toggle" type="checkbox" aria-label="Меню разделов" aria-controls="home-nav"><nav class="home-nav" id="home-nav" aria-label="Разделы сайта">
 <a href="./hotel.html?city=mozhaysk">Главная</a>
 <a href="./rooms.html?city=mozhaysk">Хаусботы</a>
-<a href="./banya.html?city=mozhaysk">Баня</a>
 <a href="./restaurant.html?city=mozhaysk" aria-current="page">Ресторан</a>
+<a href="./banya.html?city=mozhaysk">Баня</a>
 <a href="./spaces.html?city=mozhaysk">Развлечения и активный отдых</a>
 <a href="./about.html?city=mozhaysk">Об отеле</a>
 
@@ -46,15 +46,15 @@
     <main id="content" class="interior-page service-main" tabindex="-1">
       <section class="page-heading service-heading" aria-labelledby="page-title">
         <nav class="breadcrumbs service-breadcrumbs" aria-label="Хлебные крошки"><a href="./hotel.html?city=mozhaysk">Главная</a><span aria-hidden="true">/</span><span aria-current="page">Ресторан</span></nav>
-        <h1 id="page-title">Ресторан.</h1>
+        <h1 id="page-title">Ресторан</h1>
         <div class="service-heading-copy"><p class="service-lead">Завтраки, рыбные и мясные блюда, детское меню, десерты и напитки.</p><nav class="service-page-links" aria-label="На этой странице"><a href="#menu">Меню ресторана</a><a href="#reservation">Бронирование</a></nav></div>
 
       </section>
       <div class="service-experience">
-        <figure class="service-hero media"><img src="./images/home/mozhaysk/restaurant.jpg" srcset="./images/mobile/home/mozhaysk/restaurant.jpg 768w, ./images/home/mozhaysk/restaurant.jpg 1536w" sizes="(max-width: 1000px) calc(100vw - 48px), 54vw" width="1536" height="1024" alt="Ресторан с панорамными окнами и видом на воду" fetchpriority="high"></figure>
+        <figure class="service-hero media"><img src="./images/home/mozhaysk/restaurant.jpg" srcset="./images/mobile/home/mozhaysk/restaurant.jpg 768w, ./images/home/mozhaysk/restaurant.jpg 1536w" sizes="(max-width: 700px) 100vw, (max-width: 1000px) calc(100vw - 48px), 54vw" width="1536" height="1024" alt="Ресторан с панорамными окнами и видом на воду" fetchpriority="high"></figure>
         <section class="service-reservation-panel" id="reservation" tabindex="-1" aria-labelledby="service-reservation-title">
           <p class="service-eyebrow">Можайское водохранилище</p>
-          <h2 id="service-reservation-title">Забронировать столик.</h2>
+          <h2 id="service-reservation-title">Забронировать столик</h2>
           <p class="service-reservation-intro">Выберите дату, время и количество гостей.</p>
           <ol class="service-steps" aria-label="Этапы бронирования"><li data-service-step-indicator="visit" aria-current="step"><span>01</span> Визит</li><li data-service-step-indicator="contact"><span>02</span> Контакты</li></ol>
           <form id="service-request-form" data-service="restaurant" method="dialog" autocomplete="off" novalidate>
@@ -81,7 +81,7 @@
           </form>
 
           <section id="service-request-result" class="service-request-result" aria-labelledby="service-result-title" hidden>
-            <h2 id="service-result-title" tabindex="-1">Параметры визита.</h2>
+            <h2 id="service-result-title" tabindex="-1">Параметры визита</h2>
 
             <dl id="service-result-details" class="service-result-details"></dl>
             <div class="service-result-actions"><button id="service-edit-request" class="service-action" type="button">Изменить заявку</button><a id="service-result-back" class="service-text-link" href="./hotel.html?city=mozhaysk">Вернуться к отелю <svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10h22m-6-6 6 6-6 6"></path></svg></a></div>
@@ -90,12 +90,12 @@
         </section>
       </div>
       <section class="service-description" id="service-about" aria-labelledby="service-description-title">
-        <h2 id="service-description-title">О ресторане.</h2>
+        <h2 id="service-description-title">О ресторане</h2>
         <div><p>В меню ресторана — завтраки, салаты, супы и горячие блюда из рыбы, мяса и сезонных овощей. Знакомые сочетания дополняют блюда с грибами, ягодами и свежей зеленью.</p><p>Для детей собрали отдельное меню с небольшими порциями. К основным блюдам можно выбрать домашний морс, ягодный чай или десерт.</p><a class="service-text-link" href="#menu">Перейти к меню <svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10h22m-6-6 6 6-6 6"></path></svg></a></div>
       </section>
       <!-- Menu and prices authored for the local version at the owner's request. -->
       <section class="service-catalog" id="menu" aria-labelledby="service-menu-title">
-        <div class="service-catalog-heading"><h2 id="service-menu-title">Меню ресторана.</h2><p>Блюда, напитки и десерты. В каждой позиции указаны состав, порция и стоимость.</p></div>
+        <div class="service-catalog-heading"><h2 id="service-menu-title">Меню ресторана</h2><p>Блюда, напитки и десерты. В каждой позиции указаны состав, порция и стоимость.</p></div>
         <nav class="service-catalog-nav" aria-label="Разделы меню ресторана"><a href="#menu-breakfast">Завтраки</a><a href="#menu-starters">Закуски и салаты</a><a href="#menu-soups">Супы</a><a href="#menu-mains">Горячие блюда</a><a href="#menu-kids">Детское меню</a><a href="#menu-desserts-drinks">Десерты и напитки</a></nav>
         <div class="service-menu-grid"><section class="service-menu-category" id="menu-breakfast" aria-labelledby="menu-breakfast-title">
           <h3 id="menu-breakfast-title">Завтраки</h3>
@@ -189,7 +189,7 @@
             </li></ul>
         </section></div>
       </section>
-      <section class="service-menu-booking" aria-labelledby="service-menu-booking-title"><div><h2 id="service-menu-booking-title">Забронировать столик.</h2><p>Выберите дату, время и количество гостей.</p></div><a class="service-action" href="#reservation">Выбрать время <svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10h22m-6-6 6 6-6 6"></path></svg></a></section>
+      <section class="service-menu-booking" aria-labelledby="service-menu-booking-title"><div><h2 id="service-menu-booking-title">Забронировать столик</h2><p>Выберите дату, время и количество гостей.</p></div><a class="service-action" href="#reservation">Выбрать время <svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10h22m-6-6 6 6-6 6"></path></svg></a></section>
     </main>
     <footer class="home-footer"><a class="home-brand amore-logo" href="./hotel.html?city=mozhaysk" aria-label="A’MORE Collection — на главную"><span class="brand-name">A’MORE</span><span class="brand-collection">COLLECTION</span></a><span>Московская область,<br>Можайское водохранилище</span><a class="home-link" href="./"><span>Все отели</span><svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10h22m-6-6 6 6-6 6"></path></svg></a></footer>
   </body>
