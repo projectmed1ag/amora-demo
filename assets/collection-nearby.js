@@ -1,3 +1,4 @@
+import { collectionImageSource } from './collection-image-sources.js?v=20261024-image-load-1';
 import { nearbyPlaces as mozhayskPlaces, nearbyBasemap } from './mozhaysk-nearby-data.js?v=nearby-photos-1';
 import { destinationAsset, getDestination } from './collection-destinations.js?v=20261024-all-hotels-1';
 
@@ -46,8 +47,10 @@ function nearbyConfiguration(section) {
 
 function detail(place) {
   const photo = place.photo;
+  const optimized = photo && collectionImageSource(photo.src);
+  const candidates = optimized?.variants.filter(frame => frame.width >= Math.min(480, optimized.width)).map(frame => `${destinationAsset(frame.src)} ${frame.width}w`).join(', ');
   const photograph = photo ? `<figure class="nearby-place-photo">
-      <div class="nearby-photo-frame"><img src="${escape(destinationAsset(photo.src))}" alt="${escape(photo.alt)}" width="${escape(photo.width)}" height="${escape(photo.height)}" loading="lazy" decoding="async"><p class="nearby-photo-fallback" hidden>Фотография временно недоступна</p></div>
+      <div class="nearby-photo-frame"><img src="${escape(destinationAsset(optimized?.src || photo.src))}"${candidates ? ` srcset="${escape(candidates)}" sizes="(max-width: 700px) 100vw, 32vw"` : ''} alt="${escape(photo.alt)}" width="${escape(photo.width)}" height="${escape(photo.height)}" loading="lazy" decoding="async"><p class="nearby-photo-fallback" hidden>Фотография временно недоступна</p></div>
       <figcaption>Фото: <a href="${escape(photo.source)}" target="_blank" rel="noopener">${escape(photo.author)}, ${escape(photo.year)}</a> · <a href="${escape(photo.licenseURL)}" target="_blank" rel="noopener">${escape(photo.license)}</a></figcaption>
     </figure>` : '';
   return `${photograph}

@@ -1,3 +1,5 @@
+import { scheduleImagePrefetch, cancelImagePrefetch } from './collection-image-scheduler.js?v=20261024-image-load-1';
+
 const arrow = '<svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10h22m-6-6 6 6-6 6"/></svg>';
 const close = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 5 14 14M19 5 5 19"/></svg>';
 const initialized = new WeakSet();
@@ -126,6 +128,7 @@ function createViewer(kind) {
   let selection = 0;
   let failed = new Set();
   let returnFocus;
+  const prefetchKey = {};
 
   function sizesFor(photo) {
     const source = [photo.image, photo.preview].find(candidate => candidate?.naturalWidth);
@@ -178,11 +181,16 @@ function createViewer(kind) {
 
   function warmNeighbors(index) {
     if (!active || active.photos.length < 2) return;
-    const offsets = navigator.connection?.saveData ? [1] : [1, -1];
-    for (const offset of offsets) {
-      const candidate = (index + offset + active.photos.length) % active.photos.length;
-      if (!failed.has(candidate)) prepare(active.photos[candidate]);
-    }
+    const group = active;
+    const token = selection;
+    const needed = () => active === group && selection === token && requested === index;
+    scheduleImagePrefetch(prefetchKey, async () => {
+      for (const offset of [1, -1]) {
+        if (!needed()) return;
+        const candidate = (index + offset + group.photos.length) % group.photos.length;
+        if (!failed.has(candidate)) await prepare(group.photos[candidate]).ready.catch(() => {});
+      }
+    }, needed);
   }
 
   function show(index) {
@@ -233,7 +241,6 @@ function createViewer(kind) {
       }
       move(1);
     });
-    warmNeighbors(target);
   }
 
   function move(direction) {
@@ -268,6 +275,7 @@ function createViewer(kind) {
   });
   dialog.addEventListener('close', () => {
     ++selection;
+    cancelImagePrefetch(prefetchKey);
     stage.removeAttribute('aria-busy');
     document.documentElement.classList.remove(`${prefix}-photo-open`);
     active?.onClose?.(current);
@@ -323,6 +331,7 @@ function initRooms(main) {
     let requested = current;
     let selection = 0;
     let nearby = false;
+    const prefetchKey = {};
     const failed = new Set();
     const prepared = new Map();
 
@@ -365,11 +374,16 @@ function initRooms(main) {
 
     function warmNeighbors() {
       if (!nearby || records.length < 2) return;
-      const offsets = navigator.connection?.saveData ? [1] : [1, -1];
-      for (const offset of offsets) {
-        const index = (current + offset + records.length) % records.length;
-        if (!failed.has(index)) prepare(index);
-      }
+      const origin = current;
+      const token = selection;
+      const needed = () => nearby && selection === token && requested === origin;
+      scheduleImagePrefetch(prefetchKey, async () => {
+        for (const offset of [1, -1]) {
+          if (!needed()) return;
+          const index = (origin + offset + records.length) % records.length;
+          if (!failed.has(index)) await prepare(index).catch(() => {});
+        }
+      }, needed);
     }
 
     function commit(index) {
@@ -486,10 +500,9 @@ function initRooms(main) {
             const preview = thumb.querySelector('img');
             if (preview) { preview.loading = 'eager'; preview.fetchPriority = 'high'; }
           });
-          prepare(current);
-          warmNeighbors();
-        }
-      }, { rootMargin: '180px 0px', threshold: 0 });
+          void prepare(current, 'high').then(warmNeighbors).catch(() => {});
+        } else cancelImagePrefetch(prefetchKey);
+      }, { threshold: 0 });
       observer.observe(gallery);
     } else {
       gallery.addEventListener('pointerenter', () => { nearby = true; warmNeighbors(); }, { once: true });

@@ -1,3 +1,5 @@
+import { optimizeCollectionPhotograph } from './collection-image-sources.js?v=20261024-image-load-1';
+
 // Local generated photographs for the entertainment galleries.
 export const entertainmentGalleries = {
   "children": [
@@ -386,9 +388,13 @@ export const entertainmentGalleries = {
   ]
 };
 
+for (const photos of Object.values(entertainmentGalleries)) {
+  photos.forEach((photo, index) => { photos[index] = optimizeCollectionPhotograph(photo); });
+}
+
 // Winter activities have independent galleries; the original first photographs
 // are retained alongside the two additional views of the same activity.
-const generatedPhoto = (season, id, frame = '01') => ({
+const generatedPhoto = (season, id, frame = '01') => optimizeCollectionPhotograph({
   src: `images/mozhaysk/entertainment-seasons-v1/${season}-${id}-${frame}.webp`,
   mobileSrc: `images/mobile/mozhaysk/entertainment-seasons-v1/${season}-${id}-${frame}.webp`,
   previewSrc: `images/responsive/entertainment/${season}-${id}-${frame}-384.webp`,
@@ -430,7 +436,7 @@ export function getEntertainmentPhotographs(id, season = 'all', city = 'mozhaysk
   const base = entertainmentGalleries[id] || [];
   if (['ruza', 'krasnoyarsk'].includes(city) && ['children', 'routes'].includes(id)) {
     const activity = id === 'children' ? 'family' : 'routes';
-    const localPhoto = selectedSeason => ({
+    const localPhoto = selectedSeason => optimizeCollectionPhotograph({
       src: `images/${city}/seasons-v1/${activity}-${selectedSeason}.webp`,
       mobileSrc: `images/mobile/${city}/seasons-v1/${activity}-${selectedSeason}.webp`,
       previewSrc: `images/responsive/${city}/seasons-v1/${activity}-${selectedSeason}-384.webp`,

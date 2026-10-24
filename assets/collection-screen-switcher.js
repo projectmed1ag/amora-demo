@@ -1,3 +1,5 @@
+import { scheduleImagePrefetch, cancelImagePrefetch } from './collection-image-scheduler.js?v=20261024-image-load-1';
+
 // Home chapters behave as separate scenes. The document remains readable when
 // this enhancement is unavailable and for chapters taller than a small window.
 export function createScreenSwitcher({ main, getTargets, getOffset, onUpdate = () => {} }) {
@@ -7,6 +9,7 @@ export function createScreenSwitcher({ main, getTargets, getOffset, onUpdate = (
   const initialHash = location.hash;
   const removers = [];
   const decodedPhotos = new WeakMap();
+  const prefetchKey = {};
   let current = null;
   let movement = null;
   let queued = null;
@@ -45,26 +48,51 @@ export function createScreenSwitcher({ main, getTargets, getOffset, onUpdate = (
     else root.style.removeProperty('scroll-behavior');
   }
 
-  function warmPhotos(element) {
-    element.querySelectorAll('img').forEach(photo => {
+  async function warmPhotos(element, priority = 'high', needed = () => true) {
+    const pending = [...element.querySelectorAll('img')].filter(photo => photo.getAttribute('src') || photo.getAttribute('srcset'));
+    const prepare = photo => {
       if (photo.loading === 'lazy') photo.loading = 'eager';
       photo.decoding = 'async';
+      photo.fetchPriority = priority;
+      if (photo.dataset.imageSrcset) photo.srcset = photo.dataset.imageSrcset;
+      if (photo.dataset.imageSrc) photo.src = photo.dataset.imageSrc;
+      delete photo.dataset.imageSrc;
+      delete photo.dataset.imageSrcset;
+      delete photo.dataset.imageDeferred;
       const source = `${photo.src}|${photo.srcset}|${photo.sizes}`;
-      if (photo.decode && decodedPhotos.get(photo) !== source) {
-        decodedPhotos.set(photo, source);
-        photo.decode().catch(() => {});
+      const cached = decodedPhotos.get(photo);
+      if (cached?.source === source) return cached.ready;
+      if (photo.decode) {
+        const ready = photo.decode().catch(() => {});
+        decodedPhotos.set(photo, { source, ready });
+        return ready;
       }
-    });
+    };
+    if (priority === 'high') return Promise.allSettled(pending.map(prepare));
+    for (const photo of pending) {
+      if (!needed()) return;
+      await prepare(photo);
+    }
   }
 
   function activate(element) {
     if (!element) return;
     current = element;
     chapters().forEach(chapter => chapter.toggleAttribute('data-screen-active', chapter === element));
-    // Load adjacent photographs before a visitor starts the next gesture.
+    // Current scene images go first. Adjacent scenes warm in a single idle
+    // queue after the first screen has loaded, rather than all at startup.
     const all = chapters();
     const index = all.indexOf(element);
-    all.slice(Math.max(0, index - 1), index + 2).forEach(warmPhotos);
+    const token = generation;
+    cancelImagePrefetch(prefetchKey);
+    void warmPhotos(element);
+    const needed = () => current === element && generation === token;
+    scheduleImagePrefetch(prefetchKey, async () => {
+      for (const neighbour of [all[index + 1], all[index - 1]]) {
+        if (!needed()) return;
+        if (neighbour) await warmPhotos(neighbour, 'low', needed);
+      }
+    }, needed);
     onUpdate();
   }
 
@@ -82,6 +110,7 @@ export function createScreenSwitcher({ main, getTargets, getOffset, onUpdate = (
 
   function cancel() {
     generation += 1;
+    cancelImagePrefetch(prefetchKey);
     queued?.resolve(false);
     queued = null;
     if (!movement) return;
