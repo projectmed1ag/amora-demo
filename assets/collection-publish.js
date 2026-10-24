@@ -1,8 +1,8 @@
-import { enhanceCollectionRooms } from './collection-rooms.js?v=20261023-photo-response-3';
-import { enhanceCollectionHome } from './collection-home.js?v=20261023-photo-response-3';
-import { enhanceCollectionBooking } from './collection-booking.js?v=20261023-photo-response-3';
-import { enhanceCollectionEditorial } from './collection-editorial.js?v=20261023-photo-response-3';
-import { enhanceCollectionLocation, enhanceCollectionSpaces } from './collection-site.js?v=20261023-photo-response-3';
+import { enhanceCollectionRooms } from './collection-rooms.js?v=20261025-progressive-photos-1';
+import { enhanceCollectionHome } from './collection-home.js?v=20261025-progressive-photos-1';
+import { enhanceCollectionBooking } from './collection-booking.js?v=20261025-progressive-photos-1';
+import { enhanceCollectionEditorial } from './collection-editorial.js?v=20261025-progressive-photos-1';
+import { enhanceCollectionLocation, enhanceCollectionSpaces } from './collection-site.js?v=20261025-progressive-photos-1';
 
 // Run after the published app renders so generated breadcrumbs use the same
 // hotel-home route as the static header and footer.

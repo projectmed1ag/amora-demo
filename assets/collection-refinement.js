@@ -1,6 +1,6 @@
 // Shared progressive enhancements. Content, ordinary links and the locked
 // A’MORE artwork remain usable without this module.
-import { createScreenSwitcher } from './collection-screen-switcher.js?v=20261024-image-load-1';
+import { createScreenSwitcher } from './collection-screen-switcher.js?v=20261025-progressive-photos-1';
 import { initHeadingFormat } from './collection-heading-format.js?v=20261023-local-nav-restored-1';
 import { collectionDestinations, getDestination } from './collection-destinations.js?v=20261024-all-hotels-1';
 

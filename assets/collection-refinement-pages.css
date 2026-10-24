@@ -114,7 +114,7 @@ body[data-page]:not([data-page="home"]) #content .home-hero {
 }
 body[data-page]:not([data-page="home"]) #content .home-hero::before,
 body[data-page]:not([data-page="home"]) #content .home-hero::after { display: none; content: none; }
-body[data-page]:not([data-page="home"]) #content .home-hero > img {
+body[data-page]:not([data-page="home"]) #content :is(.home-hero > img, .home-hero > .collection-picture > img) {
   position: static;
   z-index: auto;
   inset: auto;
@@ -738,10 +738,10 @@ body[data-page] :is(.destination-confirm, .destination-preview-index, .destinati
   body[data-page]:not([data-page="home"]) #content .page-heading h1 { margin-bottom: 20px; }
   body[data-page]:not([data-page="home"]) #content .breadcrumbs { margin-bottom: 18px; }
   body[data-page]:not([data-page="home"]) #content .home-hero .home-hero-bottom { display: flex; flex-direction: column; align-items: flex-start; gap: 22px; padding: 36px var(--page-gutter) 30px; }
-  body[data-page]:not([data-page="home"]) #content .home-hero > img { height: auto; min-height: 0; aspect-ratio: 4 / 3; }
+  body[data-page]:not([data-page="home"]) #content :is(.home-hero > img, .home-hero > .collection-picture > img) { height: auto; min-height: 0; aspect-ratio: 4 / 3; }
   body[data-page]:not([data-page="home"]) #content :is(.editorial-hero-lead, .stays-hero-copy, .location-hero-lead, .page-lead) { font-size: 15px; line-height: 1.75; }
   body[data-page]:not([data-page="home"]) #content .page-cover { height: auto; aspect-ratio: 4 / 3; }
-  body[data-page]:not([data-page="home"]) #content :is(.home-hero > img, .page-cover img)[src*="/destinations/"] { object-position: right center; }
+  body[data-page]:not([data-page="home"]) #content :is(:is(.home-hero > img, .home-hero > .collection-picture > img), .page-cover img)[src*="/destinations/"] { object-position: right center; }
   body[data-page="rooms"] #content .stays-navigation { padding: 32px var(--page-gutter) 24px; }
   body[data-page="rooms"] #content .stays-navigation h2 { font-size: 34px; }
   body[data-page="rooms"] #content .stays-navigation nav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 20px; padding-top: 8px; }
@@ -830,7 +830,7 @@ body[data-page] :is(.destination-confirm, .destination-preview-index, .destinati
 @media (max-height: 500px) and (min-width: 701px) {
   body[data-page]:not([data-page="home"]) #content .home-hero .home-hero-bottom,
   body[data-page="spaces"] #content .cl-intro { padding-top: 32px; padding-bottom: 32px; }
-  body[data-page]:not([data-page="home"]) #content .home-hero > img { height: auto; min-height: 0; }
+  body[data-page]:not([data-page="home"]) #content :is(.home-hero > img, .home-hero > .collection-picture > img) { height: auto; min-height: 0; }
   body[data-page="spaces"] #content .cl-detail-photo { aspect-ratio: 16 / 10; }
 }
 

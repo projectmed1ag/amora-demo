@@ -1,6 +1,6 @@
-import { applyCollectionShell, addCollectionStyle } from './collection-site-shell.js?v=20261023-photo-response-3';
-import { renderCollectionLeisure } from './collection-leisure.js?v=device-1';
-import { enhanceNearbyPlaces } from './collection-nearby.js?v=device-1';
+import { applyCollectionShell, addCollectionStyle } from './collection-site-shell.js?v=20261025-progressive-photos-1';
+import { renderCollectionLeisure } from './collection-leisure.js?v=20261025-progressive-photos-1';
+import { enhanceNearbyPlaces } from './collection-nearby.js?v=20261025-progressive-photos-1';
 
 const arrow = '<svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10h22m-6-6 6 6-6 6"/></svg>';
 

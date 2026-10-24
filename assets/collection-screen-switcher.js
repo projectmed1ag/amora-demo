@@ -1,4 +1,4 @@
-import { scheduleImagePrefetch, cancelImagePrefetch } from './collection-image-scheduler.js?v=20261024-image-load-1';
+import { scheduleImagePrefetch, cancelImagePrefetch } from './collection-image-scheduler.js?v=20261025-progressive-photos-1';
 
 // Home chapters behave as separate scenes. The document remains readable when
 // this enhancement is unavailable and for chapters taller than a small window.

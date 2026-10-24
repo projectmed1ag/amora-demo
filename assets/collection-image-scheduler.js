@@ -7,7 +7,12 @@ let awaitingLoad = false;
 
 export function canPrefetchImages() {
   const connection = navigator.connection;
-  return !connection?.saveData && !['slow-2g', '2g'].includes(connection?.effectiveType);
+  // Speculative full photographs cost bandwidth even with a low priority.
+  // On constrained or high-latency links reserve it for the selected frame.
+  return !connection?.saveData
+    && !['slow-2g', '2g', '3g'].includes(connection?.effectiveType)
+    && !(connection?.rtt >= 300)
+    && !(connection?.downlink > 0 && connection.downlink <= 1.5);
 }
 
 function pump() {

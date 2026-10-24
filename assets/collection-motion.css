@@ -102,19 +102,12 @@ main#hotels {
   to { opacity: 1; }
 }
 
-/* Only JavaScript adds these classes to an image that is still loading.
-   Without JavaScript, every photograph remains visible by default. */
-.home-hero > img.collection-hero-pending {
-  opacity: 0;
-}
-
+/* Retain compatibility with cached controllers without hiding a native image
+   while its network response or decoder is still pending. */
+.home-hero > img.collection-hero-pending,
 .home-hero > img.collection-hero-revealing {
-  animation: collection-hero-in 350ms ease-out both;
-}
-
-@keyframes collection-hero-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  opacity: 1;
+  animation: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
