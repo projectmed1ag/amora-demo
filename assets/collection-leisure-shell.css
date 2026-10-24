@@ -1,5 +1,5 @@
-@font-face { font-family: 'Cormorant Garamond'; src: url('../fonts/cormorant-400-cyrillic.woff2') format('woff2'); font-style: normal; font-weight: 400; font-display: swap; unicode-range: U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116; }
-@font-face { font-family: 'Cormorant Garamond'; src: url('../fonts/cormorant-400-latin.woff2') format('woff2'); font-style: normal; font-weight: 400; font-display: swap; unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF, U+FFFD; }
+
+
 .collection-leisure-page { --paper: #f3efe5; --surface: #f3efe5; --ink: #18231b; --muted: #62645b; --line: #d7d0c1; --green: #18231b; --accent: #97794b; --serif: 'Cormorant Garamond', Georgia, serif; --mf-gutter: clamp(24px,4.1vw,80px); background: var(--paper); color: var(--ink); font-family: Georgia, 'Times New Roman', serif; -webkit-font-smoothing: antialiased; }
 .collection-leisure-page #content { max-width: none; width: 100%; padding: 0; margin: 0; }
 .collection-leisure-page :is(h1,h2,h3) { margin: 0; font-family: var(--serif); font-weight: 400; letter-spacing: -.045em; text-transform: none; }

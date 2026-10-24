@@ -1,4 +1,4 @@
-import { applyCollectionShell, addCollectionStyle } from './collection-site-shell.js?v=20261025-progressive-photos-1';
+import { applyCollectionShell, addCollectionStyle } from './collection-site-shell.js?v=20261025-first-photo-2';
 import { renderCollectionLeisure } from './collection-leisure.js?v=20261025-progressive-photos-1';
 import { enhanceNearbyPlaces } from './collection-nearby.js?v=20261025-progressive-photos-1';
 

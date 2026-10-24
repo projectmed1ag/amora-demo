@@ -13,7 +13,7 @@ export function addCollectionStyle(id, file) {
 export function applyCollectionShell(page, { light = false } = {}) {
   document.body.classList.add('collection-home-page', 'collection-site-page');
   document.documentElement.classList.add('collection-home-root');
-  addCollectionStyle('collection-home-style', './collection-home.css?v=20261025-progressive-photos-1');
+  addCollectionStyle('collection-home-style', './collection-home.css?v=20261025-first-photo-2');
   addCollectionStyle('collection-site-shell-style', './collection-site-shell.css?v=header-2');
   addCollectionStyle('collection-brand-style', './collection-brand.css?v=original-1');
   let header = document.querySelector('.site-header, .home-header');

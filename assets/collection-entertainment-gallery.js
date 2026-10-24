@@ -36,6 +36,53 @@ function initializeGallery(story, photographs) {
   const figure = story.querySelector('.entertainment-photo');
   let image = figure?.querySelector('img');
   if (!figure || !image || figure.dataset.galleryReady !== undefined) return;
+  const initialPicture = image.parentElement;
+  if (initialPicture?.matches('picture.collection-picture')) {
+    // A remaining <source> would override later gallery frames. Keep the same
+    // image node and chosen candidate while turning it into an ordinary frame.
+    const selected = image.currentSrc;
+    if (!selected) {
+      // Native source selection normally finishes before this module executes.
+      // If it has not, wait for that decision instead of guessing AVIF support
+      // and starting a second, fallback request.
+      if (figure.dataset.galleryPicturePending !== undefined) return;
+      figure.dataset.galleryPicturePending = '';
+      let frame;
+      const cleanup = () => {
+        cancelAnimationFrame(frame);
+        image.removeEventListener('load', retry);
+        image.removeEventListener('error', fallback);
+        delete figure.dataset.galleryPicturePending;
+      };
+      const retry = () => {
+        if (!image.isConnected) { cleanup(); return; }
+        if (!image.currentSrc) return;
+        cleanup();
+        initializeGallery(story, photographs);
+      };
+      const fallback = () => {
+        cleanup();
+        // A failed native candidate may still use the authored WebP fallback.
+        if (initialPicture.isConnected) initialPicture.replaceWith(image);
+        initializeGallery(story, photographs);
+      };
+      image.addEventListener('load', retry, { once: true });
+      image.addEventListener('error', fallback, { once: true });
+      frame = requestAnimationFrame(retry);
+      return;
+    }
+    const selectedSource = [...initialPicture.querySelectorAll('source[srcset]')].find(source =>
+      source.srcset.split(',').some(candidate => {
+        const path = candidate.trim().split(/\s+/)[0];
+        return path && new URL(path, image.baseURI).href === selected;
+      }));
+    if (selectedSource) {
+      image.sizes = selectedSource.sizes || image.sizes;
+      image.srcset = selectedSource.srcset;
+      image.src = selected;
+    }
+    initialPicture.replaceWith(image);
+  }
   const title = story.querySelector('h2')?.textContent.trim() || 'Развлечения';
   const gallerySizes = figure.dataset.gallerySizes || sizes;
   const overview = story.closest('[data-entertainment-overview]');
@@ -281,6 +328,9 @@ function initializeGallery(story, photographs) {
     const key = keyFor(items);
     controls.hidden = items.length < 2;
     if (key === collectionKey) return;
+    // A one-photo summer selection can share the already requested native
+    // first frame with “all seasons”. Keep its AVIF request and decoded node.
+    const retained = items[0].src === photographs[selected]?.src ? prepared.get(selected) : null;
     generation += 1;
     cancelImagePrefetch(prefetchKey);
     photographs = items;
@@ -288,6 +338,7 @@ function initializeGallery(story, photographs) {
     requested = 0;
     selected = 0;
     prepared.clear();
+    if (retained) prepared.set(0, retained);
     // Distant rows keep their existing valid node until they approach the
     // viewport. Only the selected season is downloaded and decoded there.
     if (nearby || visible || !('IntersectionObserver' in window)) void show(0);

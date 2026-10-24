@@ -1,4 +1,4 @@
-import { applyCollectionShell } from './collection-site-shell.js?v=20261025-progressive-photos-1';
+import { applyCollectionShell } from './collection-site-shell.js?v=20261025-first-photo-2';
 
 const arrow = '<svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10h22m-6-6 6 6-6 6"/></svg>';
 

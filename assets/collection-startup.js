@@ -82,7 +82,7 @@
   watchdog = setTimeout(() => finish(false, 'timeout'), 15000);
 
   const styles = [
-    ['collection-home-style', './collection-home.css?v=20261025-progressive-photos-1'],
+    ['collection-home-style', './collection-home.css?v=20261025-first-photo-2'],
     ['collection-site-shell-style', './collection-site-shell.css?v=device-1'],
   ];
   if (page === 'rooms') styles.push(['collection-rooms-style', './collection-rooms.css?v=20261023-photo-response-3']);
