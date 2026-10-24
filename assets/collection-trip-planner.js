@@ -1,4 +1,4 @@
-import { getSeasonForDate, getSeasonActivities, seasonLabels } from './collection-seasons.js?v=20261024-all-hotels-1';
+import { getSeasonForDate, getSeasonActivities, seasonLabels } from './collection-seasons.js?v=20261024-image-load-1';
 import { destinationURL } from './collection-destinations.js?v=20261024-all-hotels-1';
 
 function leisureURL(season, hash = '') {

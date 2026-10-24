@@ -1,3 +1,4 @@
+import { collectionImageSource } from './collection-image-sources.js?v=20261024-image-load-1';
 import { destinationAsset, destinationLocalDate, getDestination } from './collection-destinations.js?v=20261024-all-hotels-1';
 
 const initializedForms = new WeakSet();
@@ -117,10 +118,13 @@ export function initCollectionBooking() {
       }
       image.alt = room.alt;
       image.sizes = '(max-width: 700px) 100vw, 44vw';
-      image.srcset = `${destinationAsset(room.mobileSrc)} 768w, ${destinationAsset(room.src)} ${room.imageWidth}w`;
-      image.src = destinationAsset(room.src);
-      image.width = room.imageWidth;
-      image.height = room.imageHeight;
+      const optimized = collectionImageSource(room.src);
+      image.srcset = optimized
+        ? optimized.variants.filter(frame => frame.width >= Math.min(480, optimized.width)).map(frame => `${destinationAsset(frame.src)} ${frame.width}w`).join(', ')
+        : `${destinationAsset(room.mobileSrc)} 768w, ${destinationAsset(room.src)} ${room.imageWidth}w`;
+      image.src = destinationAsset(optimized?.src || room.src);
+      image.width = optimized?.width || room.imageWidth;
+      image.height = optimized?.height || room.imageHeight;
       photo.dataset.room = room.id;
     }
     setSummary('summary-room', room.name);

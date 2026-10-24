@@ -1,4 +1,5 @@
-import { getEntertainmentPhotographs } from './collection-entertainment-gallery-data.js?v=20261024-all-hotels-1';
+import { getEntertainmentPhotographs } from './collection-entertainment-gallery-data.js?v=20261024-image-load-1';
+import { scheduleImagePrefetch, cancelImagePrefetch } from './collection-image-scheduler.js?v=20261024-image-load-1';
 
 const imageRoot = new URL('../', import.meta.url);
 const city = document.documentElement.dataset.city || 'mozhaysk';
@@ -7,9 +8,14 @@ const sizes = '(max-width: 700px) 100vw, (max-width: 800px) 91.6vw, (max-width: 
 
 function setPhotograph(image, photograph, gallerySizes = sizes) {
   image.sizes = gallerySizes;
-  image.srcset = photograph.mobileSrc
-    ? `${new URL(photograph.mobileSrc, imageRoot).href} ${photograph.mobileWidth}w, ${new URL(photograph.src, imageRoot).href} ${photograph.width}w`
-    : '';
+  image.srcset = photograph.srcset
+    ? photograph.srcset.split(',').map(candidate => {
+      const [path, ...descriptor] = candidate.trim().split(/\s+/);
+      return `${new URL(path, imageRoot).href} ${descriptor.join(' ')}`;
+    }).join(', ')
+    : photograph.mobileSrc
+      ? `${new URL(photograph.mobileSrc, imageRoot).href} ${photograph.mobileWidth}w, ${new URL(photograph.src, imageRoot).href} ${photograph.width}w`
+      : '';
   image.src = new URL(photograph.src, imageRoot).href;
   image.alt = photograph.alt;
   image.width = photograph.width;
@@ -43,6 +49,7 @@ function initializeGallery(story, photographs) {
   let nearby = false;
   let visible = false;
   const prepared = new Map();
+  const prefetchKey = {};
 
   figure.classList.add('entertainment-gallery');
   figure.dataset.galleryReady = '';
@@ -137,21 +144,27 @@ function initializeGallery(story, photographs) {
   }
 
   function warmNeighbours() {
-    if (!nearby || navigator.connection?.saveData) return;
+    if (!visible) return;
     const origin = selected;
     const key = collectionKey;
+    const token = generation;
     const after = wrap(origin + 1);
     const before = wrap(origin - 1);
-    // Tiny previews are ready first; only one full neighbour downloads at a
-    // time. Off-screen galleries never start a page-wide preload burst.
-    void Promise.allSettled([preparePreview(after), preparePreview(before)]).then(async () => {
-      if (!visible || selected !== origin || collectionKey !== key) return;
-      const full = await prepareFull(origin).catch(() => null);
-      if (!visible || selected !== origin || requested !== origin || collectionKey !== key) return;
+    const needed = () => visible && selected === origin && requested === origin && collectionKey === key && generation === token;
+    // The photograph already in view gets its sharp version first. Neighbour
+    // requests used to delay that upgrade on cold, bandwidth-limited visits.
+    void prepareFull(origin, 'high').then(full => {
+      if (!needed()) return;
       if (full && image.hasAttribute('data-gallery-preview')) display(full, origin);
-      await prepareFull(after).catch(() => {});
-      if (visible && selected === origin && collectionKey === key) await prepareFull(before).catch(() => {});
-    });
+      scheduleImagePrefetch(prefetchKey, async () => {
+        for (const index of [...new Set([after, before])]) {
+          if (!needed()) return;
+          await preparePreview(index).catch(() => {});
+          if (!needed()) return;
+          await prepareFull(index).catch(() => {});
+        }
+      }, needed);
+    }).catch(() => {});
   }
 
   function display(node, index, preview = false) {
@@ -185,6 +198,7 @@ function initializeGallery(story, photographs) {
     try {
       if (record.fullReady && record.full.complete && record.full.naturalWidth) display(record.full, target);
       else {
+        cancelImagePrefetch(prefetchKey);
         // Respond with the selected photograph, even while its sharp version
         // is still crossing a slow connection. Never show a different frame.
         const previewReady = preparePreview(target, 'high');
@@ -237,6 +251,7 @@ function initializeGallery(story, photographs) {
         else warmNeighbours();
       }
       else {
+        cancelImagePrefetch(prefetchKey);
         // Retain only the displayed node off screen, allowing decoded buffers
         // from previously visited rows to be reclaimed on small devices.
         for (const index of prepared.keys()) if (index !== selected) prepared.delete(index);
@@ -246,6 +261,7 @@ function initializeGallery(story, photographs) {
     const visibleObserver = new IntersectionObserver(entries => {
       visible = entries[0].isIntersecting;
       if (visible) warmNeighbours();
+      else cancelImagePrefetch(prefetchKey);
     });
     visibleObserver.observe(figure);
   }
@@ -266,6 +282,7 @@ function initializeGallery(story, photographs) {
     controls.hidden = items.length < 2;
     if (key === collectionKey) return;
     generation += 1;
+    cancelImagePrefetch(prefetchKey);
     photographs = items;
     collectionKey = key;
     requested = 0;
@@ -278,7 +295,7 @@ function initializeGallery(story, photographs) {
   const initialSeason = overview?.dataset.season || new URL(location.href).searchParams.get('season') || 'all';
   updateSeason(initialSeason);
   overview?.addEventListener('collection:leisure-season', event => updateSeason(event.detail.season));
-  window.addEventListener('pagehide', () => { generation += 1; figure.removeAttribute('aria-busy'); }, { once: true });
+  window.addEventListener('pagehide', () => { generation += 1; cancelImagePrefetch(prefetchKey); figure.removeAttribute('aria-busy'); }, { once: true });
 }
 
 function initializeEntertainmentGalleries() {

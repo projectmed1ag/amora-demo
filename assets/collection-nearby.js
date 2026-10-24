@@ -1,3 +1,4 @@
+import { collectionImageSource } from './collection-image-sources.js?v=20261024-image-load-1';
 import { nearbyPlaces as mozhayskPlaces, nearbyBasemap } from './mozhaysk-nearby-data.js?v=nearby-photos-1';
 import { destinationAsset, getDestination } from './collection-destinations.js?v=20261024-all-hotels-1';
 
@@ -46,8 +47,20 @@ function nearbyConfiguration(section) {
 
 function detail(place) {
   const photo = place.photo;
+  const optimized = photo && collectionImageSource(photo.src);
+  let variants = optimized?.variants.filter(frame => frame.width >= Math.min(480, optimized.width)) || [];
+  if (!variants.length && typeof photo?.srcset === 'string') {
+    variants = photo.srcset.split(',').flatMap(candidate => {
+      const match = candidate.trim().match(/^(\S+)\s+([1-9]\d*)w$/);
+      return match ? [{ src: match[1], width: Number(match[2]) }] : [];
+    });
+  }
+  if (!variants.length && photo?.mobileSrc && Number(photo.mobileWidth) > 0 && Number(photo.width) > 0) {
+    variants = [{ src: photo.mobileSrc, width: Number(photo.mobileWidth) }, { src: photo.src, width: Number(photo.width) }];
+  }
+  const candidates = variants.map(frame => `${destinationAsset(frame.src)} ${frame.width}w`).join(', ');
   const photograph = photo ? `<figure class="nearby-place-photo">
-      <div class="nearby-photo-frame"><img src="${escape(destinationAsset(photo.src))}" alt="${escape(photo.alt)}" width="${escape(photo.width)}" height="${escape(photo.height)}" loading="lazy" decoding="async"><p class="nearby-photo-fallback" hidden>Фотография временно недоступна</p></div>
+      <div class="nearby-photo-frame"><img src="${escape(destinationAsset(optimized?.src || photo.src))}"${candidates ? ` srcset="${escape(candidates)}" sizes="(max-width: 700px) 100vw, 32vw"` : ''} alt="${escape(photo.alt)}" width="${escape(photo.width)}" height="${escape(photo.height)}" loading="lazy" decoding="async"><p class="nearby-photo-fallback" hidden>Фотография временно недоступна</p></div>
       <figcaption>Фото: <a href="${escape(photo.source)}" target="_blank" rel="noopener">${escape(photo.author)}, ${escape(photo.year)}</a> · <a href="${escape(photo.licenseURL)}" target="_blank" rel="noopener">${escape(photo.license)}</a></figcaption>
     </figure>` : '';
   return `${photograph}
@@ -86,7 +99,7 @@ export function renderNearbyPlaces() {
         <div class="nearby-map-feedback"><p id="nearby-map-help" role="status">Загружаем карту…</p><button type="button" data-nearby-retry hidden>Повторить</button></div>
       </div>
     </div>
-    <p class="nearby-visit-note">Места находятся за пределами отеля. Время работы и условия посещения уточняйте на официальных сайтах.${getDestination().id === 'mozhaysk' ? ` <a href="${destinationAsset('photo-credits.html')}#nearby-photos">Фото и лицензии ↗</a>` : ''}</p>
+    <p class="nearby-visit-note">Места находятся за пределами отеля. Время работы и условия посещения уточняйте на официальных сайтах. <a href="${destinationAsset('photo-credits.html')}#nearby-photos">Фото и лицензии ↗</a></p>
     <p class="sr-only" data-nearby-announcement aria-live="polite" aria-atomic="true"></p>
   </section>`;
 }
