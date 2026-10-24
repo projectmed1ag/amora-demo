@@ -376,11 +376,19 @@ export function createScreenSwitcher({ main, getTargets, getOffset, onUpdate = (
     try { id = decodeURIComponent(location.hash.slice(1)); } catch { return null; }
     // Preserve links to chapters that have since joined a shared section.
     const mergedChapters = {
+      top: 'section-home',
+      route: 'section-stays',
+      gallery: 'section-stays',
+      spaces: 'section-leisure',
+      panorama: 'section-home',
       'section-about': 'section-home',
+      'section-details': 'section-stays',
+      'section-walks': 'section-leisure',
+      'section-place': 'section-home',
       'section-water': 'section-leisure',
       'section-evening': 'section-leisure',
     };
-    if (mergedChapters[id] && root.dataset.city === 'mozhaysk' && !chapters().some(chapter => chapter.id === id)) {
+    if (mergedChapters[id] && !chapters().some(chapter => chapter.id === id)) {
       id = mergedChapters[id];
       const url = new URL(location.href);
       url.hash = id;

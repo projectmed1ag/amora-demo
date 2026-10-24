@@ -1,6 +1,7 @@
-import { entertainmentGalleries, getEntertainmentPhotographs } from './collection-entertainment-gallery-data.js?v=20261023-local-menu-seasons-1';
+import { getEntertainmentPhotographs } from './collection-entertainment-gallery-data.js?v=20261024-all-hotels-1';
 
 const imageRoot = new URL('../', import.meta.url);
+const city = document.documentElement.dataset.city || 'mozhaysk';
 // 1.15 / 2.15 of the desktop row after its gutters and column gap.
 const sizes = '(max-width: 700px) 100vw, (max-width: 800px) 91.6vw, (max-width: 1680px) 46.59vw, 800px';
 
@@ -258,7 +259,7 @@ function initializeGallery(story, photographs) {
     if (Math.abs(dx) >= 45 && Math.abs(dx) > Math.abs(dy) * 1.3) void show(requested + (dx < 0 ? 1 : -1));
   });
   function updateSeason(season) {
-    const items = getEntertainmentPhotographs(story.id, season);
+    const items = getEntertainmentPhotographs(story.id, season, city);
     if (!items.length) return;
     figure.dataset.gallerySeason = season;
     const key = keyFor(items);
@@ -281,7 +282,7 @@ function initializeGallery(story, photographs) {
 }
 
 function initializeEntertainmentGalleries() {
-  document.querySelectorAll('[data-entertainment-story]').forEach(story => initializeGallery(story, entertainmentGalleries[story.id]));
+  document.querySelectorAll('[data-entertainment-story]').forEach(story => initializeGallery(story, getEntertainmentPhotographs(story.id, 'all', city)));
 }
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initializeEntertainmentGalleries, { once: true });

@@ -1,10 +1,12 @@
+import { currentDestinationCity, destinationDateParts, destinationLocalDate, destinationURL, getDestination } from './collection-destinations.js?v=20261024-all-hotels-1';
+
 // Service requests are local previews. No endpoint, storage or transmission of
 // contact details is involved in this workflow.
 const services = Object.freeze({
   banya: {
     name: 'Баня',
     title: 'Бронирование бани.',
-    page: './banya.html?city=mozhaysk',
+    page: 'banya.html',
     description: 'Отдельная заявка на посещение бани. Дата, время и число гостей относятся только к бане.',
     back: 'Вернуться к бане',
     action: 'Забронировать баню',
@@ -12,7 +14,7 @@ const services = Object.freeze({
   restaurant: {
     name: 'Столик в ресторане',
     title: 'Столик в ресторане.',
-    page: './restaurant.html?city=mozhaysk',
+    page: 'restaurant.html',
     description: 'Отдельная заявка на столик в ресторане. Дата, время и число гостей относятся только к ресторану.',
     back: 'Вернуться к ресторану',
     action: 'Забронировать столик',
@@ -20,7 +22,7 @@ const services = Object.freeze({
   pavilion: {
     name: 'Аренда павильона',
     title: 'Аренда павильона.',
-    page: './pavilions.html?city=mozhaysk',
+    page: 'pavilions.html',
     description: 'Заявка на аренду павильона для праздника или встречи. Укажите желаемую дату, время и число гостей.',
     back: 'Вернуться к павильонам',
     action: 'Оставить заявку на аренду',
@@ -34,16 +36,8 @@ const fieldLabels = {
   name: 'Имя', phone: 'Телефон', email: 'Email', notes: 'Пожелания',
 };
 
-function moscowParts(now) {
-  return Object.fromEntries(new Intl.DateTimeFormat('en-GB', {
-    timeZone: 'Europe/Moscow', year: 'numeric', month: '2-digit', day: '2-digit',
-    hour: '2-digit', minute: '2-digit', hourCycle: 'h23',
-  }).formatToParts(now).map(({ type, value }) => [type, value]));
-}
-
-export function serviceLocalDate(now = new Date()) {
-  const { year, month, day } = moscowParts(now);
-  return `${year}-${month}-${day}`;
+export function serviceLocalDate(now = new Date(), city) {
+  return destinationLocalDate(now, city);
 }
 
 function validDate(value) {
@@ -52,19 +46,19 @@ function validDate(value) {
   return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value;
 }
 
-function validateVisit(values, now) {
+function validateVisit(values, now, city = currentDestinationCity()) {
   const errors = {};
   if (!Object.hasOwn(services, values.service || '')) errors.service = 'Выберите услугу.';
-  const today = serviceLocalDate(now);
+  const today = serviceLocalDate(now, city);
   if (!validDate(values.date)) errors.date = 'Укажите корректную дату посещения.';
   else if (values.date < today) errors.date = 'Дата посещения не может быть в прошлом.';
   const timeValid = /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(values.time || '');
   if (!timeValid) errors.time = 'Укажите желаемое время посещения.';
   else if (validDate(values.date) && values.date === today) {
-    const { hour, minute } = moscowParts(now);
+    const { hour, minute } = destinationDateParts(now, city);
     const currentMinutes = Number(hour) * 60 + Number(minute);
     const [hours, minutes] = values.time.split(':').map(Number);
-    if (hours * 60 + minutes <= currentMinutes) errors.time = 'Выберите время позже текущего времени по Москве.';
+    if (hours * 60 + minutes <= currentMinutes) errors.time = `Выберите время позже текущего времени ${getDestination(city).timeLabel}.`;
   }
   const guests = Number(values.guests);
   if (values.service === 'pavilion') {
@@ -209,8 +203,8 @@ function initializePhoneInput(input) {
   }
 }
 
-export function validateServiceRequest(values, now = new Date()) {
-  const errors = validateVisit(values, now);
+export function validateServiceRequest(values, now = new Date(), city = currentDestinationCity()) {
+  const errors = validateVisit(values, now, city);
   if (!values.name?.trim()) errors.name = 'Укажите ваше имя.';
   else if (values.name.trim().length > 100) errors.name = 'Сократите имя до 100 символов.';
   if (!normalizeServicePhone(values.phone)) errors.phone = 'Введите 10 цифр номера после +7.';
@@ -229,6 +223,7 @@ function readableDate(value) {
 export function initServiceBooking() {
   const form = document.getElementById('service-request-form');
   if (!form || form.dataset.serviceReady) return;
+  const destination = getDestination();
   const result = document.getElementById('service-request-result');
   const details = document.getElementById('service-result-details');
   const resultTitle = document.getElementById('service-result-title');
@@ -242,6 +237,8 @@ export function initServiceBooking() {
   const visitSummary = document.getElementById('service-visit-summary');
   const controls = Object.fromEntries(fieldNames.map(name => [name, form.elements.namedItem(name)]));
   if (!result || !details || !resultTitle || !edit || !errorSummary || !submit || !next || !visitStep || !contactStep || !editVisit || !visitSummary || Object.values(controls).some(control => !control)) return;
+  const timeHelp = document.querySelector('[data-service-time-zone], #service-time-help');
+  if (timeHelp) timeHelp.textContent = destination.timeHelp;
 
   const fixedService = Object.hasOwn(services, form.dataset.service || '') ? form.dataset.service : null;
   const readValues = () => {
@@ -298,7 +295,7 @@ export function initServiceBooking() {
     if (description) description.textContent = service?.description || 'Выберите баню или столик в ресторане. Дата, время и число гостей относятся только к выбранной услуге.';
     if (link) {
       link.hidden = !service;
-      if (service) link.href = service.page;
+      if (service) link.href = destinationURL(service.page, destination.id);
     }
     const submitLabel = document.getElementById('service-submit-label');
     if (submitLabel) submitLabel.textContent = service?.action || 'Подготовить заявку';
@@ -308,7 +305,7 @@ export function initServiceBooking() {
     url.search = '';
     if (service) url.searchParams.set('service', controls.service.value);
     else url.searchParams.delete('service');
-    url.searchParams.set('city', 'mozhaysk');
+    url.searchParams.set('city', destination.id);
     // Only service/city navigation state enters the URL; contact fields do not.
     history.replaceState(history.state, '', url);
     const bookingLink = document.querySelector('[data-service-booking-link]');
@@ -344,9 +341,9 @@ export function initServiceBooking() {
     const service = services[values.service];
     const rows = [
       ['Услуга', service.name],
-      ['Место', 'Можайское водохранилище'],
+      ['Место', destination.name],
       ['Дата', readableDate(values.date)],
-      ['Желаемое время', `${values.time} по Москве`],
+      ['Желаемое время', `${values.time} ${destination.timeLabel}`],
       ['Число гостей', String(Number(values.guests))],
       ['Имя', values.name.trim()],
       ['Телефон', values.phone.trim()],
@@ -364,7 +361,7 @@ export function initServiceBooking() {
     }));
     const back = document.getElementById('service-result-back');
     if (back) {
-      back.href = service.page;
+      back.href = destinationURL(service.page, destination.id);
       const label = document.createElement('span');
       label.textContent = service.back;
       const arrow = back.querySelector('svg');
@@ -386,7 +383,7 @@ export function initServiceBooking() {
     clearErrors();
     const guests = Number(values.guests);
     const guestWord = guests % 10 === 1 && guests % 100 !== 11 ? 'гость' : guests % 10 >= 2 && guests % 10 <= 4 && (guests % 100 < 12 || guests % 100 > 14) ? 'гостя' : 'гостей';
-    visitSummary.textContent = `${readableDate(values.date)} · ${values.time} по Москве · ${guests} ${guestWord}`;
+    visitSummary.textContent = `${readableDate(values.date)} · ${values.time} ${destination.timeLabel} · ${guests} ${guestWord}`;
     showStep('contact');
   }
 

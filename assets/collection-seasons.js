@@ -1,4 +1,5 @@
 import { leisureGroups } from './mozhaysk-leisure-data.js?v=20261023-leisure-catalog-1';
+import { currentDestinationCity, destinationURL, getDestination } from './collection-destinations.js?v=20261024-all-hotels-1';
 
 // Shared by the leisure page and date-based booking suggestions. These helpers
 // never read browser state, change source data or imply real-time availability.
@@ -74,14 +75,14 @@ const activities = Object.freeze([
   sourceActivity('garden', 'Садовые парники', 'spaces.html', 'garden', 'relaxation', warmSeasons),
 ].filter(Boolean));
 
-export function getSeasonActivities(season) {
+export function getSeasonActivities(season, city = currentDestinationCity()) {
   if (!Object.prototype.hasOwnProperty.call(seasonLabels, season)) return [];
+  const destination = getDestination(city);
   return activities
     .filter(activity => activity.seasons.includes(season))
-    .map(({ title, description, page, anchor, audience }) => ({
-      title,
-      description,
-      href: `./${page}?city=mozhaysk&season=${season}#${anchor}`,
-      audience,
-    }));
+    .map(({ title, description, page, anchor, audience }) => {
+      const url = destinationURL(destination.id === 'mozhaysk' ? page : 'spaces.html', destination.id, { season });
+      url.hash = anchor;
+      return { title, description, href: url.href, audience };
+    });
 }

@@ -426,8 +426,23 @@ seasonalPhotographs.autumn.fishing = [{ ...entertainmentGalleries.fishing[1], se
 
 // A seasonal selection contains only matching photographs, even when fewer
 // than three views exist. “All seasons” retains the three-view manual gallery.
-export function getEntertainmentPhotographs(id, season = 'all') {
+export function getEntertainmentPhotographs(id, season = 'all', city = 'mozhaysk') {
   const base = entertainmentGalleries[id] || [];
+  if (['ruza', 'krasnoyarsk'].includes(city) && ['children', 'routes'].includes(id)) {
+    const activity = id === 'children' ? 'family' : 'routes';
+    const localPhoto = selectedSeason => ({
+      src: `images/${city}/seasons-v1/${activity}-${selectedSeason}.webp`,
+      mobileSrc: `images/mobile/${city}/seasons-v1/${activity}-${selectedSeason}.webp`,
+      previewSrc: `images/responsive/${city}/seasons-v1/${activity}-${selectedSeason}-384.webp`,
+      alt: `${seasonNames[selectedSeason]}: ${id === 'children' ? 'семейный отдых' : 'лесные прогулки'}, ${city === 'ruza' ? 'Руза' : 'Красноярск'}`,
+      width: 1536, height: 1024, mobileWidth: 768, mobileHeight: 512,
+      season: selectedSeason,
+    });
+    if (season === 'all') return id === 'children'
+      ? [localPhoto('summer'), ...base.slice(1)]
+      : ['summer', 'spring', 'autumn'].map(localPhoto);
+    return Object.hasOwn(seasonNames, season) ? [localPhoto(season)] : [];
+  }
   if (season === 'all') return base;
   if (['ice-rink', 'snowmobiles', 'tubing'].includes(id)) return season === 'winter' ? base : [];
   if (season === 'summer') {

@@ -1,10 +1,11 @@
 // Shared progressive enhancements. Content, ordinary links and the locked
 // A’MORE artwork remain usable without this module.
-import { createScreenSwitcher } from './collection-screen-switcher.js?v=20261023-mobile-swipe-1';
+import { createScreenSwitcher } from './collection-screen-switcher.js?v=20261024-all-hotels-1';
 import { initHeadingFormat } from './collection-heading-format.js?v=20261023-local-nav-restored-1';
+import { collectionDestinations, getDestination } from './collection-destinations.js?v=20261024-all-hotels-1';
 
 const headerSelector = '.home-header, .site-header';
-const cityNames = new Set(['mozhaysk', 'ruza', 'krasnoyarsk']);
+const cityNames = new Set(Object.keys(collectionDestinations));
 
 function addBookingLink(header) {
   if (!header || header.querySelector('a[href*="booking.html"], [data-service-booking-link]')) return;
@@ -37,7 +38,7 @@ function closeMobileMenu(header) {
 
 const primarySections = [
   ['home-hero', 'home', 'Начало'],
-  ['home-stays', 'stays', 'Хаусботы'],
+  ['home-stays', 'stays', getDestination().stayPlural],
   ['home-restaurant', 'restaurant', 'Ресторан'],
   ['home-banya', 'banya', 'Баня'],
   ['home-leisure', 'leisure', 'Развлечения и активный отдых'],
