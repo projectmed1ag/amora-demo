@@ -1,5 +1,5 @@
-import { getEntertainmentPhotographs } from './collection-entertainment-gallery-data.js?v=20261024-image-load-1';
-import { scheduleImagePrefetch, cancelImagePrefetch } from './collection-image-scheduler.js?v=20261024-image-load-1';
+import { getEntertainmentPhotographs } from './collection-entertainment-gallery-data.js?v=20261025-progressive-photos-1';
+import { scheduleImagePrefetch, cancelImagePrefetch } from './collection-image-scheduler.js?v=20261025-progressive-photos-1';
 
 const imageRoot = new URL('../', import.meta.url);
 const city = document.documentElement.dataset.city || 'mozhaysk';
@@ -203,9 +203,9 @@ function initializeGallery(story, photographs) {
         // is still crossing a slow connection. Never show a different frame.
         const previewReady = preparePreview(target, 'high');
         if (record.previewReady) display(record.preview, target, true);
-        const fullReady = record.previewReady
-          ? prepareFull(target, 'high')
-          : previewReady.catch(() => {}).then(() => prepareFull(target, 'high'));
+        // Start the requested sharp photograph immediately. On a cold CDN a
+        // preview can have its own round trip; it must not gate the real frame.
+        const fullReady = prepareFull(target, 'high');
         const first = await Promise.any([previewReady, fullReady]);
         if (token !== generation) return;
         display(first, target, first === record.preview);

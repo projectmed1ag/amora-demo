@@ -71,7 +71,7 @@ function initializePageMotion() {
     if (home) {
       [...scope.children].filter(element => element.tagName === 'SECTION').forEach(section => {
         if (section.classList.contains('home-hero')) {
-          section.querySelectorAll('.home-hero-bottom > div, :scope > img').forEach((element, index) => prepare(element, index));
+          section.querySelectorAll('.home-hero-bottom > div').forEach((element, index) => prepare(element, index));
           return;
         }
         [...section.children].forEach((element, index) => {
@@ -84,7 +84,7 @@ function initializePageMotion() {
       });
     } else {
       scope.querySelectorAll([
-        '.stays-hero-heading', '.home-hero > img', '.room-houseboat',
+        '.stays-hero-heading', '.room-houseboat',
         '.cl-intro-copy', '.cl-intro-photo', '.cl-panel', '.cl-story-photo',
         '.cl-story-copy', '.cl-detail-photo', '.cl-detail-heading',
         '.editorial-story > div', '.editorial-story > figure',

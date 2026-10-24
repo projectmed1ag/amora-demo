@@ -1,4 +1,4 @@
-import { initCollectionMotion } from './collection-motion.js?v=static-1';
+import { initCollectionMotion } from './collection-motion.js?v=20261025-progressive-photos-1';
 import { initHeadingFormat } from './collection-heading-format.js?v=20261023-local-nav-restored-1';
 
 // Bind controls to the HTML that is already visible. No page shell or primary
@@ -28,13 +28,13 @@ if (toggle && nav) {
 const page = document.body.dataset.page;
 try {
   if (page === 'rooms' || page === 'gallery') {
-    const { initCollectionPhotos } = await import('./collection-photo-runtime.js?v=20261024-image-load-1');
+    const { initCollectionPhotos } = await import('./collection-photo-runtime.js?v=20261025-progressive-photos-1');
     initCollectionPhotos(page);
   } else if (page === 'booking') {
-    const { initCollectionBooking } = await import('./collection-booking-runtime.js?v=20261024-image-load-1');
+    const { initCollectionBooking } = await import('./collection-booking-runtime.js?v=20261025-progressive-photos-1');
     initCollectionBooking();
   } else if (['spaces', 'location'].includes(page) && document.querySelector('#nearby [data-nearby-place]')) {
-    const { enhanceNearbyPlaces } = await import('./collection-nearby.js?v=20261024-image-load-1');
+    const { enhanceNearbyPlaces } = await import('./collection-nearby.js?v=20261025-progressive-photos-1');
     enhanceNearbyPlaces(document.querySelector('#nearby'));
   }
   document.documentElement.dataset.collectionInteractive = 'ready';

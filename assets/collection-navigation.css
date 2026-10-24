@@ -1,5 +1,6 @@
-/* Homepage chapter navigation: a quiet arc on desktop, compact controls below. */
+/* Homepage chapter controls are visible only in compact layouts. */
 .section-navigation {
+  display: none;
   position: fixed;
   z-index: 18;
   top: 50%;
@@ -145,7 +146,7 @@
   .section-navigation-link:hover > span:last-child { transform: translate(0, -50%); opacity: 1; visibility: visible; }
 }
 
-@media (max-width: 1099px), (max-height: 659px) {
+@media (max-width: 1099px) {
   .section-navigation {
     top: auto;
     right: 0;

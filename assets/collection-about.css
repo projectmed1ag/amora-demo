@@ -16,7 +16,7 @@ body.collection-about-page[data-page='about'] #content .about-description-photo 
   aspect-ratio: 16 / 9;
   overflow: hidden;
 }
-body.collection-about-page[data-page='about'] #content .about-description-photo > img {
+body.collection-about-page[data-page='about'] #content :is(.about-description-photo > img, .about-description-photo > .collection-picture > img) {
   display: block;
   width: 100%;
   height: 100%;

@@ -1,4 +1,4 @@
-import { collectionImageSource } from './collection-image-sources.js?v=20261024-image-load-1';
+import { collectionImageSource } from './collection-image-sources.js?v=20261025-progressive-photos-1';
 import { nearbyPlaces as mozhayskPlaces, nearbyBasemap } from './mozhaysk-nearby-data.js?v=nearby-photos-1';
 import { destinationAsset, getDestination } from './collection-destinations.js?v=20261024-all-hotels-1';
 

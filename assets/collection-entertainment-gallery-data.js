@@ -1,4 +1,4 @@
-import { optimizeCollectionPhotograph } from './collection-image-sources.js?v=20261024-image-load-1';
+import { optimizeCollectionPhotograph } from './collection-image-sources.js?v=20261025-progressive-photos-1';
 
 // Local generated photographs for the entertainment galleries.
 export const entertainmentGalleries = {

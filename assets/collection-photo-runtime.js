@@ -1,4 +1,4 @@
-import { scheduleImagePrefetch, cancelImagePrefetch } from './collection-image-scheduler.js?v=20261024-image-load-1';
+import { scheduleImagePrefetch, cancelImagePrefetch } from './collection-image-scheduler.js?v=20261025-progressive-photos-1';
 
 const arrow = '<svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10h22m-6-6 6 6-6 6"/></svg>';
 const close = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 5 14 14M19 5 5 19"/></svg>';
@@ -489,8 +489,8 @@ function initRooms(main) {
       image.addEventListener('load', () => failed.delete(index));
       if (image.getAttribute('src') && image.complete && !image.naturalWidth) unavailable();
     });
-    // Only galleries about to enter the viewport prepare their two neighbours.
-    // Farther room frames remain dormant; no autoplay or repeating timers run.
+    // Start the current photograph shortly before it enters view. Farther room
+    // frames remain dormant; no autoplay or repeating timers run.
     if ('IntersectionObserver' in window) {
       const observer = new IntersectionObserver(entries => {
         nearby = entries.some(entry => entry.isIntersecting);
@@ -502,7 +502,7 @@ function initRooms(main) {
           });
           void prepare(current, 'high').then(warmNeighbors).catch(() => {});
         } else cancelImagePrefetch(prefetchKey);
-      }, { threshold: 0 });
+      }, { threshold: 0, rootMargin: '200px 0px' });
       observer.observe(gallery);
     } else {
       gallery.addEventListener('pointerenter', () => { nearby = true; warmNeighbors(); }, { once: true });
