@@ -1,80 +1,74 @@
 <!doctype html>
-<html lang="ru" data-city="ruza"><head>
+<html lang="ru" class="collection-home-root" data-city="ruza">
+  <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Выбор номера, дат и гостей в A’MORE Collection.">
-    <meta name="theme-color" content="#ffffff">
+    <meta name="theme-color" content="#f6f3ed">
     <title>Бронирование — Руза — A’MORE Collection</title>
+    <link rel="preload" href="../fonts/spectral-400-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
-
     <link rel="stylesheet" crossorigin="" href="../assets/styles-B5T6wf-2.css">
-
-
-      <script src="../assets/collection-route.js?v=20261023-photo-response-3"></script>
-    <script type="module" src="../assets/collection-legacy.js?v=20261023-photo-response-3"></script>
+    <link id="collection-home-style" rel="stylesheet" href="../assets/collection-home.css?v=home-1">
+    <link id="collection-site-shell-style" rel="stylesheet" href="../assets/collection-site-shell.css?v=header-2">
+    <link id="collection-booking-style" rel="stylesheet" href="../assets/collection-booking.css?v=site-1">
+    <link id="collection-brand-style" rel="stylesheet" href="../assets/collection-brand.css?v=original-1">
+    <link rel="stylesheet" href="../assets/collection-motion.css?v=static-1">
+<script type="module" src="../assets/collection-runtime.js?v=20261024-all-hotels-1"></script>
       <link rel="preload" href="../fonts/amore-condensed-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="../assets/collection-refinement.css?v=20261023-entertainment-2">
     <link rel="stylesheet" href="../assets/collection-refinement-pages.css?v=20261023-responsive-1">
     <link rel="stylesheet" href="../assets/collection-navigation.css?v=20261023-chapter-response-1">
-    <script type="module" src="../assets/collection-refinement.js?v=20261023-mobile-swipe-1"></script>
+    <script type="module" src="../assets/collection-refinement.js?v=20261024-all-hotels-1"></script>
       <link rel="stylesheet" href="../assets/collection-page-motion.css?v=20261023-local-menu-seasons-1">
-    <script type="module" src="../assets/collection-page-motion.js?v=20261022-1"></script>
+    <script type="module" src="../assets/collection-page-motion.js?v=20261024-all-hotels-1"></script>
+      <link rel="stylesheet" href="../assets/collection-trip-planner.css?v=20261022-1">
+    <script type="module" src="../assets/collection-trip-planner.js?v=20261024-all-hotels-1"></script>
   </head>
-  <body data-page="booking">
+  <body data-page="booking" class="collection-home-page collection-site-page collection-booking-page" data-collection-static="">
     <a class="skip-link" href="#content">К содержанию</a>
-    <header class="site-header" data-header="">
-      <div class="header-main">
-        <a class="header-booking" data-booking-link="" data-page-link="" href="./booking.html?city=ruza">
-          <svg viewbox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="5" width="16" height="16" rx="1"></rect><path d="M8 3v4m8-4v4M4 11h16m-11 5 2 2 4-4"></path></svg>
-          <span class="booking-label-full">Забронировать</span><span class="booking-label-short">Бронь</span>
-        </a>
-        <a class="site-logo" data-page-link="" href="./hotel.html?city=ruza" aria-label="A’MORE Collection — на главную"><span class="brand-name">A’MORE</span><span class="brand-collection">COLLECTION</span></a>
-        <div class="header-controls">
-          <a class="destination-trigger" href="../" aria-label="Все отели A’MORE Collection">
-            <svg viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 10c0 6-8 11-8 11S4 16 4 10a8 8 0 1 1 16 0Z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>
-            <span class="destination-trigger-copy"><span class="destination-trigger-label">Отели</span><span id="selected-destination">Руза</span></span>
-          </a>
-          <button class="menu-toggle" type="button" aria-label="Открыть меню" aria-expanded="false" aria-controls="site-menu" hidden="">
-            <span class="menu-line"></span><span class="menu-line"></span>
-          </button>
-        </div>
-        <a class="mobile-destination" href="../" aria-label="Все отели A’MORE Collection"><span data-selected-mobile="">Руза</span></a>
-      </div>
-      <nav class="site-nav" id="site-menu" aria-label="Разделы сайта">
-        <a data-page-link="" href="./hotel.html?city=ruza">Главная</a>
-        <a data-page-link="" href="./rooms.html?city=ruza" class="is-current-section">Номера</a>
-        <a data-page-link="" href="./spaces.html?city=ruza">Развлечения и активный отдых</a>
-        <a data-page-link="" href="./location.html?city=ruza">Об отеле</a>
-        <a class="nav-booking" data-booking-link="" data-page-link="" href="./booking.html?city=ruza">Забронировать</a>
-      </nav>
-    </header>
+    <header class="home-header home-header-light" data-header="">
+<a class="home-brand amore-logo" href="./hotel.html?city=ruza" aria-label="A’MORE Collection — на главную"><span class="brand-name">A’MORE</span><span class="brand-collection">COLLECTION</span></a>
+<input class="home-menu-toggle" id="home-menu-toggle" type="checkbox" aria-label="Меню разделов" aria-controls="home-nav"><nav class="home-nav" id="home-nav" aria-label="Разделы сайта">
+<a href="./hotel.html?city=ruza">Главная</a>
+<a href="./rooms.html?city=ruza" class="is-current-section">Номера</a>
+<a href="./restaurant.html?city=ruza">Ресторан</a>
+<a href="./banya.html?city=ruza">Баня</a>
+<a href="./pavilions.html?city=ruza">Аренда павильонов</a>
+<a href="./spaces.html?city=ruza">Развлечения и активный отдых</a>
+<a href="./about.html?city=ruza">Об отеле</a>
 
-    <main id="content" class="interior-page" tabindex="-1"><section class="page-heading booking-heading" id="top" aria-labelledby="page-title">
+<a class="mobile-hotels-link" href="../">Все отели</a>
+</nav>
+<div class="home-header-end"><a href="../">Отели</a><label class="home-menu" for="home-menu-toggle"><span></span><span></span></label></div>
+</header>
+
+    <main id="content" class="interior-page" tabindex="-1"><section class="page-heading booking-heading collection-booking-heading" id="top" aria-labelledby="page-title">
     <nav class="breadcrumbs" aria-label="Хлебные крошки"><a data-page-link="" href="./hotel.html?city=ruza">Главная</a><span aria-hidden="true">/</span><a data-page-link="" href="./rooms.html?city=ruza">Номера</a><span aria-hidden="true">/</span><span aria-current="page">Бронирование</span></nav>
     <p class="eyebrow">Руза · Бронирование</p><h1 id="page-title">Бронирование</h1>
-    <p class="page-lead">Выберите даты и гостей — соберём детали вашего отдыха.</p>
+    <p class="page-lead">Выберите номер, даты и количество гостей.</p>
   </section>
 
-  <div class="booking-layout">
+  <div class="booking-layout collection-booking-layout">
     <div class="booking-main">
-      <form id="booking-form" novalidate="">
+      <noscript><p class="form-hint">Для заполнения формы включите JavaScript.</p></noscript><form id="booking-form" novalidate="">
         <fieldset><legend><span>01</span> Номер и гости</legend>
-          <div class="form-row"><div class="form-field"><label for="booking-room">Категория номера</label><select name="room" id="booking-room"><option value="standard" selected="">Стандарт · до 2 гостей</option><option value="comfort">Комфорт · до 2 гостей</option><option value="junior-suite">Полулюкс · до 3 гостей</option><option value="suite">Люкс · до 4 гостей</option></select></div>
-          <div class="form-field"><label for="booking-guests">Гостей, включая детей</label><select name="guests" id="booking-guests" aria-describedby="error-guests"><option value="1">1</option><option value="2" selected="">2</option><option value="3" disabled="">3</option><option value="4" disabled="">4</option></select><p class="field-error" id="error-guests" hidden=""></p></div></div>
+          <div class="form-row"><div class="form-field"><label for="booking-room">Категория номера</label><select name="room" id="booking-room"><option value="standard" selected>Стандарт · до 2 гостей</option><option value="comfort">Комфорт · до 4 гостей</option><option value="junior-suite">Полулюкс · до 4 гостей</option><option value="suite">Люкс · до 6 гостей</option></select></div>
+          <div class="form-field"><label for="booking-guests">Гостей, включая детей</label><select name="guests" id="booking-guests" aria-describedby="error-guests"><option value="1">1</option><option value="2" selected>2</option><option value="3" disabled>3</option><option value="4" disabled>4</option><option value="5" disabled>5</option><option value="6" disabled>6</option></select><p class="field-error" id="error-guests" hidden=""></p></div></div>
           <p id="capacity-notice" class="form-hint" aria-live="polite"></p>
         </fieldset>
-        <fieldset><legend><span>02</span> Даты отдыха</legend><div class="form-row"><div class="form-field"><label for="booking-checkin">Заезд</label><input id="booking-checkin" name="checkin" type="date" required="" aria-describedby="error-checkin" min="2026-10-17"><p class="field-error" id="error-checkin" hidden=""></p></div><div class="form-field"><label for="booking-checkout">Выезд</label><input id="booking-checkout" name="checkout" type="date" required="" aria-describedby="error-checkout" min="2026-10-18"><p class="field-error" id="error-checkout" hidden=""></p></div></div></fieldset>
+        <fieldset><legend><span>02</span> Даты отдыха</legend><div class="form-row"><div class="form-field"><label for="booking-checkin">Заезд</label><input id="booking-checkin" name="checkin" type="date" required="" aria-describedby="error-checkin"><p class="field-error" id="error-checkin" hidden=""></p></div><div class="form-field"><label for="booking-checkout">Выезд</label><input id="booking-checkout" name="checkout" type="date" required="" aria-describedby="error-checkout"><p class="field-error" id="error-checkout" hidden=""></p></div></div></fieldset>
         <fieldset><legend><span>03</span> Ваши контакты</legend><div class="form-row"><div class="form-field"><label for="booking-name">Имя</label><input id="booking-name" name="name" type="text" required="" aria-describedby="error-name" autocomplete="given-name" maxlength="80"><p class="field-error" id="error-name" hidden=""></p></div><div class="form-field"><label for="booking-email">Email</label><input id="booking-email" name="email" type="email" required="" aria-describedby="error-email" autocomplete="email" maxlength="120"><p class="field-error" id="error-email" hidden=""></p></div></div></fieldset>
-        <button class="primary-action" type="submit" disabled="">Посмотреть итог</button>
-        <noscript><p>Для заполнения формы включите JavaScript.</p></noscript>
+        <button class="primary-action" type="submit" disabled><span>Посмотреть итог</span><svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10h22m-6-6 6 6-6 6"></path></svg></button>
+
       </form>
       <section id="booking-result" class="booking-result" aria-labelledby="result-title" hidden="">
         <h2 id="result-title" tabindex="-1">Ваш выбор</h2>
-        <dl id="result-details"></dl><button class="primary-action" type="button" id="edit-booking">Изменить данные</button>
+        <dl id="result-details"></dl><button class="primary-action" type="button" id="edit-booking"><span>Изменить данные</span><svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10h22m-6-6 6 6-6 6"></path></svg></button>
       </section>
     </div>
     <aside class="booking-summary" aria-label="Ваш выбор">
-      <figure class="media" id="summary-photo" data-room="standard"><img src="../images/rooms/ruza/standard.jpg" srcset="../images/mobile/rooms/ruza/standard.jpg 768w, ../images/rooms/ruza/standard.jpg 1536w" sizes="(max-width: 800px) 100vw, 35vw" alt="Уютная спальня с тёплым деревом и берёзами за окном" fetchpriority="high"></figure>
+      <figure class="media" id="summary-photo" data-room="standard"><img src="../images/rooms/ruza/standard.jpg" srcset="../images/mobile/rooms/ruza/standard.jpg 768w, ../images/rooms/ruza/standard.jpg 1536w" sizes="(max-width: 700px) 100vw, 44vw" width="1536" height="1024" alt="Уютная спальня с тёплым деревом и берёзами за окном" fetchpriority="high"></figure>
       <div class="booking-summary-copy"><p class="eyebrow">Руза</p><h2 id="summary-room">Стандарт</h2><p id="summary-features">26 м² · до 2 гостей</p>
         <dl><div><dt>Даты</dt><dd id="summary-dates">Выберите даты</dd></div><div><dt>Гости</dt><dd id="summary-guests">2</dd></div><div><dt>Стоимость</dt><dd>Не рассчитана</dd></div></dl>
 
@@ -82,37 +76,11 @@
     </aside>
   </div></main>
 
-    <footer class="site-footer">
-      <a class="footer-wordmark" data-page-link="" href="./hotel.html?city=ruza" aria-label="A’MORE Collection — на главную">A’MORE <small>COLLECTION</small></a>
-      <p>Можайское водохранилище · Руза · Красноярск</p>
-      <a class="back-top" href="#top">К началу</a>
-    </footer>
-    <dialog id="destination-dialog" class="destination-dialog" aria-labelledby="destination-title">
-      <button class="destination-close" type="button" data-destination-close="" aria-label="Закрыть выбор отеля"><svg viewbox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"></path></svg></button>
-      <div class="destination-layout">
-        <div class="destination-preview" aria-hidden="true"><div class="destination-preview-images"><div data-destination-photo="mozhaysk"><img src="../images/destinations/mozhaysk.jpg" srcset="../images/mobile/destinations/mozhaysk.jpg 768w, ../images/destinations/mozhaysk.jpg 1536w" sizes="(max-width: 700px) 100vw, (max-width: 1200px) 52vw, 590px" alt="" loading="lazy"></div><div data-destination-photo="ruza" class="is-selected"><img src="../images/destinations/ruza.jpg" srcset="../images/mobile/destinations/ruza.jpg 768w, ../images/destinations/ruza.jpg 1536w" sizes="(max-width: 700px) 100vw, (max-width: 1200px) 52vw, 590px" alt="" loading="lazy"></div><div data-destination-photo="krasnoyarsk"><img src="../images/destinations/krasnoyarsk.jpg" srcset="../images/mobile/destinations/krasnoyarsk.jpg 768w, ../images/destinations/krasnoyarsk.jpg 1536w" sizes="(max-width: 700px) 100vw, (max-width: 1200px) 52vw, 590px" alt="" loading="lazy"></div></div><span class="destination-preview-index"><span data-destination-index="">02</span> / 03</span></div>
-        <div class="destination-panel">
-          <div class="destination-brand" aria-label="A’MORE Collection"><span class="brand-name">A’MORE</span><span class="brand-collection">COLLECTION</span></div>
-          <h2 id="destination-title" tabindex="-1">Отели коллекции</h2>
-          <fieldset class="destination-fieldset"><legend class="sr-only">Отель</legend><div class="destination-options"><label class="destination-option">
-    <input class="sr-only" type="radio" name="destination-preview" value="mozhaysk" data-destination="mozhaysk">
-    <span class="destination-option-copy"><span class="destination-region">Московская область</span><span class="destination-name">Можайское водохранилище</span></span>
-    <span class="destination-option-mark" aria-hidden="true"><svg viewbox="0 0 20 20"><path d="m5 10 3.2 3.2L15 6.5"></path></svg></span>
-  </label><label class="destination-option">
-    <input class="sr-only" type="radio" name="destination-preview" value="ruza" data-destination="ruza">
-    <span class="destination-option-copy"><span class="destination-region">Московская область</span><span class="destination-name">Руза</span></span>
-    <span class="destination-option-mark" aria-hidden="true"><svg viewbox="0 0 20 20"><path d="m5 10 3.2 3.2L15 6.5"></path></svg></span>
-  </label><label class="destination-option">
-    <input class="sr-only" type="radio" name="destination-preview" value="krasnoyarsk" data-destination="krasnoyarsk">
-    <span class="destination-option-copy"><span class="destination-region">Красноярский край</span><span class="destination-name">Красноярск</span></span>
-    <span class="destination-option-mark" aria-hidden="true"><svg viewbox="0 0 20 20"><path d="m5 10 3.2 3.2L15 6.5"></path></svg></span>
-  </label></div></fieldset>
-          <button class="destination-confirm" type="button" data-destination-confirm="" aria-label="Продолжить: Руза">Продолжить</button>
-        </div>
-      </div>
-    </dialog>
-    <p class="sr-only" aria-live="polite" id="city-status"></p>
+    <footer class="home-footer"><a class="home-brand amore-logo" href="./hotel.html?city=ruza" aria-label="A’MORE Collection — на главную"><span class="brand-name">A’MORE</span><span class="brand-collection">COLLECTION</span></a><span>Московская область<br>Руза</span><a class="home-link" href="../"><span>Все отели</span><svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10h22m-6-6 6 6-6 6"></path></svg></a></footer>
+
+
     <noscript>Сейчас показан отель: Руза. <a href="../">Выбрать другой отель</a>.</noscript>
 
 
-</body></html>
+</body>
+</html>

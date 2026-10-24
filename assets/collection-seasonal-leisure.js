@@ -1,4 +1,4 @@
-import { getSeasonForDate, getSeasonActivities, seasonLabels } from './collection-seasons.js?v=20261023-local-menu-seasons-1';
+import { getSeasonForDate, getSeasonActivities, seasonLabels } from './collection-seasons.js?v=20261024-all-hotels-1';
 
 const knownSeason = value => Object.hasOwn(seasonLabels, value || '');
 

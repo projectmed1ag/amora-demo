@@ -1,61 +1,101 @@
-import { nearbyPlaces, nearbyBasemap } from './mozhaysk-nearby-data.js?v=nearby-photos-1';
+import { nearbyPlaces as mozhayskPlaces, nearbyBasemap } from './mozhaysk-nearby-data.js?v=nearby-photos-1';
+import { destinationAsset, getDestination } from './collection-destinations.js?v=20261024-all-hotels-1';
 
-// One lazily-created Leaflet instance, four exact-location markers, no routing
+// One lazily-created Leaflet instance per page, curated place markers, no routing
 // engine or geolocation. DOM owns the place list and detail; Leaflet owns the
 // EPSG:3857 basemap/markers. Badges stay screen-sized, with anchor dots and
 // leader lines when two locations overlap. The list survives failed tiles/JS.
 // Selection uses a validated ?place= slug (replaceState); camera is ephemeral.
 const arrow = '<svg viewBox="0 0 28 20" aria-hidden="true" focusable="false"><path d="M2 10h22m-6-6 6 6-6 6"/></svg>';
 const number = index => String(index + 1).padStart(2, '0');
-const initialPlace = () => nearbyPlaces.find(place => place.id === new URLSearchParams(location.search).get('place')) || nearbyPlaces[0];
+const placeCount = count => `${String(count).padStart(2, '0')} ${count % 10 === 1 && count % 100 !== 11 ? 'место' : count % 10 >= 2 && count % 10 <= 4 && (count % 100 < 12 || count % 100 > 14) ? 'места' : 'мест'}`;
+const initialPlace = places => places.find(place => place.id === new URLSearchParams(location.search).get('place')) || places[0];
 const routeURL = place => `https://yandex.ru/maps/?rtext=~${place.coordinates.join(',')}&rtt=auto&z=12`;
+const escape = value => String(value ?? '').replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
+
+function nearbyConfiguration(section) {
+  const destination = getDestination();
+  if (destination.id === 'mozhaysk') return {
+    city: destination.id,
+    places: mozhayskPlaces,
+    overviewBounds: [[55.491, 35.60], [55.64, 36.045]],
+    eyebrow: 'Можайск и окрестности',
+    description: 'Старинные усадьбы, история Бородинского поля и архитектура Можайска. Выберите место для небольшого путешествия.',
+    mapLabel: 'Карта интересных мест у Можайского водохранилища',
+    minZoom: 8,
+  };
+  // Other hotels supply their own verified attractions in their static HTML.
+  // Missing or mismatched city data must never show the Mozhaysk map instead.
+  const source = section?.querySelector('script[type="application/json"][data-nearby-data]');
+  if (!source) return null;
+  try {
+    const config = JSON.parse(source.textContent);
+    if (config.city !== destination.id || !Array.isArray(config.places) || !config.places.length) return null;
+    const validCoordinates = coordinates => Array.isArray(coordinates) && coordinates.length === 2
+      && coordinates.every(Number.isFinite) && Math.abs(coordinates[0]) <= 90 && Math.abs(coordinates[1]) <= 180;
+    if (config.places.some(place => !/^[a-z0-9-]+$/.test(place.id || '') || !place.title || !validCoordinates(place.coordinates))) return null;
+    if (new Set(config.places.map(place => place.id)).size !== config.places.length) return null;
+    return {
+      ...config,
+      overviewBounds: Array.isArray(config.overviewBounds) && config.overviewBounds.length >= 2 && config.overviewBounds.every(validCoordinates)
+        ? config.overviewBounds : config.places.map(place => place.coordinates),
+      minZoom: 6,
+    };
+  } catch { return null; }
+}
 
 function detail(place) {
   const photo = place.photo;
-  return `<figure class="nearby-place-photo">
-      <div class="nearby-photo-frame"><img src="${photo.src}" alt="${photo.alt}" width="${photo.width}" height="${photo.height}" loading="lazy" decoding="async"><p class="nearby-photo-fallback" hidden>Фотография временно недоступна</p></div>
-      <figcaption>Фото: <a href="${photo.source}" target="_blank" rel="noopener">${photo.author}, ${photo.year}</a> · <a href="${photo.licenseURL}" target="_blank" rel="noopener">${photo.license}</a></figcaption>
-    </figure>
-    <p class="nearby-place-category">${place.category}</p>
-    <h3>${place.title}</h3>
-    <p class="nearby-place-description">${place.description}</p>
+  const photograph = photo ? `<figure class="nearby-place-photo">
+      <div class="nearby-photo-frame"><img src="${escape(destinationAsset(photo.src))}" alt="${escape(photo.alt)}" width="${escape(photo.width)}" height="${escape(photo.height)}" loading="lazy" decoding="async"><p class="nearby-photo-fallback" hidden>Фотография временно недоступна</p></div>
+      <figcaption>Фото: <a href="${escape(photo.source)}" target="_blank" rel="noopener">${escape(photo.author)}, ${escape(photo.year)}</a> · <a href="${escape(photo.licenseURL)}" target="_blank" rel="noopener">${escape(photo.license)}</a></figcaption>
+    </figure>` : '';
+  return `${photograph}
+    <p class="nearby-place-category">${escape(place.category)}</p>
+    <h3>${escape(place.title)}</h3>
+    <p class="nearby-place-description">${escape(place.description)}</p>
     <div class="nearby-place-links">
       <a class="home-link" href="${routeURL(place)}" target="_blank" rel="noopener"><span>Проложить маршрут</span>${arrow}</a>
-      <a class="nearby-source" href="${place.source}" target="_blank" rel="noopener">Об этом месте ↗</a>
+      <a class="nearby-source" href="${escape(place.source)}" target="_blank" rel="noopener">Об этом месте ↗</a>
     </div>`;
 }
 
 export function renderNearbyPlaces() {
-  const selected = initialPlace();
+  const config = nearbyConfiguration(document.querySelector('#nearby'));
+  if (!config) return '';
+  const nearbyPlaces = config.places;
+  const selected = initialPlace(nearbyPlaces);
   return `<section class="cl-nearby" id="nearby" aria-labelledby="nearby-title">
     <header class="nearby-heading">
-      <div><p class="nearby-eyebrow">Можайск и окрестности</p><h2 id="nearby-title">Впечатления<br>за пределами отеля.</h2></div>
-      <p>Старинные усадьбы, история Бородинского поля и архитектура Можайска. Выберите место для небольшого путешествия.</p>
+      <div><p class="nearby-eyebrow">${escape(config.eyebrow || getDestination().name)}</p><h2 id="nearby-title">Впечатления<br>за пределами отеля</h2></div>
+      <p>${escape(config.description || 'Выберите интересное место для поездки по окрестностям.')}</p>
     </header>
     <div class="nearby-layout">
       <div class="nearby-places">
-        <p class="nearby-list-label">Куда отправиться <span>04 места</span></p>
+        <p class="nearby-list-label">Куда отправиться <span>${placeCount(nearbyPlaces.length)}</span></p>
         <ol class="nearby-place-list" aria-label="Интересные места в окрестностях">
-          ${nearbyPlaces.map((place, index) => `<li><button type="button" data-nearby-place="${place.id}" aria-pressed="${place.id === selected.id}" aria-controls="nearby-place-detail"><span class="nearby-list-number">${number(index)}</span><span>${place.title}</span><span class="nearby-list-arrow" aria-hidden="true">↗</span></button></li>`).join('')}
+          ${nearbyPlaces.map((place, index) => `<li><button type="button" data-nearby-place="${escape(place.id)}" aria-pressed="${place.id === selected.id}" aria-controls="nearby-place-detail"><span class="nearby-list-number">${number(index)}</span><span>${escape(place.title)}</span><span class="nearby-list-arrow" aria-hidden="true">↗</span></button></li>`).join('')}
         </ol>
         <article class="nearby-place-detail" id="nearby-place-detail" aria-label="Описание выбранного места">${detail(selected)}</article>
       </div>
       <div class="nearby-map-column">
         <div class="nearby-map-stage">
-          <div class="nearby-map" id="nearby-map" role="region" aria-label="Карта интересных мест у Можайского водохранилища" aria-describedby="nearby-map-help" data-map-state="idle"></div>
+          <div class="nearby-map" id="nearby-map" role="region" aria-label="${escape(config.mapLabel || `Карта интересных мест: ${getDestination().name}`)}" aria-describedby="nearby-map-help" data-map-state="idle"></div>
           <div class="nearby-map-toolbar"><button type="button" data-nearby-overview disabled>Все места <span aria-hidden="true">↗</span></button><button type="button" data-nearby-touch aria-pressed="false" disabled>Двигать карту</button></div>
         </div>
         <div class="nearby-map-feedback"><p id="nearby-map-help" role="status">Загружаем карту…</p><button type="button" data-nearby-retry hidden>Повторить</button></div>
       </div>
     </div>
-    <p class="nearby-visit-note">Места находятся за пределами отеля. Время работы и условия посещения уточняйте на официальных сайтах. <a href="./photo-credits.html#nearby-photos">Фото и лицензии ↗</a></p>
+    <p class="nearby-visit-note">Места находятся за пределами отеля. Время работы и условия посещения уточняйте на официальных сайтах.${getDestination().id === 'mozhaysk' ? ` <a href="${destinationAsset('photo-credits.html')}#nearby-photos">Фото и лицензии ↗</a>` : ''}</p>
     <p class="sr-only" data-nearby-announcement aria-live="polite" aria-atomic="true"></p>
   </section>`;
 }
 
 export function enhanceNearbyPlaces(section) {
   if (!section || section.dataset.initialized) return;
-  section.dataset.initialized = 'true';
+  const config = nearbyConfiguration(section);
+  if (!config) return;
+  const nearbyPlaces = config.places;
   const canvas = section.querySelector('.nearby-map');
   const stage = section.querySelector('.nearby-map-stage');
   const help = section.querySelector('#nearby-map-help');
@@ -63,11 +103,15 @@ export function enhanceNearbyPlaces(section) {
   const overview = section.querySelector('[data-nearby-overview]');
   const touchToggle = section.querySelector('[data-nearby-touch]');
   const buttons = [...section.querySelectorAll('[data-nearby-place]')];
+  const detailElement = section.querySelector('#nearby-place-detail');
+  if (!canvas || !stage || !help || !retry || !overview || !touchToggle || !detailElement || !buttons.length) return;
+  if (buttons.some(button => !nearbyPlaces.some(place => place.id === button.dataset.nearbyPlace))) return;
+  section.dataset.initialized = 'true';
   const compact = matchMedia('(max-width: 1100px)');
   const coarsePointer = matchMedia('(any-pointer: coarse)');
   const needsTouchControl = () => compact.matches || coarsePointer.matches;
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
-  let selected = initialPlace();
+  let selected = initialPlace(nearbyPlaces);
   // The HTML already contains the default place. A saved direct place URL only
   // updates this small detail panel; the page and map layout stay static.
   if (buttons.find(button => button.getAttribute('aria-pressed') === 'true')?.dataset.nearbyPlace !== selected.id) {
@@ -77,16 +121,15 @@ export function enhanceNearbyPlaces(section) {
   let map, tiles, L, starting, loadTimer, tileErrors = 0, attempts = 0;
   let markers = [];
   let zooming = false, pendingView;
-  const detailElement = section.querySelector('#nearby-place-detail');
   // Keep the text, route and image credit available if a photograph fails.
   detailElement.addEventListener('error', event => {
     if (!(event.target instanceof HTMLImageElement)) return;
     event.target.hidden = true;
-    detailElement.querySelector('.nearby-photo-fallback').hidden = false;
+    const fallback = detailElement.querySelector('.nearby-photo-fallback');
+    if (fallback) fallback.hidden = false;
   }, true);
-  // Include the reservoir west of Gorétovo as context, rather than fitting only
-  // the town monuments. No unverified hotel pin is added.
-  const overviewBounds = [[55.491, 35.60], [55.64, 36.045]];
+  // Bounds come from the current destination's attractions, never a hotel pin.
+  const overviewBounds = config.overviewBounds;
 
   function feedback(message, state, canRetry = false) {
     help.textContent = message;
@@ -119,7 +162,8 @@ export function enhanceNearbyPlaces(section) {
     selected = place;
     buttons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.nearbyPlace === place.id)));
     detailElement.innerHTML = detail(place);
-    section.querySelector('[data-nearby-announcement]').textContent = `Выбрано: ${place.title}. Описание и маршрут — под списком мест.`;
+    const announcement = section.querySelector('[data-nearby-announcement]');
+    if (announcement) announcement.textContent = `Выбрано: ${place.title}. Описание и маршрут — под списком мест.`;
     const url = new URL(location.href);
     url.searchParams.set('place', place.id);
     history.replaceState(history.state, '', url);
@@ -196,7 +240,7 @@ export function enhanceNearbyPlaces(section) {
         dragging: !needsTouchControl(),
         touchZoom: !needsTouchControl(),
         doubleClickZoom: !needsTouchControl(),
-        minZoom: 8,
+        minZoom: config.minZoom,
         maxZoom: nearbyBasemap.maxZoom,
         zoomAnimation: !motion.matches,
         fadeAnimation: !motion.matches,

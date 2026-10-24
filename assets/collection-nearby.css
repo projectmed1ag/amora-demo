@@ -1,4 +1,6 @@
-.collection-site-leisure .cl-nearby { padding: 70px var(--g) 28px; background: #f6f3ed; color: #23261f; scroll-margin-top: 24px; }
+/* The document already reserves the fixed header in scroll-padding-top. */
+#nearby { scroll-margin-top: 20px; }
+.collection-site-leisure .cl-nearby { padding: 70px var(--g) 28px; background: #f6f3ed; color: #23261f; }
 .nearby-heading { display: grid; grid-template-columns: 1.35fr .65fr; gap: 70px; align-items: end; padding-bottom: 42px; }
 .nearby-eyebrow { margin-bottom: 24px; font: 11px/1.5 Arial, sans-serif; letter-spacing: .14em; text-transform: uppercase; color: #666b60; }
 .collection-site-leisure .nearby-heading h2 { font: 400 clamp(55px, 6.1vw, 94px)/.9 Cormorant, Georgia, serif; letter-spacing: -.045em; }

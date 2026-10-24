@@ -1,16 +1,14 @@
-const rooms = [
-  { id: 'standard', name: 'Стандарт', guests: 2, area: 24, image: 'concept-covers/standard-v1', imageWidth: 1086, alt: 'Хаусбот Стандарт' },
-  { id: 'comfort', name: 'Комфорт', guests: 4, area: 34, image: 'concept-covers/comfort-v1', imageWidth: 1086, alt: 'Хаусбот Комфорт' },
-  { id: 'junior-suite', name: 'Полулюкс', guests: 4, area: 46, image: 'concept-covers/junior-suite-v1', imageWidth: 1086, alt: 'Хаусбот Полулюкс' },
-  { id: 'suite', name: 'Люкс', guests: 6, area: 64, image: 'concept-covers/suite-v1', imageWidth: 1086, alt: 'Хаусбот Люкс' },
-];
+import { destinationAsset, destinationLocalDate, getDestination } from './collection-destinations.js?v=20261024-all-hotels-1';
 
 const initializedForms = new WeakSet();
 const validatedFields = ['checkin', 'checkout', 'guests', 'name', 'email'];
-const findRoom = id => rooms.find(room => room.id === id) || rooms[0];
+const findRoom = (id, city) => {
+  const rooms = getDestination(city).rooms;
+  return rooms.find(room => room.id === id) || rooms[0];
+};
 
-export function collectionLocalDate(date = new Date()) {
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+export function collectionLocalDate(date = new Date(), city) {
+  return destinationLocalDate(date, city);
 }
 
 function dateDay(value) {
@@ -31,16 +29,17 @@ export function collectionBookingNights(checkin, checkout) {
   return Number.isFinite(nights) && nights > 0 ? nights : 0;
 }
 
-export function validateCollectionBooking(values, roomId = values.room, today = collectionLocalDate()) {
+export function validateCollectionBooking(values, roomId = values.room, today, city) {
   const errors = {};
+  const earliestDate = today ?? collectionLocalDate(new Date(), city);
   const checkin = dateDay(values.checkin);
   const checkout = dateDay(values.checkout);
   if (!Number.isFinite(checkin)) errors.checkin = 'Укажите дату заезда.';
-  else if (checkin < dateDay(today)) errors.checkin = 'Дата заезда не может быть в прошлом.';
+  else if (checkin < dateDay(earliestDate)) errors.checkin = 'Дата заезда не может быть в прошлом.';
   if (!Number.isFinite(checkout)) errors.checkout = 'Укажите дату выезда.';
   else if (Number.isFinite(checkin) && checkout <= checkin) errors.checkout = 'Выезд должен быть позже заезда.';
 
-  const room = findRoom(roomId);
+  const room = findRoom(roomId, city);
   const guests = Number(values.guests);
   if (!Number.isInteger(guests) || guests < 1 || guests > room.guests) {
     errors.guests = `Для этой категории выберите от 1 до ${room.guests} гостей.`;
@@ -69,6 +68,7 @@ function formatDate(value) {
 export function initCollectionBooking() {
   const form = document.getElementById('booking-form');
   if (!form || initializedForms.has(form)) return;
+  const destination = getDestination();
 
   const result = document.getElementById('booking-result');
   const details = document.getElementById('result-details');
@@ -117,8 +117,10 @@ export function initCollectionBooking() {
       }
       image.alt = room.alt;
       image.sizes = '(max-width: 700px) 100vw, 44vw';
-      image.srcset = `./images/mobile/rooms/mozhaysk/${room.image}.jpg 768w, ./images/rooms/mozhaysk/${room.image}.jpg ${room.imageWidth}w`;
-      image.src = `./images/rooms/mozhaysk/${room.image}.jpg`;
+      image.srcset = `${destinationAsset(room.mobileSrc)} 768w, ${destinationAsset(room.src)} ${room.imageWidth}w`;
+      image.src = destinationAsset(room.src);
+      image.width = room.imageWidth;
+      image.height = room.imageHeight;
       photo.dataset.room = room.id;
     }
     setSummary('summary-room', room.name);
@@ -135,7 +137,7 @@ export function initCollectionBooking() {
 
     const url = new URL(location.href);
     url.searchParams.set('room', room.id);
-    url.searchParams.set('city', 'mozhaysk');
+    url.searchParams.set('city', destination.id);
     history.replaceState(history.state, '', url);
     return room;
   }
@@ -169,8 +171,8 @@ export function initCollectionBooking() {
 
     const nights = collectionBookingNights(values.checkin, values.checkout);
     const rows = [
-      ['Отель', 'Можайское водохранилище'],
-      ['Хаусбот', room.name],
+      ['Отель', destination.name],
+      [destination.stayLabel, room.name],
       ['Даты', `${formatDate(values.checkin)} — ${formatDate(values.checkout)}`],
       ['Продолжительность', `${nights} ${nightLabel(nights)}`],
       ['Гостей', values.guests],

@@ -28,13 +28,13 @@ if (toggle && nav) {
 const page = document.body.dataset.page;
 try {
   if (page === 'rooms' || page === 'gallery') {
-    const { initCollectionPhotos } = await import('./collection-photo-runtime.js?v=20261023-photo-response-3');
+    const { initCollectionPhotos } = await import('./collection-photo-runtime.js?v=20261024-all-hotels-1');
     initCollectionPhotos(page);
   } else if (page === 'booking') {
-    const { initCollectionBooking } = await import('./collection-booking-runtime.js?v=20261023-capacity-1');
+    const { initCollectionBooking } = await import('./collection-booking-runtime.js?v=20261024-all-hotels-1');
     initCollectionBooking();
-  } else if (page === 'spaces' && document.querySelector('#nearby')) {
-    const { enhanceNearbyPlaces } = await import('./collection-nearby.js?v=static-1');
+  } else if (['spaces', 'location'].includes(page) && document.querySelector('#nearby [data-nearby-place]')) {
+    const { enhanceNearbyPlaces } = await import('./collection-nearby.js?v=20261024-all-hotels-1');
     enhanceNearbyPlaces(document.querySelector('#nearby'));
   }
   document.documentElement.dataset.collectionInteractive = 'ready';

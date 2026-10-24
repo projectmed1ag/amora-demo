@@ -1,9 +1,8 @@
-import { getSeasonForDate, getSeasonActivities, seasonLabels } from './collection-seasons.js?v=20261023-local-menu-seasons-1';
+import { getSeasonForDate, getSeasonActivities, seasonLabels } from './collection-seasons.js?v=20261024-all-hotels-1';
+import { destinationURL } from './collection-destinations.js?v=20261024-all-hotels-1';
 
 function leisureURL(season, hash = '') {
-  const url = new URL('./spaces.html', location.href);
-  url.searchParams.set('city', 'mozhaysk');
-  url.searchParams.set('season', season);
+  const url = destinationURL('spaces.html', undefined, { season });
   url.hash = hash;
   return url;
 }
@@ -31,7 +30,7 @@ function seasonsForStay(checkin, checkout) {
 }
 
 function initializeBookingSeasons() {
-  if (document.body.dataset.page !== 'booking' || document.documentElement.dataset.city !== 'mozhaysk') return;
+  if (document.body.dataset.page !== 'booking') return;
   const form = document.getElementById('booking-form');
   const summary = document.querySelector('.booking-summary-copy');
   if (!form || !summary) return;
@@ -54,7 +53,7 @@ function initializeBookingSeasons() {
     }
     message.textContent = `${seasonsInStay.map(season => seasonLabels[season]).join(' · ')}. Занятия зависят от погоды и наличия инвентаря.`;
     const seen = new Set();
-    const activities = seasonsInStay.flatMap(getSeasonActivities).filter(activity => {
+    const activities = seasonsInStay.flatMap(season => getSeasonActivities(season)).filter(activity => {
       if (seen.has(activity.title)) return false;
       seen.add(activity.title);
       return true;

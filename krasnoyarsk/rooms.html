@@ -1,123 +1,67 @@
 <!doctype html>
-<html lang="ru" data-city="krasnoyarsk"><head>
+<html lang="ru" class="collection-home-root" data-city="krasnoyarsk">
+  <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Номера в A’MORE Collection.">
-    <meta name="theme-color" content="#ffffff">
+    <meta name="description" content="Четыре категории номеров A’MORE Collection.">
+    <meta name="theme-color" content="#1c241b">
     <title>Номера — Красноярск — A’MORE Collection</title>
+    <link rel="preload" href="../fonts/spectral-400-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
-
     <link rel="stylesheet" crossorigin="" href="../assets/styles-B5T6wf-2.css">
-
-
-      <script src="../assets/collection-route.js?v=20261023-photo-response-3"></script>
-    <script type="module" src="../assets/collection-legacy.js?v=20261023-photo-response-3"></script>
+    <link id="collection-home-style" rel="stylesheet" href="../assets/collection-home.css?v=home-1">
+    <link id="collection-site-shell-style" rel="stylesheet" href="../assets/collection-site-shell.css?v=header-2">
+    <link id="collection-rooms-style" rel="stylesheet" href="../assets/collection-rooms.css?v=20261023-photo-response-3">
+    <link id="collection-brand-style" rel="stylesheet" href="../assets/collection-brand.css?v=original-1">
+    <link rel="stylesheet" href="../assets/collection-motion.css?v=static-1">
+<script type="module" src="../assets/collection-runtime.js?v=20261024-all-hotels-1"></script>
       <link rel="preload" href="../fonts/amore-condensed-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="../assets/collection-refinement.css?v=20261023-entertainment-2">
     <link rel="stylesheet" href="../assets/collection-refinement-pages.css?v=20261023-responsive-1">
     <link rel="stylesheet" href="../assets/collection-navigation.css?v=20261023-chapter-response-1">
-    <script type="module" src="../assets/collection-refinement.js?v=20261023-mobile-swipe-1"></script>
+    <script type="module" src="../assets/collection-refinement.js?v=20261024-all-hotels-1"></script>
       <link rel="stylesheet" href="../assets/collection-page-motion.css?v=20261023-local-menu-seasons-1">
-    <script type="module" src="../assets/collection-page-motion.js?v=20261022-1"></script>
+    <script type="module" src="../assets/collection-page-motion.js?v=20261024-all-hotels-1"></script>
+      <link rel="stylesheet" href="../assets/collection-trip-planner.css?v=20261022-1">
+    <script type="module" src="../assets/collection-trip-planner.js?v=20261024-all-hotels-1"></script>
   </head>
-  <body data-page="rooms">
+  <body data-page="rooms" class="collection-home-page collection-site-page collection-rooms-page" data-collection-static="">
     <a class="skip-link" href="#content">К содержанию</a>
-    <header class="site-header" data-header="">
-      <div class="header-main">
-        <a class="header-booking" data-booking-link="" data-page-link="" href="./booking.html?city=krasnoyarsk">
-          <svg viewbox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="5" width="16" height="16" rx="1"></rect><path d="M8 3v4m8-4v4M4 11h16m-11 5 2 2 4-4"></path></svg>
-          <span class="booking-label-full">Забронировать</span><span class="booking-label-short">Бронь</span>
-        </a>
-        <a class="site-logo" data-page-link="" href="./hotel.html?city=krasnoyarsk" aria-label="A’MORE Collection — на главную"><span class="brand-name">A’MORE</span><span class="brand-collection">COLLECTION</span></a>
-        <div class="header-controls">
-          <a class="destination-trigger" href="../" aria-label="Все отели A’MORE Collection">
-            <svg viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 10c0 6-8 11-8 11S4 16 4 10a8 8 0 1 1 16 0Z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>
-            <span class="destination-trigger-copy"><span class="destination-trigger-label">Отели</span><span id="selected-destination">Красноярск</span></span>
-          </a>
-          <button class="menu-toggle" type="button" aria-label="Открыть меню" aria-expanded="false" aria-controls="site-menu" hidden="">
-            <span class="menu-line"></span><span class="menu-line"></span>
-          </button>
-        </div>
-        <a class="mobile-destination" href="../" aria-label="Все отели A’MORE Collection"><span data-selected-mobile="">Красноярск</span></a>
-      </div>
-      <nav class="site-nav" id="site-menu" aria-label="Разделы сайта">
-        <a data-page-link="" href="./hotel.html?city=krasnoyarsk">Главная</a>
-        <a data-page-link="" href="./rooms.html?city=krasnoyarsk" aria-current="page">Номера</a>
-        <a data-page-link="" href="./spaces.html?city=krasnoyarsk">Развлечения и активный отдых</a>
-        <a data-page-link="" href="./location.html?city=krasnoyarsk">Об отеле</a>
-        <a class="nav-booking" data-booking-link="" data-page-link="" href="./booking.html?city=krasnoyarsk">Забронировать</a>
-      </nav>
-    </header>
+    <header class="home-header" data-header="">
+<a class="home-brand amore-logo" href="./hotel.html?city=krasnoyarsk" aria-label="A’MORE Collection — на главную"><span class="brand-name">A’MORE</span><span class="brand-collection">COLLECTION</span></a>
+<input class="home-menu-toggle" id="home-menu-toggle" type="checkbox" aria-label="Меню разделов" aria-controls="home-nav"><nav class="home-nav" id="home-nav" aria-label="Разделы сайта">
+<a href="./hotel.html?city=krasnoyarsk">Главная</a>
+<a href="./rooms.html?city=krasnoyarsk" aria-current="page">Номера</a>
+<a href="./restaurant.html?city=krasnoyarsk">Ресторан</a>
+<a href="./banya.html?city=krasnoyarsk">Баня</a>
+<a href="./pavilions.html?city=krasnoyarsk">Аренда павильонов</a>
+<a href="./spaces.html?city=krasnoyarsk">Развлечения и активный отдых</a>
+<a href="./about.html?city=krasnoyarsk">Об отеле</a>
 
-    <main id="content" class="interior-page" tabindex="-1"><section class="page-heading" id="top" aria-labelledby="page-title">
-    <nav class="breadcrumbs" aria-label="Хлебные крошки"><a data-page-link="" href="./hotel.html?city=krasnoyarsk">Главная</a><span aria-hidden="true">/</span><span aria-current="page">Номера</span></nav>
-    <p class="eyebrow">Красноярск · Номера</p>
-    <h1 id="page-title">Номера</h1>
-  </section>
+<a class="mobile-hotels-link" href="../">Все отели</a>
+</nav>
+<div class="home-header-end"><a href="../">Отели</a><label class="home-menu" for="home-menu-toggle"><span></span><span></span></label></div>
+</header>
+
+    <main id="content" class="interior-page" tabindex="-1"><section class="home-hero stays-hero" id="top" aria-labelledby="page-title"><img src="../images/destinations/krasnoyarsk.jpg" srcset="../images/mobile/destinations/krasnoyarsk.jpg 768w, ../images/destinations/krasnoyarsk.jpg 1536w" sizes="100vw" width="1536" height="1024" alt="Загородный дом с панорамными окнами и террасой на лесном склоне" fetchpriority="high"><div class="home-hero-bottom"><h1 id="page-title">Номера</h1></div></section><section class="stays-navigation" aria-labelledby="stays-choice-title"><h2 id="stays-choice-title">Категории</h2><nav aria-label="Категории номеров"><a href="#stay-standard">Стандарт</a><a href="#stay-comfort">Комфорт</a><a href="#stay-junior-suite">Полулюкс</a><a href="#stay-suite">Люкс</a></nav></section><div class="room-list"><article class="room-card room-houseboat" aria-labelledby="room-standard" id="stay-standard">
+      <div class="room-gallery" data-room-photos="standard"><figure class="media room-slideshow"><a class="room-photo-trigger" data-room-gallery="standard" aria-label="Открыть фотографии: Стандарт" href="../images/rooms/krasnoyarsk/standard.jpg"><span class="room-slide is-current" aria-hidden="false"><img src="../images/rooms/krasnoyarsk/standard.jpg" srcset="../images/mobile/rooms/krasnoyarsk/standard.jpg 768w, ../images/rooms/krasnoyarsk/standard.jpg 1536w" sizes="(max-width: 700px) 100vw, 47vw" width="1536" height="1024" alt="Спальня с тёмным деревом и видом на сибирские холмы" fetchpriority="high"></span><span class="room-slide" aria-hidden="true"><img data-room-src="../images/krasnoyarsk/room-views-v1/standard-02.webp" data-room-srcset="../images/mobile/krasnoyarsk/room-views-v1/standard-02.webp 768w, ../images/krasnoyarsk/room-views-v1/standard-02.webp 1536w" sizes="(max-width: 700px) 100vw, 47vw" width="1536" height="1024" alt="Номер Стандарт: зона отдыха и вид из окна" loading="lazy" decoding="async"></span><span class="room-slide" aria-hidden="true"><img data-room-src="../images/krasnoyarsk/room-views-v1/standard-03.webp" data-room-srcset="../images/mobile/krasnoyarsk/room-views-v1/standard-03.webp 768w, ../images/krasnoyarsk/room-views-v1/standard-03.webp 1536w" sizes="(max-width: 700px) 100vw, 47vw" width="1536" height="1024" alt="Номер Стандарт: другой ракурс интерьера" loading="lazy" decoding="async"></span></a><button class="room-photo-arrow room-photo-prev" type="button" data-room-prev="" aria-label="Предыдущее фото: Стандарт"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 5-7 7 7 7"></path></svg></button><button class="room-photo-arrow room-photo-next" type="button" data-room-next="" aria-label="Следующее фото: Стандарт"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 5 7 7-7 7"></path></svg></button></figure><div class="room-thumbnails" role="group" aria-label="Фотографии: Стандарт" style="grid-template-columns:repeat(3,minmax(0,1fr))"><button class="room-thumbnail" type="button" data-room-thumb="0" aria-pressed="true" aria-label="Фото 1: Стандарт"><img src="../images/mobile/rooms/krasnoyarsk/standard.jpg" width="768" height="512" alt="" loading="lazy"></button><button class="room-thumbnail" type="button" data-room-thumb="1" aria-pressed="false" aria-label="Фото 2: Стандарт"><img src="../images/responsive/krasnoyarsk/room-views-v1/standard-02-384.webp" width="384" height="256" alt="" loading="lazy"></button><button class="room-thumbnail" type="button" data-room-thumb="2" aria-pressed="false" aria-label="Фото 3: Стандарт"><img src="../images/responsive/krasnoyarsk/room-views-v1/standard-03-384.webp" width="384" height="256" alt="" loading="lazy"></button></div></div>
+      <div class="room-card-copy"><p class="stays-number" aria-hidden="true">01</p><h2 id="room-standard">Стандарт</h2><dl class="room-specifications"><div><dt>Вместимость</dt><dd>До 2 гостей</dd></div><div><dt>Площадь</dt><dd>28 м²</dd></div></dl><p>Номер с отделкой из тёмного дерева и видом на сосновые склоны.</p><ul class="room-features"><li>Двуспальная кровать</li><li>Вид на сосновые склоны</li></ul><a class="primary-action home-link" data-page-link="" href="./booking.html?city=krasnoyarsk&amp;room=standard" aria-label="Выбрать номер Стандарт"><span>Выбрать номер</span><svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10h22m-6-6 6 6-6 6"></path></svg></a></div>
+    </article><article class="room-card room-houseboat" aria-labelledby="room-comfort" id="stay-comfort">
+      <div class="room-gallery" data-room-photos="comfort"><figure class="media room-slideshow"><a class="room-photo-trigger" data-room-gallery="comfort" aria-label="Открыть фотографии: Комфорт" href="../images/rooms/krasnoyarsk/comfort.jpg"><span class="room-slide is-current" aria-hidden="false"><img src="../images/rooms/krasnoyarsk/comfort.jpg" srcset="../images/mobile/rooms/krasnoyarsk/comfort.jpg 768w, ../images/rooms/krasnoyarsk/comfort.jpg 1536w" sizes="(max-width: 700px) 100vw, 47vw" width="1536" height="1024" alt="Номер Комфорт с тёмным деревом, креслом и видом на речную долину" loading="lazy" decoding="async"></span><span class="room-slide" aria-hidden="true"><img data-room-src="../images/krasnoyarsk/room-views-v1/comfort-02.webp" data-room-srcset="../images/mobile/krasnoyarsk/room-views-v1/comfort-02.webp 768w, ../images/krasnoyarsk/room-views-v1/comfort-02.webp 1536w" sizes="(max-width: 700px) 100vw, 47vw" width="1536" height="1024" alt="Номер Комфорт: зона отдыха и вид из окна" loading="lazy" decoding="async"></span><span class="room-slide" aria-hidden="true"><img data-room-src="../images/krasnoyarsk/room-views-v1/comfort-03.webp" data-room-srcset="../images/mobile/krasnoyarsk/room-views-v1/comfort-03.webp 768w, ../images/krasnoyarsk/room-views-v1/comfort-03.webp 1536w" sizes="(max-width: 700px) 100vw, 47vw" width="1536" height="1024" alt="Номер Комфорт: другой ракурс интерьера" loading="lazy" decoding="async"></span></a><button class="room-photo-arrow room-photo-prev" type="button" data-room-prev="" aria-label="Предыдущее фото: Комфорт"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 5-7 7 7 7"></path></svg></button><button class="room-photo-arrow room-photo-next" type="button" data-room-next="" aria-label="Следующее фото: Комфорт"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 5 7 7-7 7"></path></svg></button></figure><div class="room-thumbnails" role="group" aria-label="Фотографии: Комфорт" style="grid-template-columns:repeat(3,minmax(0,1fr))"><button class="room-thumbnail" type="button" data-room-thumb="0" aria-pressed="true" aria-label="Фото 1: Комфорт"><img src="../images/mobile/rooms/krasnoyarsk/comfort.jpg" width="768" height="512" alt="" loading="lazy"></button><button class="room-thumbnail" type="button" data-room-thumb="1" aria-pressed="false" aria-label="Фото 2: Комфорт"><img src="../images/responsive/krasnoyarsk/room-views-v1/comfort-02-384.webp" width="384" height="256" alt="" loading="lazy"></button><button class="room-thumbnail" type="button" data-room-thumb="2" aria-pressed="false" aria-label="Фото 3: Комфорт"><img src="../images/responsive/krasnoyarsk/room-views-v1/comfort-03-384.webp" width="384" height="256" alt="" loading="lazy"></button></div></div>
+      <div class="room-card-copy"><p class="stays-number" aria-hidden="true">02</p><h2 id="room-comfort">Комфорт</h2><dl class="room-specifications"><div><dt>Вместимость</dt><dd>До 4 гостей</dd></div><div><dt>Площадь</dt><dd>38 м²</dd></div></dl><p>Большое угловое окно и кресло с видом на речную долину.</p><ul class="room-features"><li>Панорамное остекление</li><li>Зона отдыха у окна</li></ul><a class="primary-action home-link" data-page-link="" href="./booking.html?city=krasnoyarsk&amp;room=comfort" aria-label="Выбрать номер Комфорт"><span>Выбрать номер</span><svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10h22m-6-6 6 6-6 6"></path></svg></a></div>
+    </article><article class="room-card room-houseboat" aria-labelledby="room-junior-suite" id="stay-junior-suite">
+      <div class="room-gallery" data-room-photos="junior-suite"><figure class="media room-slideshow"><a class="room-photo-trigger" data-room-gallery="junior-suite" aria-label="Открыть фотографии: Полулюкс" href="../images/rooms/krasnoyarsk/junior-suite.jpg"><span class="room-slide is-current" aria-hidden="false"><img src="../images/rooms/krasnoyarsk/junior-suite.jpg" srcset="../images/mobile/rooms/krasnoyarsk/junior-suite.jpg 768w, ../images/rooms/krasnoyarsk/junior-suite.jpg 1536w" sizes="(max-width: 700px) 100vw, 47vw" width="1536" height="1024" alt="Сибирский полулюкс с диваном, спальней и панорамным видом" loading="lazy" decoding="async"></span><span class="room-slide" aria-hidden="true"><img data-room-src="../images/krasnoyarsk/room-views-v1/junior-suite-02.webp" data-room-srcset="../images/mobile/krasnoyarsk/room-views-v1/junior-suite-02.webp 768w, ../images/krasnoyarsk/room-views-v1/junior-suite-02.webp 1536w" sizes="(max-width: 700px) 100vw, 47vw" width="1536" height="1024" alt="Номер Полулюкс: зона отдыха и вид из окна" loading="lazy" decoding="async"></span><span class="room-slide" aria-hidden="true"><img data-room-src="../images/krasnoyarsk/room-views-v1/junior-suite-03.webp" data-room-srcset="../images/mobile/krasnoyarsk/room-views-v1/junior-suite-03.webp 768w, ../images/krasnoyarsk/room-views-v1/junior-suite-03.webp 1536w" sizes="(max-width: 700px) 100vw, 47vw" width="1536" height="1024" alt="Номер Полулюкс: другой ракурс интерьера" loading="lazy" decoding="async"></span></a><button class="room-photo-arrow room-photo-prev" type="button" data-room-prev="" aria-label="Предыдущее фото: Полулюкс"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 5-7 7 7 7"></path></svg></button><button class="room-photo-arrow room-photo-next" type="button" data-room-next="" aria-label="Следующее фото: Полулюкс"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 5 7 7-7 7"></path></svg></button></figure><div class="room-thumbnails" role="group" aria-label="Фотографии: Полулюкс" style="grid-template-columns:repeat(3,minmax(0,1fr))"><button class="room-thumbnail" type="button" data-room-thumb="0" aria-pressed="true" aria-label="Фото 1: Полулюкс"><img src="../images/mobile/rooms/krasnoyarsk/junior-suite.jpg" width="768" height="512" alt="" loading="lazy"></button><button class="room-thumbnail" type="button" data-room-thumb="1" aria-pressed="false" aria-label="Фото 2: Полулюкс"><img src="../images/responsive/krasnoyarsk/room-views-v1/junior-suite-02-384.webp" width="384" height="256" alt="" loading="lazy"></button><button class="room-thumbnail" type="button" data-room-thumb="2" aria-pressed="false" aria-label="Фото 3: Полулюкс"><img src="../images/responsive/krasnoyarsk/room-views-v1/junior-suite-03-384.webp" width="384" height="256" alt="" loading="lazy"></button></div></div>
+      <div class="room-card-copy"><p class="stays-number" aria-hidden="true">03</p><h2 id="room-junior-suite">Полулюкс</h2><dl class="room-specifications"><div><dt>Вместимость</dt><dd>До 4 гостей</dd></div><div><dt>Площадь</dt><dd>52 м²</dd></div></dl><p>Спальная зона и гостиная с большими окнами.</p><ul class="room-features"><li>Спальная и гостиная зоны</li><li>Большие угловые окна</li></ul><a class="primary-action home-link" data-page-link="" href="./booking.html?city=krasnoyarsk&amp;room=junior-suite" aria-label="Выбрать номер Полулюкс"><span>Выбрать номер</span><svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10h22m-6-6 6 6-6 6"></path></svg></a></div>
+    </article><article class="room-card room-houseboat" aria-labelledby="room-suite" id="stay-suite">
+      <div class="room-gallery" data-room-photos="suite"><figure class="media room-slideshow"><a class="room-photo-trigger" data-room-gallery="suite" aria-label="Открыть фотографии: Люкс" href="../images/rooms/krasnoyarsk/suite.jpg"><span class="room-slide is-current" aria-hidden="false"><img src="../images/rooms/krasnoyarsk/suite.jpg" srcset="../images/mobile/rooms/krasnoyarsk/suite.jpg 768w, ../images/rooms/krasnoyarsk/suite.jpg 1536w" sizes="(max-width: 700px) 100vw, 47vw" width="1536" height="1024" alt="Гостиная сибирского люкса с отдельной спальней и панорамой холмов" loading="lazy" decoding="async"></span><span class="room-slide" aria-hidden="true"><img data-room-src="../images/krasnoyarsk/room-views-v1/suite-02.webp" data-room-srcset="../images/mobile/krasnoyarsk/room-views-v1/suite-02.webp 768w, ../images/krasnoyarsk/room-views-v1/suite-02.webp 1536w" sizes="(max-width: 700px) 100vw, 47vw" width="1536" height="1024" alt="Номер Люкс: зона отдыха и вид из окна" loading="lazy" decoding="async"></span><span class="room-slide" aria-hidden="true"><img data-room-src="../images/krasnoyarsk/room-views-v1/suite-03.webp" data-room-srcset="../images/mobile/krasnoyarsk/room-views-v1/suite-03.webp 768w, ../images/krasnoyarsk/room-views-v1/suite-03.webp 1536w" sizes="(max-width: 700px) 100vw, 47vw" width="1536" height="1024" alt="Номер Люкс: другой ракурс интерьера" loading="lazy" decoding="async"></span></a><button class="room-photo-arrow room-photo-prev" type="button" data-room-prev="" aria-label="Предыдущее фото: Люкс"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 5-7 7 7 7"></path></svg></button><button class="room-photo-arrow room-photo-next" type="button" data-room-next="" aria-label="Следующее фото: Люкс"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 5 7 7-7 7"></path></svg></button></figure><div class="room-thumbnails" role="group" aria-label="Фотографии: Люкс" style="grid-template-columns:repeat(3,minmax(0,1fr))"><button class="room-thumbnail" type="button" data-room-thumb="0" aria-pressed="true" aria-label="Фото 1: Люкс"><img src="../images/mobile/rooms/krasnoyarsk/suite.jpg" width="768" height="512" alt="" loading="lazy"></button><button class="room-thumbnail" type="button" data-room-thumb="1" aria-pressed="false" aria-label="Фото 2: Люкс"><img src="../images/responsive/krasnoyarsk/room-views-v1/suite-02-384.webp" width="384" height="256" alt="" loading="lazy"></button><button class="room-thumbnail" type="button" data-room-thumb="2" aria-pressed="false" aria-label="Фото 3: Люкс"><img src="../images/responsive/krasnoyarsk/room-views-v1/suite-03-384.webp" width="384" height="256" alt="" loading="lazy"></button></div></div>
+      <div class="room-card-copy"><p class="stays-number" aria-hidden="true">04</p><h2 id="room-suite">Люкс</h2><dl class="room-specifications"><div><dt>Вместимость</dt><dd>До 6 гостей</dd></div><div><dt>Площадь</dt><dd>76 м²</dd></div></dl><p>Гостиная, отдельная спальня и терраса над лесным склоном.</p><ul class="room-features"><li>Отдельная спальня</li><li>Гостиная и видовая терраса</li></ul><a class="primary-action home-link" data-page-link="" href="./booking.html?city=krasnoyarsk&amp;room=suite" aria-label="Выбрать номер Люкс"><span>Выбрать номер</span><svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10h22m-6-6 6 6-6 6"></path></svg></a></div>
+    </article></div><aside class="stays-next"><h2>Развлечения и активный отдых</h2><a class="home-link" href="./spaces.html?city=krasnoyarsk"><span>Все развлечения</span><svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10h22m-6-6 6 6-6 6"></path></svg></a></aside></main>
+
+    <footer class="home-footer"><a class="home-brand amore-logo" href="./hotel.html?city=krasnoyarsk" aria-label="A’MORE Collection — на главную"><span class="brand-name">A’MORE</span><span class="brand-collection">COLLECTION</span></a><span>Красноярский край<br>Красноярск</span><a class="home-link" href="../"><span>Все отели</span><svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10h22m-6-6 6 6-6 6"></path></svg></a></footer>
 
 
-  <div class="room-grid"><article class="room-card" aria-labelledby="room-standard">
-    <figure class="media"><img src="../images/rooms/krasnoyarsk/standard.jpg" srcset="../images/mobile/rooms/krasnoyarsk/standard.jpg 768w, ../images/rooms/krasnoyarsk/standard.jpg 1536w" sizes="(max-width: 700px) 100vw, 50vw" alt="Спальня с тёмным деревом и видом на сибирские холмы" fetchpriority="high"></figure>
-    <div class="room-card-copy"><p class="eyebrow">28 м² <span aria-hidden="true">·</span> до 2 гостей</p>
-      <h2 id="room-standard">Стандарт</h2><p>Номер с отделкой из тёмного дерева и видом на сосновые склоны.</p>
-      <ul class="room-features"><li>Двуспальная кровать</li><li>Вид на сосновые склоны</li></ul>
-      <a class="primary-action" data-page-link="" href="./booking.html?city=krasnoyarsk&amp;room=standard" aria-label="Выбрать номер Стандарт">Выбрать номер</a>
-    </div>
-  </article><article class="room-card" aria-labelledby="room-comfort">
-    <figure class="media"><img src="../images/rooms/krasnoyarsk/comfort.jpg" srcset="../images/mobile/rooms/krasnoyarsk/comfort.jpg 768w, ../images/rooms/krasnoyarsk/comfort.jpg 1536w" sizes="(max-width: 700px) 100vw, 50vw" alt="Номер Комфорт с тёмным деревом, креслом и видом на речную долину" fetchpriority="high"></figure>
-    <div class="room-card-copy"><p class="eyebrow">38 м² <span aria-hidden="true">·</span> до 2 гостей</p>
-      <h2 id="room-comfort">Комфорт</h2><p>Большое угловое окно и кресло с видом на речную долину.</p>
-      <ul class="room-features"><li>Панорамное остекление</li><li>Зона отдыха у окна</li></ul>
-      <a class="primary-action" data-page-link="" href="./booking.html?city=krasnoyarsk&amp;room=comfort" aria-label="Выбрать номер Комфорт">Выбрать номер</a>
-    </div>
-  </article><article class="room-card" aria-labelledby="room-junior-suite">
-    <figure class="media reveal"><img src="../images/rooms/krasnoyarsk/junior-suite.jpg" srcset="../images/mobile/rooms/krasnoyarsk/junior-suite.jpg 768w, ../images/rooms/krasnoyarsk/junior-suite.jpg 1536w" sizes="(max-width: 700px) 100vw, 50vw" alt="Сибирский полулюкс с диваном, спальней и панорамным видом" loading="lazy"></figure>
-    <div class="room-card-copy"><p class="eyebrow">52 м² <span aria-hidden="true">·</span> до 3 гостей</p>
-      <h2 id="room-junior-suite">Полулюкс</h2><p>Спальная зона и гостиная с большими окнами.</p>
-      <ul class="room-features"><li>Спальная и гостиная зоны</li><li>Большие угловые окна</li></ul>
-      <a class="primary-action" data-page-link="" href="./booking.html?city=krasnoyarsk&amp;room=junior-suite" aria-label="Выбрать номер Полулюкс">Выбрать номер</a>
-    </div>
-  </article><article class="room-card" aria-labelledby="room-suite">
-    <figure class="media reveal"><img src="../images/rooms/krasnoyarsk/suite.jpg" srcset="../images/mobile/rooms/krasnoyarsk/suite.jpg 768w, ../images/rooms/krasnoyarsk/suite.jpg 1536w" sizes="(max-width: 700px) 100vw, 50vw" alt="Гостиная сибирского люкса с отдельной спальней и панорамой холмов" loading="lazy"></figure>
-    <div class="room-card-copy"><p class="eyebrow">76 м² <span aria-hidden="true">·</span> до 4 гостей</p>
-      <h2 id="room-suite">Люкс</h2><p>Гостиная, отдельная спальня и терраса над лесным склоном.</p>
-      <ul class="room-features"><li>Отдельная спальня</li><li>Гостиная и видовая терраса</li></ul>
-      <a class="primary-action" data-page-link="" href="./booking.html?city=krasnoyarsk&amp;room=suite" aria-label="Выбрать номер Люкс">Выбрать номер</a>
-    </div>
-  </article></div>
-  <aside class="page-next"><h2>Развлечения и активный отдых</h2><a class="primary-action" data-page-link="" href="./spaces.html?city=krasnoyarsk">Чем заняться</a></aside></main>
-
-    <footer class="site-footer">
-      <a class="footer-wordmark" data-page-link="" href="./hotel.html?city=krasnoyarsk" aria-label="A’MORE Collection — на главную">A’MORE <small>COLLECTION</small></a>
-      <p>Можайское водохранилище · Руза · Красноярск</p>
-      <a class="back-top" href="#top">К началу</a>
-    </footer>
-    <dialog id="destination-dialog" class="destination-dialog" aria-labelledby="destination-title">
-      <button class="destination-close" type="button" data-destination-close="" aria-label="Закрыть выбор отеля"><svg viewbox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"></path></svg></button>
-      <div class="destination-layout">
-        <div class="destination-preview" aria-hidden="true"><div class="destination-preview-images"><div data-destination-photo="mozhaysk"><img src="../images/destinations/mozhaysk.jpg" srcset="../images/mobile/destinations/mozhaysk.jpg 768w, ../images/destinations/mozhaysk.jpg 1536w" sizes="(max-width: 700px) 100vw, (max-width: 1200px) 52vw, 590px" alt="" loading="lazy"></div><div data-destination-photo="ruza"><img src="../images/destinations/ruza.jpg" srcset="../images/mobile/destinations/ruza.jpg 768w, ../images/destinations/ruza.jpg 1536w" sizes="(max-width: 700px) 100vw, (max-width: 1200px) 52vw, 590px" alt="" loading="lazy"></div><div data-destination-photo="krasnoyarsk" class="is-selected"><img src="../images/destinations/krasnoyarsk.jpg" srcset="../images/mobile/destinations/krasnoyarsk.jpg 768w, ../images/destinations/krasnoyarsk.jpg 1536w" sizes="(max-width: 700px) 100vw, (max-width: 1200px) 52vw, 590px" alt="" loading="lazy"></div></div><span class="destination-preview-index"><span data-destination-index="">03</span> / 03</span></div>
-        <div class="destination-panel">
-          <div class="destination-brand" aria-label="A’MORE Collection"><span class="brand-name">A’MORE</span><span class="brand-collection">COLLECTION</span></div>
-          <h2 id="destination-title" tabindex="-1">Отели коллекции</h2>
-          <fieldset class="destination-fieldset"><legend class="sr-only">Отель</legend><div class="destination-options"><label class="destination-option">
-    <input class="sr-only" type="radio" name="destination-preview" value="mozhaysk" data-destination="mozhaysk">
-    <span class="destination-option-copy"><span class="destination-region">Московская область</span><span class="destination-name">Можайское водохранилище</span></span>
-    <span class="destination-option-mark" aria-hidden="true"><svg viewbox="0 0 20 20"><path d="m5 10 3.2 3.2L15 6.5"></path></svg></span>
-  </label><label class="destination-option">
-    <input class="sr-only" type="radio" name="destination-preview" value="ruza" data-destination="ruza">
-    <span class="destination-option-copy"><span class="destination-region">Московская область</span><span class="destination-name">Руза</span></span>
-    <span class="destination-option-mark" aria-hidden="true"><svg viewbox="0 0 20 20"><path d="m5 10 3.2 3.2L15 6.5"></path></svg></span>
-  </label><label class="destination-option">
-    <input class="sr-only" type="radio" name="destination-preview" value="krasnoyarsk" data-destination="krasnoyarsk">
-    <span class="destination-option-copy"><span class="destination-region">Красноярский край</span><span class="destination-name">Красноярск</span></span>
-    <span class="destination-option-mark" aria-hidden="true"><svg viewbox="0 0 20 20"><path d="m5 10 3.2 3.2L15 6.5"></path></svg></span>
-  </label></div></fieldset>
-          <button class="destination-confirm" type="button" data-destination-confirm="" aria-label="Продолжить: Красноярск">Продолжить</button>
-        </div>
-      </div>
-    </dialog>
-    <p class="sr-only" aria-live="polite" id="city-status"></p>
     <noscript>Сейчас показан отель: Красноярск. <a href="../">Выбрать другой отель</a>.</noscript>
 
 
-</body></html>
+</body>
+</html>
