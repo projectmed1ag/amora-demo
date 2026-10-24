@@ -35,7 +35,7 @@
 .nearby-place-links .home-link { min-height: 44px; font-size: 13px; }
 .nearby-source { display: inline-flex; align-items: center; min-height: 44px; font: 11px/1.5 Arial, sans-serif; color: #6b6d60; text-decoration: underline; text-underline-offset: 4px; }
 .nearby-map-column { display: flex; flex-direction: column; min-width: 0; }
-.nearby-map-stage { position: relative; isolation: isolate; flex: 1; min-height: 620px; background: #e4e6dc; }
+.nearby-map-stage { position: relative; isolation: isolate; flex: 1 0 auto; min-height: 620px; background: #e4e6dc; }
 .nearby-map { z-index: 0; width: 100%; height: 100%; background: #e4e6dc; font-family: Arial, sans-serif; }
 .nearby-map .leaflet-tile-pane { filter: saturate(.52); }
 .nearby-map .leaflet-tile { width: 256px; height: 256px; max-width: none !important; object-fit: fill; }
