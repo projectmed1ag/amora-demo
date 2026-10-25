@@ -21,7 +21,7 @@ if (toggle && nav) {
     if (event.key === 'Escape' && toggle.checked) { close(); toggle.focus(); }
   });
   header.addEventListener('focusout', event => { if (event.relatedTarget && !header.contains(event.relatedTarget)) close(); });
-  matchMedia('(min-width: 1600px)').addEventListener('change', close);
+  matchMedia('(min-width: 1100px)').addEventListener('change', close);
   sync();
 }
 

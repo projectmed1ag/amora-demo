@@ -71,5 +71,5 @@ export function applyCollectionShell(page, { light = false } = {}) {
   header.addEventListener('focusout', event => {
     if (event.relatedTarget && !header.contains(event.relatedTarget)) close();
   });
-  window.matchMedia('(min-width: 1600px)').addEventListener('change', close);
+  window.matchMedia('(min-width: 1100px)').addEventListener('change', close);
 }
