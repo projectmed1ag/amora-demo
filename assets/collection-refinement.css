@@ -198,7 +198,12 @@ body[data-page='home'] .panorama-copy, body[data-page='home'] .closing-copy { po
 body[data-page='home'] .panorama-copy p, body[data-page='home'] .closing-copy p { max-width: 760px; margin-inline: auto; }
 body[data-page='home'] .panorama-media, body[data-page='home'] .closing-media { position: static; width: 100%; height: 440px; margin: 0; }
 body[data-page='home'] .panorama-media img, body[data-page='home'] .closing-media img { width: 100%; height: 100%; object-fit: cover; }
-@media (max-width: 1399px) {
+/* The complete navigation needs room for all labels, including Safari's
+   font metrics and the bold current page. Keep the logo at its locked size. */
+@media (min-width: 1600px) {
+  body .home-nav a, body .site-nav a { white-space: nowrap; flex-shrink: 0; }
+}
+@media (max-width: 1599px) {
   :root { --header-height: 104px; }
   body .home-header { display: flex; justify-content: space-between; padding: 16px 24px; gap: 20px; }
   body .home-header-end { gap: 14px; }
@@ -218,6 +223,9 @@ body[data-page='home'] .panorama-media img, body[data-page='home'] .closing-medi
   body .menu-toggle { display: flex; flex: none; flex-direction: column; justify-content: center; align-items: center; gap: 6px; width: 44px; min-width: 44px; height: 44px; padding: 8px; border: 0; background: transparent; }
   body .site-nav { grid-area: auto; position: absolute; top: var(--header-height); left: 0; right: 0; flex-direction: column; align-items: stretch; padding: 16px 24px 24px; gap: 0; border-bottom: 1px solid #e3e4e8; max-height: calc(100dvh - var(--header-height)); overflow: auto; }
   body .site-nav a { min-height: 52px; border-bottom: 1px solid #e3e4e8; }
+}
+/* Preserve the existing page grids independently of the header breakpoint. */
+@media (max-width: 1399px) {
   body[data-page='home'] .home-rooms-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
   body[data-page='home'] .home-panel-copy > p:not(.home-room-meta) { min-height: 48px; }
   body[data-page='home'] .home-hero-bottom { min-height: 360px; }
