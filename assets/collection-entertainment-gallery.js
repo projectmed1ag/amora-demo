@@ -1,4 +1,4 @@
-import { getEntertainmentPhotographs } from './collection-entertainment-photographs.js?v=20261025-sharp-gallery-1';
+import { getEntertainmentPhotographs } from './collection-entertainment-photographs.js?v=20261025-original-quality-1';
 import { scheduleImagePrefetch, cancelImagePrefetch } from './collection-image-scheduler.js?v=20261025-progressive-photos-1';
 
 // Keep a small shared cache of detached frames, rather than every decoded
@@ -42,6 +42,15 @@ const city = document.documentElement.dataset.city || 'mozhaysk';
 const sizes = '(max-width: 700px) 100vw, (max-width: 800px) 91.6vw, (max-width: 1680px) 46.59vw, 800px';
 
 function setPhotograph(image, photograph, gallerySizes = sizes, avif = false) {
+  if (photograph.original) {
+    image.removeAttribute('srcset');
+    image.removeAttribute('sizes');
+    image.src = new URL(photograph.src, imageRoot).href;
+    image.alt = photograph.alt;
+    image.width = photograph.width;
+    image.height = photograph.height;
+    return;
+  }
   image.sizes = gallerySizes;
   // The regional galleries keep over 2x density on phones without downloading
   // a desktop photograph just because the screen reports DPR 3.

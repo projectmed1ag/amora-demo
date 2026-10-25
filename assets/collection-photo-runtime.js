@@ -55,7 +55,12 @@ function imageReady(image) {
 }
 
 function readyPhotoSource(photo) {
-  return [photo.image, photo.preview].find(image => image?.complete && image.naturalWidth)?.currentSrc || '';
+  const original = new URL(photo.src, photo.image?.baseURI || document.baseURI).href;
+  // A thumbnail or inline placeholder must never become a full-size dialog
+  // frame. Reuse a painted image only when it is the same requested original.
+  const ready = [photo.image, photo.preview].find(image => image?.complete && image.naturalWidth
+    && (image.currentSrc || image.src) === original);
+  return ready?.currentSrc || ready?.src || '';
 }
 
 function swipePhotos(surface, move) {
@@ -207,8 +212,8 @@ function createViewer(kind) {
       warmNeighbors(target);
       return;
     }
-    // Reuse the page's already loaded responsive frame (or room thumbnail)
-    // while the dialog-sized variant is prepared. Never clear a painted frame.
+    // Reuse the identical original already loaded on the page. A cold request
+    // keeps the previous sharp dialog frame until its next original is decoded.
     const previewSource = readyPhotoSource(photo);
     let previewReady;
     if (previewSource) {
@@ -414,24 +419,8 @@ function initRooms(main) {
         return;
       }
       gallery.setAttribute('aria-busy', 'true');
-      // A cold, non-adjacent selection responds with its already cached thumb.
-      // The sharp frame replaces it after decode without hiding the photograph.
-      const preview = record.photo.preview;
-      function showPreview() {
-        if (token !== selection || (record.image.dataset.decoded === 'true' && record.image.complete && record.image.naturalWidth)) return;
-        record.slide.style.backgroundImage = `url(${JSON.stringify(preview.currentSrc)})`;
-        record.slide.style.backgroundSize = record.photo.src.includes('/concept-covers/') ? 'contain' : 'cover';
-        record.slide.style.backgroundPosition = 'center';
-        record.slide.style.backgroundRepeat = 'no-repeat';
-        record.image.style.opacity = '0';
-        commit(target);
-      }
-      if (preview) {
-        preview.loading = 'eager';
-        preview.fetchPriority = 'high';
-        if (preview.complete && preview.naturalWidth) showPreview();
-        else imageReady(preview).then(showPreview).catch(() => {});
-      }
+      // Selection is committed only after the requested original is decoded.
+      // Keep the current sharp frame and selected control during a cold load.
       try {
         await prepare(target, 'high');
         if (token !== selection) return;
@@ -441,16 +430,8 @@ function initRooms(main) {
       } catch {
         if (token !== selection) return;
         gallery.removeAttribute('aria-busy');
-        // An available cached thumbnail is still the correct selected picture.
-        // Keep it visible if its larger variant fails, including offline use.
-        if (preview) {
-          try {
-            await imageReady(preview);
-            if (token !== selection) return;
-            showPreview();
-            if (record.slide.style.backgroundImage) return;
-          } catch {}
-        }
+        // Failed originals are skipped once; if all fail, move() retains the
+        // last good photograph instead of stretching a small thumbnail.
         move(1);
       }
     }

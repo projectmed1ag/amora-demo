@@ -39,7 +39,7 @@ function initializeNearbyOnApproach(section) {
   function load() {
     if (section.dataset.initialized) return Promise.resolve();
     if (!pending) {
-      pending = import('./collection-nearby.js?v=20261025-sharp-gallery-1')
+      pending = import('./collection-nearby.js?v=20261025-original-quality-1')
         .then(({ enhanceNearbyPlaces }) => {
           enhanceNearbyPlaces(section);
           if (section.dataset.initialized) cleanup();
@@ -81,10 +81,10 @@ function initializeNearbyOnApproach(section) {
 
 try {
   if (page === 'rooms' || page === 'gallery') {
-    const { initCollectionPhotos } = await import('./collection-photo-runtime.js?v=20261025-progressive-photos-1');
+    const { initCollectionPhotos } = await import('./collection-photo-runtime.js?v=20261025-original-quality-1');
     initCollectionPhotos(page);
   } else if (page === 'booking') {
-    const { initCollectionBooking } = await import('./collection-booking-runtime.js?v=20261025-progressive-photos-1');
+    const { initCollectionBooking } = await import('./collection-booking-runtime.js?v=20261025-original-quality-1');
     initCollectionBooking();
   } else if (['spaces', 'location'].includes(page) && document.querySelector('#nearby [data-nearby-place]')) {
     initializeNearbyOnApproach(document.querySelector('#nearby'));

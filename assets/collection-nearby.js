@@ -12,15 +12,6 @@ const placeCount = count => `${String(count).padStart(2, '0')} ${count % 10 === 
 const initialPlace = places => places.find(place => place.id === new URLSearchParams(location.search).get('place')) || places[0];
 const routeURL = place => `https://yandex.ru/maps/?rtext=~${place.coordinates.join(',')}&rtt=auto&z=12`;
 const escape = value => String(value ?? '').replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
-// Only these four legacy JPEG records need local responsive metadata. Regional
-// place records already contain srcset; the full site image index is unrelated
-// to this optional section and must not be downloaded to open its map.
-const nearbyPhotoStems = {
-  'images/mozhaysk/nearby/borodino.jpg': 'images/fast-v1/borodino-61eeec381fb3',
-  'images/mozhaysk/nearby/nikolsky.jpg': 'images/fast-v1/nikolsky-f4298071628e',
-  'images/mozhaysk/nearby/luzhetsky.jpg': 'images/fast-v1/luzhetsky-d137a01e659e',
-  'images/mozhaysk/nearby/goretovo.jpg': 'images/fast-v1/goretovo-f2bfe4e1cb66',
-};
 
 function nearbyConfiguration(section) {
   const destination = getDestination();
@@ -55,20 +46,8 @@ function nearbyConfiguration(section) {
 
 function detail(place) {
   const photo = place.photo;
-  const optimizedStem = photo && nearbyPhotoStems[photo.src.replace(/^\.\//, '')];
-  let variants = optimizedStem ? [480, 960].map(width => ({ src: `${optimizedStem}-${width}.webp`, width })) : [];
-  if (!variants.length && typeof photo?.srcset === 'string') {
-    variants = photo.srcset.split(',').flatMap(candidate => {
-      const match = candidate.trim().match(/^(\S+)\s+([1-9]\d*)w$/);
-      return match ? [{ src: match[1], width: Number(match[2]) }] : [];
-    });
-  }
-  if (!variants.length && photo?.mobileSrc && Number(photo.mobileWidth) > 0 && Number(photo.width) > 0) {
-    variants = [{ src: photo.mobileSrc, width: Number(photo.mobileWidth) }, { src: photo.src, width: Number(photo.width) }];
-  }
-  const candidates = variants.map(frame => `${destinationAsset(frame.src)} ${frame.width}w`).join(', ');
   const photograph = photo ? `<figure class="nearby-place-photo">
-      <div class="nearby-photo-frame"><img src="${escape(destinationAsset(optimizedStem ? `${optimizedStem}-960.webp` : photo.src))}"${candidates ? ` srcset="${escape(candidates)}" sizes="(max-width: 700px) 100vw, 32vw"` : ''} alt="${escape(photo.alt)}" width="${escape(photo.width)}" height="${escape(photo.height)}" loading="lazy" decoding="async"><p class="nearby-photo-fallback" hidden>Фотография временно недоступна</p></div>
+      <div class="nearby-photo-frame"><img src="${escape(destinationAsset(photo.src))}" alt="${escape(photo.alt)}" width="${escape(photo.width)}" height="${escape(photo.height)}" loading="lazy" decoding="async"><p class="nearby-photo-fallback" hidden>Фотография временно недоступна</p></div>
       <figcaption>Фото: <a href="${escape(photo.source)}" target="_blank" rel="noopener">${escape(photo.author)}, ${escape(photo.year)}</a> · <a href="${escape(photo.licenseURL)}" target="_blank" rel="noopener">${escape(photo.license)}</a></figcaption>
     </figure>` : '';
   return `${photograph}

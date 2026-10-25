@@ -1,4 +1,4 @@
-import { collectionImageSource } from './collection-image-sources.js?v=20261025-progressive-photos-1';
+import { collectionImageSource } from './collection-image-sources.js?v=20261025-original-quality-1';
 import { destinationAsset, destinationLocalDate, getDestination } from './collection-destinations.js?v=20261024-all-hotels-1';
 
 const initializedForms = new WeakSet();
