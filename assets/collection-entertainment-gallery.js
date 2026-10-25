@@ -1,22 +1,65 @@
-import { getEntertainmentPhotographs } from './collection-entertainment-gallery-data.js?v=20261025-progressive-photos-1';
+import { getEntertainmentPhotographs } from './collection-entertainment-photographs.js?v=20261025-sharp-gallery-1';
 import { scheduleImagePrefetch, cancelImagePrefetch } from './collection-image-scheduler.js?v=20261025-progressive-photos-1';
+
+// Keep a small shared cache of detached frames, rather than every decoded
+// photograph from every visited season. Displayed DOM images remain browser-owned.
+const frameCache = new Map();
+const visibleLoads = new Set();
+// Only one approaching row may download at once. Visible/user-selected frames
+// bypass this queue; low-priority rows must not flood a slow connection.
+const approaching = new Map();
+let approachRunning = false;
+function pumpApproaching() {
+  if (approachRunning || !approaching.size) return;
+  approachRunning = true;
+  setTimeout(async () => {
+    try {
+      while (visibleLoads.size) await Promise.allSettled([...visibleLoads]);
+      for (const [key, job] of approaching) if (!job.needed()) approaching.delete(key);
+      const first = [...approaching].sort((a, b) => a[1].distance() - b[1].distance())[0];
+      if (!first) return;
+      approaching.delete(first[0]);
+      await first[1].run();
+    } catch { /* A failed optional frame must not stall the queue. */ }
+    finally { approachRunning = false; pumpApproaching(); }
+  }, 120);
+}
+
+const avifSupported = new Promise(resolve => {
+  const probe = new Image();
+  probe.onload = () => resolve(probe.naturalWidth > 0);
+  probe.onerror = () => resolve(false);
+  probe.src = 'data:image/avif;base64,AAAAHGZ0eXBhdmlmAAAAAG1pZjFhdmlmbWlhZgAAANZtZXRhAAAAAAAAACFoZGxyAAAAAAAAAABwaWN0AAAAAAAAAAAAAAAAAAAAACJpbG9jAAAAAERAAAEAAQAAAAAA+gABAAAAAAAAAB0AAAAjaWluZgAAAAAAAQAAABVpbmZlAgAAAAABAABhdjAxAAAAAA5waXRtAAAAAAABAAAAVmlwcnAAAAA4aXBjbwAAAAxhdjFDgSACAAAAABRpc3BlAAAAAAAAAAEAAAABAAAAEHBpeGkAAAAAAwgICAAAABZpcG1hAAAAAAAAAAEAAQOBAgMAAAAlbWRhdBIACgc4AAaQENBpMhAZQmMEwAA0AACQQMkcYIpq';
+});
+function trimFrames() {
+  const detached = [...frameCache].filter(([, record]) => !record.pending && !record.full?.isConnected);
+  while (detached.length > 8) frameCache.delete(detached.shift()[0]);
+}
 
 const imageRoot = new URL('../', import.meta.url);
 const city = document.documentElement.dataset.city || 'mozhaysk';
 // 1.15 / 2.15 of the desktop row after its gutters and column gap.
 const sizes = '(max-width: 700px) 100vw, (max-width: 800px) 91.6vw, (max-width: 1680px) 46.59vw, 800px';
 
-function setPhotograph(image, photograph, gallerySizes = sizes) {
+function setPhotograph(image, photograph, gallerySizes = sizes, avif = false) {
   image.sizes = gallerySizes;
-  image.srcset = photograph.srcset
-    ? photograph.srcset.split(',').map(candidate => {
+  // The regional galleries keep over 2x density on phones without downloading
+  // a desktop photograph just because the screen reports DPR 3.
+  const mobile = matchMedia('(max-width: 700px)').matches;
+  const responsive = avif
+    ? (mobile ? photograph.avifMobileSrcset : photograph.avifSrcset)
+    : (mobile && photograph.mobileSrcset) || photograph.srcset;
+  image.srcset = responsive
+    ? responsive.split(',').map(candidate => {
       const [path, ...descriptor] = candidate.trim().split(/\s+/);
       return `${new URL(path, imageRoot).href} ${descriptor.join(' ')}`;
     }).join(', ')
     : photograph.mobileSrc
       ? `${new URL(photograph.mobileSrc, imageRoot).href} ${photograph.mobileWidth}w, ${new URL(photograph.src, imageRoot).href} ${photograph.width}w`
       : '';
-  image.src = new URL(photograph.src, imageRoot).href;
+  image.src = new URL(avif
+    ? (mobile ? photograph.avifMobileSrc : photograph.avifSrc)
+    : (mobile && photograph.mobileSrc) || photograph.src, imageRoot).href;
   image.alt = photograph.alt;
   image.width = photograph.width;
   image.height = photograph.height;
@@ -87,15 +130,15 @@ function initializeGallery(story, photographs) {
   const gallerySizes = figure.dataset.gallerySizes || sizes;
   const overview = story.closest('[data-entertainment-overview]');
   const keyFor = items => items.map(item => item.src).join('|');
+  const cacheKey = photograph => `${photograph.src}|${matchMedia('(max-width: 700px)').matches ? 'mobile' : gallerySizes}`;
   let collectionKey = keyFor(photographs);
-  let displayedKey = collectionKey;
+  let displayedKey = '';
   let selected = 0;
   let requested = 0;
   let generation = 0;
   let pointer = null;
   let nearby = false;
   let visible = false;
-  const prepared = new Map();
   const prefetchKey = {};
 
   figure.classList.add('entertainment-gallery');
@@ -105,12 +148,15 @@ function initializeGallery(story, photographs) {
   figure.setAttribute('aria-roledescription', 'галерея');
   figure.setAttribute('aria-label', `Фотографии: ${title}`);
   image.draggable = false;
-  // Retain the HTML image and its in-flight request. Reassigning src/srcset
-  // during startup needlessly competes with the first requested photograph.
   const imageClass = image.className;
-  prepared.set(0, image.hasAttribute('data-gallery-preview')
-    ? { preview: image, previewReady: image.complete && image.naturalWidth > 0 }
-    : { full: image, fullReady: image.complete && image.naturalWidth > 0 });
+  // Early entry loading may already have the correct seasonal/anchor frame.
+  // Keep its native request, including the browser's AVIF/WebP choice.
+  const original = getEntertainmentPhotographs(story.id, 'all', city)[0];
+  const initialSource = image.dataset.gallerySource || (!image.hasAttribute('data-gallery-preview') ? original?.src : null);
+  if (initialSource === photographs[0].src && !image.hasAttribute('data-gallery-preview')) {
+    frameCache.set(cacheKey(photographs[0]), { full: image, fullReady: image.complete && image.naturalWidth > 0 });
+    displayedKey = collectionKey;
+  }
 
   const controls = document.createElement('div');
   controls.className = 'entertainment-gallery-controls';
@@ -125,111 +171,99 @@ function initializeGallery(story, photographs) {
   status.setAttribute('role', 'status');
   status.setAttribute('aria-live', 'polite');
   status.setAttribute('aria-atomic', 'true');
+  controls.hidden = photographs.length < 2;
   controls.append(previous, position, next);
   figure.append(controls, status);
 
   const wrap = index => (index + photographs.length) % photographs.length;
   function recordFor(index) {
-    if (!prepared.has(index)) prepared.set(index, {});
-    return prepared.get(index);
+    const key = cacheKey(photographs[index]);
+    const record = frameCache.get(key) || {};
+    frameCache.delete(key);
+    frameCache.set(key, record);
+    return record;
   }
 
-  function decode(image) {
-    if (image.complete && image.naturalWidth) return Promise.resolve(image);
-    return image.decode().then(() => image);
-  }
-
-  function preparePreview(index, priority = 'low') {
-    const record = recordFor(index);
-    if (!record.previewPromise) {
-      const preview = record.preview || new Image();
-      if (!record.preview) {
-        preview.decoding = 'async';
-        preview.fetchPriority = priority;
-        preview.src = new URL(photographs[index].previewSrc, imageRoot).href;
-        preview.alt = photographs[index].alt;
-        preview.width = photographs[index].width;
-        preview.height = photographs[index].height;
-      }
-      record.preview = preview;
-      record.previewPromise = decode(preview).then(() => {
-        record.previewReady = true;
-        return preview;
-      });
-      // Background requests must not produce an unhandled rejection.
-      void record.previewPromise.catch(() => {});
-    }
-    record.preview.fetchPriority = priority;
-    return record.previewPromise;
+  function decode(node) {
+    return node.decode().then(() => {
+      if (!node.naturalWidth) throw new Error('Empty photograph');
+      return node;
+    });
   }
 
   function prepareFull(index, priority = 'low') {
+    const photograph = photographs[index];
     const record = recordFor(index);
-    if (!record.full) {
-      record.full = new Image();
-      record.full.decoding = 'async';
-      record.full.loading = 'eager';
-      record.full.fetchPriority = priority;
-      setPhotograph(record.full, photographs[index], gallerySizes);
-    }
-    record.full.fetchPriority = priority;
-    if (record.fullReady && !record.full.complete) {
-      record.fullReady = false;
-      record.fullPromise = null;
-    }
+    if (record.full) record.full.fetchPriority = priority;
     if (!record.fullPromise) {
-      record.fullPromise = decode(record.full).then(() => {
+      record.pending = true;
+      record.fullPromise = (async () => {
+        const create = format => {
+          const node = new Image();
+          node.decoding = 'async';
+          node.loading = 'eager';
+          node.fetchPriority = priority;
+          setPhotograph(node, photograph, gallerySizes, format);
+          return node;
+        };
+        let avif;
+        if (!record.full) {
+          avif = photograph.avifSrc && await avifSupported;
+          record.full = create(avif);
+        } else avif = /\.avif(?:[?#]|$)/i.test(record.full.currentSrc || record.full.src);
+        try { await decode(record.full); }
+        catch (error) {
+          if (!avif || !photograph.avifSrc) throw error;
+          // Native entry frames and dynamic frames share the same fallback.
+          record.full = create(false);
+          await decode(record.full);
+        }
         record.fullReady = true;
         return record.full;
-      }).catch(error => {
+      })().catch(error => {
+        record.full = null;
+        record.fullReady = false;
         record.fullPromise = null;
         throw error;
-      });
+      }).finally(() => { record.pending = false; trimFrames(); });
       void record.fullPromise.catch(() => {});
     }
     return record.fullPromise;
   }
 
-  function warmNeighbours() {
-    if (!visible) return;
-    const origin = selected;
-    const key = collectionKey;
-    const token = generation;
-    const after = wrap(origin + 1);
-    const before = wrap(origin - 1);
-    const needed = () => visible && selected === origin && requested === origin && collectionKey === key && generation === token;
-    // The photograph already in view gets its sharp version first. Neighbour
-    // requests used to delay that upgrade on cold, bandwidth-limited visits.
-    void prepareFull(origin, 'high').then(full => {
-      if (!needed()) return;
-      if (full && image.hasAttribute('data-gallery-preview')) display(full, origin);
-      scheduleImagePrefetch(prefetchKey, async () => {
-        for (const index of [...new Set([after, before])]) {
-          if (!needed()) return;
-          await preparePreview(index).catch(() => {});
-          if (!needed()) return;
-          await prepareFull(index).catch(() => {});
-        }
-      }, needed);
-    }).catch(() => {});
-  }
-
-  function display(node, index, preview = false) {
+  function display(node, index) {
     const old = image;
     image = node;
     image.className = imageClass;
     image.removeAttribute('aria-hidden');
+    image.removeAttribute('data-gallery-preview');
+    image.removeAttribute('style');
+    image.dataset.gallerySource = photographs[index].src;
     image.draggable = false;
     image.alt = photographs[index].alt;
-    image.toggleAttribute('data-gallery-preview', preview);
-    // Swap already decoded nodes atomically. An animated outgoing overlay can
-    // remain above the new photograph in background Safari windows.
+    // Only decoded full frames replace the current photograph. A cold request
+    // keeps the previous sharp image and counter until the requested one is ready.
     if (old !== image) old.replaceWith(image);
     selected = index;
     displayedKey = collectionKey;
     figure.dataset.galleryIndex = String(selected);
     position.textContent = `${selected + 1} / ${photographs.length}`;
     status.textContent = `${title}: фотография ${selected + 1} из ${photographs.length}`;
+    trimFrames();
+  }
+
+  function warmNeighbours() {
+    if (!visible || story.hidden || requested !== selected || displayedKey !== collectionKey) return;
+    const origin = selected;
+    const key = collectionKey;
+    const token = generation;
+    const needed = () => visible && !story.hidden && selected === origin && requested === origin && collectionKey === key && generation === token;
+    scheduleImagePrefetch(prefetchKey, async () => {
+      for (const index of [...new Set([wrap(origin + 1), wrap(origin - 1)])]) {
+        if (!needed()) return;
+        await prepareFull(index).catch(() => {});
+      }
+    }, needed);
   }
 
   async function show(index) {
@@ -237,43 +271,50 @@ function initializeGallery(story, photographs) {
     const target = requested;
     const token = ++generation;
     const record = recordFor(target);
-    if (target === selected && displayedKey === collectionKey && !image.hasAttribute('data-gallery-preview')) {
+    cancelImagePrefetch(prefetchKey);
+    if (target === selected && displayedKey === collectionKey && record.fullReady && image === record.full) {
       figure.removeAttribute('aria-busy');
+      warmNeighbours();
       return;
     }
     figure.setAttribute('aria-busy', 'true');
+    status.textContent = 'Загрузка фотографии';
+    const pending = prepareFull(target, visible ? 'high' : 'low');
+    if (visible) visibleLoads.add(pending);
     try {
-      if (record.fullReady && record.full.complete && record.full.naturalWidth) display(record.full, target);
-      else {
-        cancelImagePrefetch(prefetchKey);
-        // Respond with the selected photograph, even while its sharp version
-        // is still crossing a slow connection. Never show a different frame.
-        const previewReady = preparePreview(target, 'high');
-        if (record.previewReady) display(record.preview, target, true);
-        // Start the requested sharp photograph immediately. On a cold CDN a
-        // preview can have its own round trip; it must not gate the real frame.
-        const fullReady = prepareFull(target, 'high');
-        const first = await Promise.any([previewReady, fullReady]);
-        if (token !== generation) return;
-        display(first, target, first === record.preview);
-        const full = await fullReady;
-        if (token !== generation) return;
-        display(full, target);
-      }
+      const full = await pending;
+      if (token !== generation) return;
+      display(full, target);
       figure.removeAttribute('aria-busy');
       warmNeighbours();
     } catch {
       if (token !== generation) return;
       figure.removeAttribute('aria-busy');
-      status.textContent = 'Не удалось загрузить фотографию. Попробуйте другую.';
-    }
+      status.textContent = 'Не удалось загрузить фотографию. Попробуйте ещё раз.';
+    } finally { visibleLoads.delete(pending); }
   }
 
+  // A viewport of lead time prepares the next row before it appears. The
+  // shared queue reserves bandwidth for explicit switches and visible frames.
+  function warmCurrent() {
+    approaching.delete(prefetchKey);
+    if (story.hidden || !nearby) return;
+    if (visible) { void show(requested); return; }
+    if (displayedKey === collectionKey && selected === requested && !image.hasAttribute('data-gallery-preview')) return;
+    approaching.set(prefetchKey, {
+      needed: () => nearby && !visible && !story.hidden,
+      distance: () => {
+        const rect = figure.getBoundingClientRect();
+        return rect.top >= innerHeight ? rect.top - innerHeight : -rect.bottom;
+      },
+      run: () => show(requested),
+    });
+    pumpApproaching();
+  }
   previous.addEventListener('click', () => { void show(requested - 1); });
   next.addEventListener('click', () => { void show(requested + 1); });
   const anticipate = direction => {
-    const target = wrap(requested + direction);
-    void preparePreview(target).then(() => prepareFull(target)).catch(() => {});
+    if (visible) void prepareFull(wrap(requested + direction)).catch(() => {});
   };
   previous.addEventListener('pointerenter', () => anticipate(-1));
   next.addEventListener('pointerenter', () => anticipate(1));
@@ -292,26 +333,17 @@ function initializeGallery(story, photographs) {
   if ('IntersectionObserver' in window) {
     const observer = new IntersectionObserver(entries => {
       nearby = entries[0].isIntersecting;
-      image.fetchPriority = nearby ? 'high' : 'low';
-      if (nearby) {
-        if (displayedKey !== collectionKey) void show(requested);
-        else warmNeighbours();
-      }
-      else {
-        cancelImagePrefetch(prefetchKey);
-        // Retain only the displayed node off screen, allowing decoded buffers
-        // from previously visited rows to be reclaimed on small devices.
-        for (const index of prepared.keys()) if (index !== selected) prepared.delete(index);
-      }
-    }, { rootMargin: '160px 0px' });
+      if (nearby) warmCurrent();
+      else { approaching.delete(prefetchKey); cancelImagePrefetch(prefetchKey); }
+    }, { rootMargin: '800px 0px' });
     observer.observe(figure);
     const visibleObserver = new IntersectionObserver(entries => {
       visible = entries[0].isIntersecting;
-      if (visible) warmNeighbours();
+      if (visible) { nearby = true; warmCurrent(); }
       else cancelImagePrefetch(prefetchKey);
     });
     visibleObserver.observe(figure);
-  }
+  } else { nearby = true; visible = true; warmCurrent(); }
   figure.addEventListener('pointercancel', () => { pointer = null; });
   figure.addEventListener('pointerup', event => {
     const gesture = pointer;
@@ -323,34 +355,43 @@ function initializeGallery(story, photographs) {
   });
   function updateSeason(season) {
     const items = getEntertainmentPhotographs(story.id, season, city);
-    if (!items.length) return;
     figure.dataset.gallerySeason = season;
+    // Invalidate pending work even for a row hidden in this season.
+    if (!items.length) {
+      generation += 1;
+      approaching.delete(prefetchKey);
+      cancelImagePrefetch(prefetchKey);
+      figure.removeAttribute('aria-busy');
+      return;
+    }
     const key = keyFor(items);
     controls.hidden = items.length < 2;
     if (key === collectionKey) return;
-    // A one-photo summer selection can share the already requested native
-    // first frame with “all seasons”. Keep its AVIF request and decoded node.
-    const retained = items[0].src === photographs[selected]?.src ? prepared.get(selected) : null;
     generation += 1;
     cancelImagePrefetch(prefetchKey);
     photographs = items;
     collectionKey = key;
     requested = 0;
-    selected = 0;
-    prepared.clear();
-    if (retained) prepared.set(0, retained);
-    // Distant rows keep their existing valid node until they approach the
-    // viewport. Only the selected season is downloaded and decoded there.
-    if (nearby || visible || !('IntersectionObserver' in window)) void show(0);
+    // Keep the old sharp DOM frame until the new seasonal one is decoded.
+    if (nearby && !story.hidden) warmCurrent();
   }
-  const initialSeason = overview?.dataset.season || new URL(location.href).searchParams.get('season') || 'all';
+  const initialSeason = overview?.dataset.season || document.documentElement.dataset.galleryEntrySeason || new URL(location.href).searchParams.get('season') || 'all';
   updateSeason(initialSeason);
   overview?.addEventListener('collection:leisure-season', event => updateSeason(event.detail.season));
-  window.addEventListener('pagehide', () => { generation += 1; cancelImagePrefetch(prefetchKey); figure.removeAttribute('aria-busy'); }, { once: true });
+  window.addEventListener('pagehide', () => {
+    generation += 1;
+    approaching.delete(prefetchKey);
+    cancelImagePrefetch(prefetchKey);
+    figure.removeAttribute('aria-busy');
+  }, { once: true });
 }
 
 function initializeEntertainmentGalleries() {
-  document.querySelectorAll('[data-entertainment-story]').forEach(story => initializeGallery(story, getEntertainmentPhotographs(story.id, 'all', city)));
+  const season = document.querySelector('[data-entertainment-overview]')?.dataset.season || document.documentElement.dataset.galleryEntrySeason || new URL(location.href).searchParams.get('season') || 'all';
+  document.querySelectorAll('[data-entertainment-story]').forEach(story => {
+    const items = getEntertainmentPhotographs(story.id, season, city);
+    initializeGallery(story, items.length ? items : getEntertainmentPhotographs(story.id, 'all', city));
+  });
 }
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initializeEntertainmentGalleries, { once: true });
