@@ -7,6 +7,22 @@
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <link rel="preload" href="../fonts/spectral-400-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="../fonts/amore-condensed-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+
+    <script data-gallery-entry-config>
+    (()=>{const c={"base":"../images/krasnoyarsk/entertainment-v2/","sourceBase":"images/krasnoyarsk/entertainment-v2/","sizes":"(max-width: 700px) 100vw, (max-width: 1000px) calc(100vw - 48px), 47vw","rows":{"events":[0,1,3,0,2]},"photos":[["events-01","Летний семейный обед в просторном деревянном павильоне"],["events-02","Зимний семейный праздник в тёплом павильоне"],["events-03","Осеннее чаепитие за праздничным столом в павильоне"],["events-spring","Подготовка весеннего семейного праздника в павильоне"]]};
+const q=new URLSearchParams(location.search),seasons=['all','winter','spring','summer','autumn'];
+const fromDate=value=>{if(!/^(?!0000)\d{4}-\d{2}-\d{2}$/.test(value||''))return '';const d=new Date(value+'T00:00:00Z');if(!Number.isFinite(d.getTime())||d.toISOString().slice(0,10)!==value)return '';const m=d.getUTCMonth()+1;return m===12||m<3?'winter':m<6?'spring':m<9?'summer':'autumn';};
+let season=fromDate(q.get('date'))||fromDate(q.get('checkin'))||(seasons.includes(q.get('season'))?q.get('season'):'all'),hash='';try{hash=decodeURIComponent(location.hash.slice(1));}catch{}
+const aliases={movement:'rental',active:'rental',nature:'routes'};let story=aliases[hash]||hash,anchor=Object.hasOwn(c.rows,story),index=seasons.indexOf(season);
+if(anchor&&c.rows[story][index]===null){season='all';index=0;}
+if(!anchor)story=Object.keys(c.rows).find(id=>c.rows[id][index]!==null)||Object.keys(c.rows)[0];
+document.documentElement.dataset.galleryEntrySeason=season;
+if(q.has('place')||hash==='nearby'||hash==='nearby-place-detail')return;
+const photo=c.photos[c.rows[story][index]],entry=window.collectionEntertainmentEntry={story,season,anchor,base:c.base,stem:photo[0],alt:photo[1],source:c.sourceBase+photo[0]+'-1536.webp',sizes:c.sizes,stories:Object.keys(c.rows).filter(id=>c.rows[id][index]!==null)};
+const preload=document.createElement('link');preload.rel='preload';preload.as='image';preload.type='image/avif';preload.fetchPriority='high';preload.href=c.base+photo[0]+'-800.avif';preload.imageSrcset=matchMedia('(max-width: 700px)').matches?c.base+photo[0]+'-800.avif 800w':c.base+photo[0]+'-800.avif 800w, '+c.base+photo[0]+'-1280.avif 1280w';preload.imageSizes=c.sizes;preload.dataset.galleryEntryPreload='';document.head.append(preload);
+})();
+    </script>
+    <script defer src="../assets/collection-entertainment-entry.js?v=20261025-sharp-gallery-1"></script>
     <link rel="stylesheet" href="../assets/styles-B5T6wf-2.css">
     <link id="collection-home-style" rel="stylesheet" href="../assets/collection-home.css?v=20261025-first-photo-2">
     <link id="collection-site-shell-style" rel="stylesheet" href="../assets/collection-site-shell.css?v=header-2">
@@ -17,7 +33,7 @@
     <link rel="stylesheet" href="../assets/collection-navigation.css?v=20261025-progressive-photos-1">
     <link rel="stylesheet" href="../assets/collection-page-motion.css?v=20261023-local-menu-seasons-1">
     <link rel="stylesheet" href="../assets/collection-services.css?v=20261023-mobile-overlap-1">
-    <script type="module" src="../assets/collection-runtime.js?v=20261025-progressive-photos-1"></script>
+    <script type="module" src="../assets/collection-runtime.js?v=20261025-sharp-gallery-1"></script>
     <script type="module" src="../assets/collection-refinement.js?v=20261025-progressive-photos-1"></script>
     <script type="module" src="../assets/collection-page-motion.js?v=20261025-progressive-photos-1"></script>
     <script type="module" src="../assets/collection-services.js?v=20261024-image-load-1"></script>
@@ -25,9 +41,9 @@
     <title>Аренда павильонов — A’MORE Collection</title>
     <link rel="stylesheet" href="../assets/collection-service-content.css?v=20261023-menu-1">
     <link rel="stylesheet" href="../assets/collection-pavilions.css?v=20261023-local-menu-seasons-1">
-    <script type="module" src="../assets/collection-entertainment-gallery.js?v=20261025-first-photo-2"></script>
-      <link rel="modulepreload" href="../assets/collection-entertainment-gallery-data.js?v=20261025-progressive-photos-1">
-    <link rel="modulepreload" href="../assets/collection-image-sources.js?v=20261025-progressive-photos-1">
+    <script type="module" src="../assets/collection-entertainment-gallery.js?v=20261025-sharp-gallery-1"></script>
+      <link rel="modulepreload" href="../assets/collection-entertainment-krasnoyarsk-data.js?v=20261025-sharp-gallery-1">
+    <link rel="modulepreload" href="../assets/collection-entertainment-photographs.js?v=20261025-sharp-gallery-1">
 </head>
   <body data-page="pavilions" class="collection-home-page collection-site-page collection-service-page collection-pavilions-page" data-collection-static="">
     <a class="skip-link" href="#content">К содержанию</a>
@@ -54,7 +70,7 @@
       </section>
       <div class="pavilion-layout">
         <section class="pavilion-story" id="events" data-entertainment-story="" aria-labelledby="pavilion-description-title">
-          <figure class="service-hero entertainment-photo pavilion-photo" data-gallery-sizes="(max-width: 700px) 100vw, (max-width: 1000px) calc(100vw - 48px), 47vw"><img data-gallery-preview="" src="data:image/webp;base64,UklGRtwAAABXRUJQVlA4INAAAABQBQCdASogABUAPzmEuFOvKCUisAgB4CcJQBfJthyjSWpNLae1DT+5BYqTt52aj30bxgAA/q/FTwct0qbenNhdb8Ooz36qrPAxLNgwJCmFXm91ZV5D9trFIa4zxmHDR1HMWF5KN9e3+WVeaHTDe1QcO/y7TpYekSBz/+HfQXvIVWTUH0IL3TEp1shZ+a2WLmvyAGv4qMvznbn83j1l06dj5fwhH4fe18j/9dLvvQ/J8kYUVDW/jF6vpJizIjBMwFbYqR7RRwqjkuIr1H1wygAA" width="1536" height="1024" alt="Семейный праздник за столом в деревянном павильоне" decoding="async" fetchpriority="high" sizes="100vw" style=";background-image:url(&#x27;data:image/webp;base64,UklGRtwAAABXRUJQVlA4INAAAABQBQCdASogABUAPzmEuFOvKCUisAgB4CcJQBfJthyjSWpNLae1DT+5BYqTt52aj30bxgAA/q/FTwct0qbenNhdb8Ooz36qrPAxLNgwJCmFXm91ZV5D9trFIa4zxmHDR1HMWF5KN9e3+WVeaHTDe1QcO/y7TpYekSBz/+HfQXvIVWTUH0IL3TEp1shZ+a2WLmvyAGv4qMvznbn83j1l06dj5fwhH4fe18j/9dLvvQ/J8kYUVDW/jF6vpJizIjBMwFbYqR7RRwqjkuIr1H1wygAA&#x27;);background-size:cover;background-position:center" data-progressive-photo=""></figure>
+          <figure class="service-hero entertainment-photo pavilion-photo" data-gallery-sizes="(max-width: 700px) 100vw, (max-width: 1000px) calc(100vw - 48px), 47vw"><img src="data:image/webp;base64,UklGRv4AAABXRUJQVlA4IPIAAACQBgCdASogABUAPwFoq08rJaOiMAgBYCAJZgCdMtFGaVqeAFVPubDp01Zi2frutkiiOAmqVyHqjVrFYZMAAP6Dh5IkhqSG7QVbhjVD3mRaJNmUfbjNRc9K9zvchSn4GgFQ62YRn1xnAO4XSc/4xd73ZKOIgpM7APnbZhI+r/3AwvCYMQjvVqA/zTlv9owRjm+gjjpGjy4LhKUMJSdyVr27voN1dqNZQDqVqK5NO8iqxvapO+vWV9joB/HNaeFKOnmAKO5+6W4/pmGzBDqUeFfffxoobthzbfc9Io8JlZNJVMUUB0ZIglbzdGHUoqc7fbwAAA==" alt="Летний семейный обед в просторном деревянном павильоне" width="1536" height="1024" sizes="(max-width: 700px) 100vw, (max-width: 1000px) calc(100vw - 48px), 47vw" decoding="async" style="background-image:url(&#x27;data:image/webp;base64,UklGRv4AAABXRUJQVlA4IPIAAACQBgCdASogABUAPwFoq08rJaOiMAgBYCAJZgCdMtFGaVqeAFVPubDp01Zi2frutkiiOAmqVyHqjVrFYZMAAP6Dh5IkhqSG7QVbhjVD3mRaJNmUfbjNRc9K9zvchSn4GgFQ62YRn1xnAO4XSc/4xd73ZKOIgpM7APnbZhI+r/3AwvCYMQjvVqA/zTlv9owRjm+gjjpGjy4LhKUMJSdyVr27voN1dqNZQDqVqK5NO8iqxvapO+vWV9joB/HNaeFKOnmAKO5+6W4/pmGzBDqUeFfffxoobthzbfc9Io8JlZNJVMUUB0ZIglbzdGHUoqc7fbwAAA==&#x27;);background-size:cover;background-position:center" data-progressive-photo="" loading="lazy" fetchpriority="low" data-gallery-preview=""><noscript><style>#events > .entertainment-photo > img { display: none; }</style><picture class="collection-picture"><source type="image/avif" srcset="../images/krasnoyarsk/entertainment-v2/events-01-800.avif 800w, ../images/krasnoyarsk/entertainment-v2/events-01-1280.avif 1280w" sizes="(max-width: 700px) 100vw, (max-width: 1000px) calc(100vw - 48px), 47vw"><img src="../images/krasnoyarsk/entertainment-v2/events-01-960.webp" srcset="../images/krasnoyarsk/entertainment-v2/events-01-480.webp 480w, ../images/krasnoyarsk/entertainment-v2/events-01-960.webp 960w, ../images/krasnoyarsk/entertainment-v2/events-01-1536.webp 1536w" sizes="(max-width: 700px) 100vw, (max-width: 1000px) calc(100vw - 48px), 47vw" alt="Летний семейный обед в просторном деревянном павильоне" width="1536" height="1024" loading="eager" decoding="async"></picture></noscript></figure>
           <div class="pavilion-description">
             <h2 id="pavilion-description-title">Павильоны для праздников</h2>
             <p>Павильоны на территории подходят для дней рождения, семейных праздников и встреч с друзьями. Здесь можно собрать гостей вместе, а праздник дополнить прогулками, играми и отдыхом на природе.</p>
