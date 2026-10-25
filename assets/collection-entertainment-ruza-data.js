@@ -1,3 +1,5 @@
+import { collectionImageSource } from './collection-image-sources.js?v=20261025-original-quality-1';
+
 // Regional photographs: store each scene once and derive responsive candidates.
 const root = "images/ruza/entertainment-v2/";
 const records = [
@@ -54,29 +56,9 @@ const records = [
   ["garden-02","Весенняя рассада в парнике","spring"],
   ["garden-03","Осенний урожай в парнике","autumn"]
 ];
-const photographs = records.map(([stem, alt, season]) => {
-  const base = `${root}${stem}`;
-  const candidates = (widths, format) => widths.map(width => `${base}-${width}.${format} ${width}w`).join(', ');
-  return {
-    src: `${base}-1536.webp`,
-    srcset: candidates([480, 960, 1536], 'webp'),
-    mobileSrc: `${base}-960.webp`,
-    mobileSrcset: candidates([480, 960], 'webp'),
-    mobileWidth: 960,
-    mobileHeight: 640,
-    avifSrc: `${base}-1280.avif`,
-    avifSrcset: candidates([800, 1280], 'avif'),
-    avifMobileSrc: `${base}-800.avif`,
-    avifMobileSrcset: candidates([800], 'avif'),
-    width: 1536,
-    height: 1024,
-    previewSrc: `${base}-192.webp`,
-    previewWidth: 192,
-    previewHeight: 128,
-    alt,
-    season,
-  };
-});
+const photographs = records.map(([stem, alt, season]) => ({
+  ...collectionImageSource(`${root}${stem}-1536.webp`), alt, season,
+}));
 const galleries = {"children":[0,1,2],"firepit":[6,7,8],"barbecue":[10,11,12],"rental":[14,15,16],"routes":[17,18,19],"fishing":[22,23,24],"sup":[26,27,28],"sunbathing":[29,30,31],"ice-rink":[32,33,34],"snowmobiles":[35,36,37],"tubing":[38,39,40],"buggy":[41,42,43],"events":[45,46,47],"garden":[49,50,51]};
 const seasons = {"winter":{"children":[5],"firepit":[7],"barbecue":[11],"routes":[21],"fishing":[24],"ice-rink":[32,33,34],"snowmobiles":[35,36,37],"tubing":[38,39,40],"buggy":[43],"events":[46]},"spring":{"children":[1],"firepit":[9],"barbecue":[13],"rental":[15],"routes":[18],"fishing":[25],"buggy":[42],"events":[48],"garden":[50]},"summer":{"children":[0],"firepit":[6],"barbecue":[10],"rental":[14],"routes":[17],"fishing":[22],"sup":[26,27,28],"sunbathing":[29,30,31],"buggy":[41],"events":[45],"garden":[49]},"autumn":{"children":[2],"firepit":[8],"barbecue":[12],"rental":[16],"routes":[20],"fishing":[23],"buggy":[44],"events":[47],"garden":[51]}};
 export function getEntertainmentPhotographs(id, season = "all") {
