@@ -1,4 +1,4 @@
-/* Document links stay available at the bottom on every screen size. */
+/* The bottom carousel is reserved for mobile and tablet layouts. */
 .section-navigation {
   position: fixed;
   z-index: 40;
@@ -54,7 +54,10 @@ html:has(body.has-page-navigation) { scroll-padding-bottom: calc(96px + env(safe
 .section-navigation-target:focus { outline: none; }
 
 @media (min-width: 1100px) {
-  html.collection-screen-mode:has(body.has-page-navigation) { --chapter-bottom: calc(88px + env(safe-area-inset-bottom, 0px)); }
+  .section-navigation { display: none; }
+  html body.has-page-navigation { padding-bottom: 0; }
+  html:has(body.has-page-navigation) { scroll-padding-bottom: 0; }
+  html.collection-screen-mode:has(body.has-page-navigation) { --chapter-bottom: 0px; }
 }
 @media (max-width: 1099px) {
   .section-navigation {
