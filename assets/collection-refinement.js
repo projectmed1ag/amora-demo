@@ -1,7 +1,7 @@
 // Shared progressive enhancements. Content, ordinary links and the locked
 // A’MORE artwork remain usable without this module.
 import { createHomeScroller } from './collection-home-scroll.js?v=20261027-native-home-scroll-1';
-import { initPageNavigation } from './collection-page-navigation.js?v=20261027-page-navigation-1';
+import { initPageNavigation } from './collection-page-navigation.js?v=20261027-mobile-carousel-1';
 import { initHeadingFormat } from './collection-heading-format.js?v=20261023-local-nav-restored-1';
 import { collectionDestinations, getDestination } from './collection-destinations.js?v=20261024-all-hotels-1';
 
