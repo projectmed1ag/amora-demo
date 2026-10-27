@@ -3,6 +3,19 @@
   --collection-motion-ease: cubic-bezier(.22, 1, .36, 1);
 }
 
+/* Start page titles on the first paint, independently of images and modules. */
+body main :is(h1, .hotel-name):not(:where(.visually-hidden, .sr-only, [hidden])) {
+  animation: collection-heading-in 950ms var(--collection-motion-ease) both;
+}
+
+@keyframes collection-heading-in {
+  from { opacity: 0; transform: translate3d(0, 18px, 0); }
+  to { opacity: 1; transform: none; }
+}
+
+/* History restores the page's reading position without replaying its title. */
+html.collection-heading-restored body main :is(h1, .hotel-name) { animation: none; }
+
 html,
 html.collection-home-root {
   scroll-padding-top: calc(var(--header-height, 104px) + 20px);
@@ -110,6 +123,8 @@ main#hotels { view-transition-name: collection-content; }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  body main :is(h1, .hotel-name) { animation: none; }
+
   html,
   html.collection-home-root { scroll-behavior: auto; }
 
