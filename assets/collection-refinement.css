@@ -100,7 +100,7 @@ body .site-nav { grid-row: 1; grid-column: 2; position: static; display: flex; f
 body .site-nav a { padding: 0; border: 0; }
 body .site-nav .nav-booking { display: none; }
 body .home-nav .mobile-hotels-link { display: none; }
-body .home-footer, body .site-footer { background: #303442; color: #fff; border-top: 1px solid #303442; padding: 36px var(--g); }
+body .home-footer, body .site-footer { background: #303442; color: #fff; border-top: 1px solid #303442; min-height: var(--header-height); padding: 12px var(--g); gap: 24px; }
 body.collection-site-page .home-footer { background: #303442; color: #fff; margin-inline: 0; padding-inline: var(--g); }
 body .home-footer > span, body .site-footer p, body .site-footer .back-top { font-family: var(--body-font); font-size: 12px; }
 /* Preserve the three full-height destination panels; only refine type/actions. */
@@ -253,6 +253,11 @@ body[data-page='home'] .panorama-media img, body[data-page='home'] .closing-medi
   body .home-header-end > a:not(.refine-booking) { display: none; }
   body .header-controls { gap: 8px; }
   body .header-controls .destination-trigger { display: none; }
+  body .home-footer { grid-template-columns: auto minmax(0, 1fr); gap: 2px 20px; padding-block: 12px; }
+  body .home-footer .home-brand { grid-column: 1; grid-row: 1 / 3; justify-self: start; margin-right: 0; }
+  body .home-footer > span { grid-column: 2; font-size: 11px; line-height: 1.4; }
+  body .home-footer .home-link { grid-column: 2; justify-self: start; min-height: 44px; gap: 12px; font-size: 12px; }
+
   body[data-page='home'] .home-hero { min-height: 0; }
   body[data-page='home'] .home-hero-bottom { min-height: 0; padding: 46px 24px 32px; gap: 24px; }
   body[data-page='home'] .home-hero h1, body[data-page='home'] .hero h1 { font-size: clamp(56px,15vw,90px); line-height: .92; }
