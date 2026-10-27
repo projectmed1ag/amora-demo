@@ -1,5 +1,11 @@
 // Reveal only initializes after content exists. The base page remains readable
 // when scripting, IntersectionObserver or Web Animations are unavailable.
+const pageHeadingSelector = ':is(h1, .hotel-name):not(.visually-hidden):not(.sr-only):not([hidden])';
+
+window.addEventListener('pageshow', event => {
+  if (event.persisted) document.documentElement.classList.add('collection-heading-restored');
+});
+
 function initializePageMotion() {
   const scope = document.querySelector('#content, #hotels');
   if (!scope || !('IntersectionObserver' in window)) return;
@@ -40,6 +46,9 @@ function initializePageMotion() {
 
   function prepare(element, index = 0) {
     if (processed.has(element) || !element.getClientRects().length) return;
+    // Titles have their own first-paint animation. Keep their ancestors steady
+    // so two reveal effects cannot multiply the opacity or vertical movement.
+    if (element.matches(pageHeadingSelector) || element.querySelector(pageHeadingSelector)) return;
     if (element.matches('nav, form, dialog, input, button, [role="navigation"]')) return;
     if (element.closest('form, dialog, .home-header, .site-header, .home-footer, .site-footer')) return;
     processed.add(element);
