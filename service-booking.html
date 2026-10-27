@@ -12,13 +12,13 @@
     <link id="collection-site-shell-style" rel="stylesheet" href="./assets/collection-site-shell.css?v=header-2">
     <link id="collection-brand-style" rel="stylesheet" href="./assets/collection-brand.css?v=original-1">
     <link rel="stylesheet" href="./assets/collection-motion.css?v=20261025-progressive-photos-1">
-    <link rel="stylesheet" href="./assets/collection-refinement.css?v=20261025-laptop-full-nav-1">
+    <link rel="stylesheet" href="./assets/collection-refinement.css?v=20261027-full-width-footer-1">
     <link rel="stylesheet" href="./assets/collection-refinement-pages.css?v=20261025-progressive-photos-1">
-    <link rel="stylesheet" href="./assets/collection-navigation.css?v=20261025-progressive-photos-1">
+    <link rel="stylesheet" href="./assets/collection-navigation.css?v=20261027-fixed-page-navigation-1">
     <link rel="stylesheet" href="./assets/collection-page-motion.css?v=20261023-local-menu-seasons-1">
     <link rel="stylesheet" href="./assets/collection-services.css?v=20261023-responsive-1">
     <script type="module" src="./assets/collection-runtime.js?v=20261025-original-quality-1"></script>
-    <script type="module" src="./assets/collection-refinement.js?v=20261025-progressive-photos-1"></script>
+    <script type="module" src="./assets/collection-refinement.js?v=20261027-page-navigation-1"></script>
     <script type="module" src="./assets/collection-page-motion.js?v=20261025-progressive-photos-1"></script>
     <script type="module" src="./assets/collection-services.js?v=20261024-image-load-1"></script>
     <meta name="description" content="Выбор даты, времени и числа гостей для посещения бани или ресторана A’MORE Collection.">
@@ -58,7 +58,7 @@
             <div id="service-form-errors" class="service-form-errors" role="alert" hidden></div>
             <fieldset id="service-visit-step"><legend class="service-sr-only">Ваш визит</legend>
               <div class="service-fields">
-                <div class="service-field service-field-wide"><label for="service-kind">Что бронируем</label><select id="service-kind" name="service" required aria-describedby="service-error-service"><option value="">Выберите услугу</option><option value="banya">Баня</option><option value="restaurant">Столик в ресторане</option></select><p class="service-field-error" id="service-error-service" hidden></p></div>
+                <div class="service-field service-field-wide"><label for="service-kind">Что бронируем</label><select id="service-kind" name="service" required aria-describedby="service-error-service"><option value="">Выберите услугу</option><option value="banya">Баня</option><option value="restaurant">Столик в ресторане</option><option value="pavilion">Аренда павильона</option></select><p class="service-field-error" id="service-error-service" hidden></p></div>
                 <div class="service-field"><label for="service-date">Дата</label><input id="service-date" name="date" type="date" required aria-describedby="service-error-date"><p class="service-field-error" id="service-error-date" hidden></p></div>
                 <div class="service-field"><label for="service-time">Время</label><input id="service-time" name="time" type="time" step="60" required aria-describedby="service-time-help service-error-time"><p class="service-field-help" id="service-time-help">По московскому времени</p><p class="service-field-error" id="service-error-time" hidden></p></div>
                 <div class="service-field service-field-wide"><label for="service-guests">Количество гостей</label><input id="service-guests" name="guests" type="number" min="1" max="20" step="1" inputmode="numeric" value="2" required aria-describedby="service-error-guests"><p class="service-field-error" id="service-error-guests" hidden></p></div>
@@ -85,7 +85,7 @@
           </section>
           <noscript><p class="service-field-help">Для заполнения формы включите JavaScript.</p></noscript>
         </div>
-        <aside class="service-booking-aside" aria-labelledby="service-aside-title"><h2 id="service-aside-title">Отдельная заявка</h2><p id="service-aside-description">Выберите баню или столик в ресторане. Дата, время и число гостей относятся только к выбранной услуге.</p><a id="service-details-link" class="service-text-link" href="./banya.html?city=mozhaysk" hidden>Об услуге <svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10h22m-6-6 6 6-6 6"></path></svg></a><div class="service-related-links"><a href="./restaurant.html?city=mozhaysk">Ресторан</a><a href="./banya.html?city=mozhaysk">Баня</a><a href="./booking.html?city=mozhaysk">Бронирование проживания</a></div></aside>
+        <aside class="service-booking-aside" aria-labelledby="service-aside-title"><h2 id="service-aside-title">Отдельная заявка</h2><p id="service-aside-description">Выберите баню или столик в ресторане. Дата, время и число гостей относятся только к выбранной услуге.</p><a id="service-details-link" class="service-text-link" href="./banya.html?city=mozhaysk" hidden>Об услуге <svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10h22m-6-6 6 6-6 6"></path></svg></a></aside>
       </div>
     </main>
     <footer class="home-footer"><a class="home-brand amore-logo" href="./hotel.html?city=mozhaysk" aria-label="A’MORE Collection — на главную"><span class="brand-name">A’MORE</span><span class="brand-collection">COLLECTION</span></a><span>Московская область,<br>Можайское водохранилище</span><a class="home-link" href="./"><span>Все отели</span><svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10h22m-6-6 6 6-6 6"></path></svg></a></footer>

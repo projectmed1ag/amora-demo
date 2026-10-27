@@ -1,5 +1,5 @@
-/* One chapter per screen. Activated by the progressive chapter controller.
-   Short windows retain document scrolling inside a chapter; nothing is clipped. */
+/* Shared home layout. Sections keep their approved desktop/mobile composition
+   while the document scrolls normally through them. */
 html.collection-screen-mode {
   --chapter-bottom: 0px;
   --chapter-height: calc(100dvh - var(--header-height) - var(--chapter-bottom));
@@ -7,10 +7,8 @@ html.collection-screen-mode {
   scroll-behavior: auto;
   scroll-padding-top: var(--header-height);
   scroll-padding-bottom: var(--chapter-bottom);
-  scrollbar-width: none;
 }
 
-html.collection-screen-mode::-webkit-scrollbar { display: none; }
 html.collection-screen-mode body[data-page='home'] main#content { view-transition-name: none; }
 
 /* A phone's address bar must not resize every chapter during a swipe. */
@@ -273,7 +271,7 @@ html.collection-screen-mode body[data-page='home'] .home-more-leisure { flex: no
   html.collection-screen-mode { --chapter-bottom: calc(64px + env(safe-area-inset-bottom, 0px)); }
 
   /* Reserve the controls' paper until the controller creates the real links. */
-  html.collection-screen-mode:not([data-chapter-engine]) body[data-page='home']::after {
+  html.collection-screen-mode body[data-page='home']:not(:has(.section-navigation:not([hidden])))::after {
     content: '';
     position: fixed;
     z-index: 18;
@@ -462,10 +460,6 @@ body[data-page='home'] .home-leisure-family .home-leisure-media img {
   object-fit: cover;
   object-position: 50% 42%;
   transform: none;
-}
-
-@media (min-width: 1200px) and (max-width: 1399px) {
-  html.collection-screen-mode body[data-page='home'] { padding-bottom: 0; }
 }
 
 @media (min-width: 701px) and (max-width: 1099px) and (orientation: portrait) {
