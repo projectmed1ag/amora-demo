@@ -1,0 +1,27 @@
+@font-face{font-family:'AMore Condensed';src:url('../fonts/amore-condensed-cyrillic.woff2') format('woff2');font-style:normal;font-weight:400;font-display:swap;unicode-range:U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'AMore Condensed';src:url('../fonts/amore-condensed-latin.woff2') format('woff2');font-style:normal;font-weight:400;font-display:swap}
+:root{--ink:#303442;--muted:#747782;--line:#e3e4e8;--gold:#a89268;--paper:#fff;color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.5 Arial,sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}
+button,a,input,select,textarea{-webkit-tap-highlight-color:transparent}
+button,a{touch-action:manipulation}
+button{cursor:pointer}
+a{color:inherit}
+h1,h2,h3,p{margin-top:0}
+h1,h2,h3{font-family:'AMore Condensed',Arial,sans-serif;font-weight:400;line-height:1.05;text-transform:uppercase}
+button,input,select,textarea{border-radius:0}
+input,select,textarea{width:100%;min-height:46px;padding:11px 13px;border:1px solid #c8cad1;background:#fff}
+label{display:block}
+.button{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:46px;padding:12px 22px;border:1px solid var(--ink);background:var(--ink);color:#fff;text-decoration:none;font-size:13px;letter-spacing:.055em;text-align:center}
+.button.secondary{color:var(--ink);background:#fff}
+.button:hover{background:#484c58;border-color:#484c58;color:#fff}
+.button:disabled{opacity:.45;cursor:default}
+.eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+.muted{color:var(--muted)}
+:focus-visible{outline:2px solid var(--gold);outline-offset:4px}
+dialog{color:var(--ink);border:1px solid var(--line);padding:30px;max-width:min(540px,calc(100% - 30px));max-height:calc(100dvh - 32px);overflow:auto}
+dialog::backdrop{background:rgb(20 23 32 / .48)}
+[hidden]{display:none!important}
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
