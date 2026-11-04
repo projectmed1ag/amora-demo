@@ -85,6 +85,9 @@ html:has(body.has-page-navigation) { scroll-padding-bottom: calc(96px + env(safe
   }
   .page-navigation-links::-webkit-scrollbar { display: none; }
   .page-navigation-links > li { flex: none; }
+  /* Center short lists; auto margins become zero when horizontal scrolling is needed. */
+  .page-navigation-links > li:first-child { margin-inline-start: auto; }
+  .page-navigation-links > li:last-child { margin-inline-end: auto; }
   .page-navigation-link {
     display: inline-flex;
     align-items: center;
