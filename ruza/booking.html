@@ -1,89 +1,35 @@
 <!doctype html>
-<html lang="ru" data-city="ruza">
+<html lang="ru">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#303442">
-  <title>Бронирование — Руза — A’MORE Collection</title>
-  <meta name="description" content="Демонстрационный календарь бронирования A’MORE Collection: Руза.">
-  <style>html[data-collection-redirect] body{visibility:hidden}</style>
-  <script src="../assets/collection-route.js?v=20261024-all-hotels-1"></script>
-  <link rel="stylesheet" href="../assets/collection-calendar-base.css?v=20261104-calendar-booking-1">
-  <link rel="stylesheet" href="../assets/collection-brand.css?v=original-1">
-  <link rel="stylesheet" href="../assets/collection-calendar-booking.css?v=20261105-calendar-checkout-1">
-  <script type="module" src="../assets/collection-calendar-booking.js?v=20261105-calendar-checkout-1"></script>
+  <meta name="robots" content="noindex">
+  <meta name="referrer" content="no-referrer">
+  <title>Бронирование — Руза · A’MORE</title>
+  <noscript><meta http-equiv="refresh" content="0; url=https://amora-med1ag-booking.ai-vipsup.chatgpt.site/ruza/booking.html?city=ruza"></noscript>
+  <style>
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;padding:32px 20px;display:grid;place-items:center;background:#fff;color:#303442;font:16px/1.6 Arial,sans-serif}main{width:100%;max-width:540px}h1{font-size:28px;line-height:1.2;margin:0 0 20px}p{margin:0 0 24px}a{display:inline-block;max-width:100%;padding:12px 20px;background:#a89268;color:#303442;font-weight:bold;text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}a:focus-visible{outline:3px solid #303442;outline-offset:4px}
+  </style>
 </head>
 <body>
-  <header class="dates-header">
-    <a class="amore-logo" href="hotel.html?city=ruza" aria-label="A’MORE COLLECTION — Руза"><span class="brand-name">A’MORE</span><span class="brand-collection">COLLECTION</span></a>
-    <nav class="dates-header-nav" aria-label="Разделы сайта"><a href="../index.html?city=ruza">ОТЕЛИ</a><span>Бронирование</span></nav>
-  </header>
-
-  <noscript><p class="dates-footnote">Для выбора дат включите JavaScript. Это демонстрационная форма без отправки бронирования.</p></noscript>
-  <main class="dates-main">
-    <div id="booking-view">
-      <h1 id="page-title" class="sr-only" tabindex="-1">Бронирование A’MORE</h1>
-      <div class="dates-layout">
-        <aside class="stay-choice" aria-label="Ваш отдых">
-          <label class="stay-guests">Гости<select id="stay-guests"><option value="1">1 гость</option><option value="2" selected>2 гостя</option><option value="3">3 гостя</option><option value="4">4 гостя</option><option value="5">5 гостей</option><option value="6">6 гостей</option></select></label>
-          <img class="category-photo" id="category-photo" src="../images/rooms/ruza/comfort.jpg" alt="Комфорт — Руза" width="1536" height="1024">
-          <label class="stay-category">Категория<select id="stay-category"></select></label>
-          <p class="category-caption" id="category-caption">36 м² · до 4 гостей</p>
-          <p class="arrival-caption" id="arrival-caption">Заезд с 15:00 · выезд до 12:00</p>
-          <p class="capacity-notice" id="capacity-notice" aria-live="polite"></p>
-        </aside>
-
-        <section class="month-panel" aria-labelledby="month-heading">
-          <div class="month-topline">
-            <h2 id="month-heading" aria-live="polite">Ноябрь 2026</h2>
-            <div class="month-navigation"><button id="month-prev" type="button" aria-label="Предыдущий месяц">Предыдущий</button><button id="month-next" type="button" aria-label="Следующий месяц">Следующий</button></div>
-          </div>
-          <div class="month-actions"><button id="reset-dates" type="button">Сбросить даты</button></div>
-          <div class="month-weekdays" aria-hidden="true"><span>ПН</span><span>ВТ</span><span>СР</span><span>ЧТ</span><span>ПТ</span><span>СБ</span><span>ВС</span></div>
-          <div class="month-grid" id="month-grid" role="group" aria-label="Даты проживания"></div>
-          <div class="calendar-help"><p>Цена за ночь · Серые даты недоступны</p><p id="availability-note">12–13 ноября недоступны для категории Комфорт.</p></div>
-          <p class="selection-instruction" id="selection-instruction" aria-live="polite">Выбраны заезд и выезд. Нажмите на дату, чтобы выбрать новый период.</p>
-          <p class="dates-error" id="dates-error" role="alert" hidden></p>
-        </section>
-      </div>
-
-      <section class="trip-total" aria-label="Итог бронирования">
-        <div class="selected-period"><span id="selected-period">Выберите даты отдыха</span><small id="selected-category">Комфорт</small><small id="selected-location">Расположение: Руза</small></div>
-        <div class="trip-price"><strong id="trip-price">—</strong><span id="trip-deposit">Выберите доступный период</span></div>
-        <button type="button" class="button" id="continue-booking" disabled>Продолжить</button>
-      </section>
-      <p class="dates-footnote">Цены и доступность демонстрационные. Сначала выберите дату заезда, затем дату выезда. Реальная бронь не создаётся.</p>
-    </div>
-
-    <section class="dates-success" id="success-view" hidden aria-labelledby="success-heading">
-      <p class="success-demo">Тестовое подтверждение</p><h1 id="success-heading" tabindex="-1">Ваш отдых<br>почти начался</h1>
-      <p class="success-greeting" id="success-greeting"></p>
-      <dl class="success-details" id="success-details"></dl>
-      <p class="success-note">Это демонстрация: реальная бронь не создана, деньги не списаны. Контакты не отправляются и не сохраняются.</p>
-      <div class="success-actions"><button class="button" type="button" id="restart-booking">Выбрать другие даты</button><a href="hotel.html?city=ruza">Вернуться к отелю</a></div>
-    </section>
+  <main>
+    <h1>Бронирование — Руза</h1>
+    <p role="status">Переходим в сервис бронирования A’MORE. Если переход не начался, воспользуйтесь ссылкой.</p>
+    <a id="continue-link" href="https://amora-med1ag-booking.ai-vipsup.chatgpt.site/ruza/booking.html?city=ruza">Продолжить</a>
   </main>
-
-  <dialog class="dates-dialog" id="contact-dialog" aria-labelledby="contact-title">
-    <form id="contact-form" novalidate>
-      <div class="contact-heading"><div><h2 id="contact-title">Ваш отдых в деталях</h2><p id="contact-trip"></p></div><button class="text-button" id="close-contact" type="button">Закрыть</button></div>
-      <p class="contact-intro">Осталось познакомиться и выбрать удобный способ оплаты.</p>
-      <button class="sample-data" id="sample-data" type="button">Пример данных</button>
-      <div class="contact-fields">
-        <label class="full">Имя и фамилия<input id="contact-name" name="name" autocomplete="name" placeholder="Как к вам обращаться" required minlength="2" maxlength="80"></label>
-        <label>Телефон<input id="contact-phone" name="phone" type="tel" autocomplete="tel" placeholder="+7 999 000-00-00" required maxlength="24"></label>
-        <label>Электронная почта<input id="contact-email" name="email" type="email" autocomplete="email" placeholder="name@example.com" required maxlength="120"></label>
-      </div>
-      <fieldset class="payment-choice"><legend>Как вам удобно оплатить?</legend>
-        <label><input type="radio" name="payment" value="deposit" checked><span><strong>Предоплата 30%</strong><small>Остаток — при заселении</small></span><b id="payment-deposit"></b></label>
-        <label><input type="radio" name="payment" value="full"><span><strong>Полная оплата</strong><small>Проживание целиком</small></span><b id="payment-full"></b></label>
-      </fieldset>
-      <label class="demo-consent"><input id="demo-consent" type="checkbox" required><span>Я понимаю, что это тестовое бронирование без реальной оплаты.</span></label>
-      <p class="contact-error" id="contact-error" role="alert" hidden></p>
-      <div class="contact-total"><span>В демо к оплате</span><strong id="contact-due"></strong></div>
-      <button class="button confirm-demo" id="confirm-demo" type="submit">Подтвердить тестовую бронь</button>
-      <p class="contact-disclaimer">Банковские данные не нужны. Платёж не проводится, контакты не отправляются.</p>
-    </form>
-  </dialog>
+  <script>
+(() => {
+  const source = new URL(window.location.href);
+  const aliases = new Map([['moscow', 'mozhaysk'], ['petersburg', 'ruza'], ['mozhaysk', 'mozhaysk'], ['ruza', 'ruza'], ['krasnoyarsk', 'krasnoyarsk']]);
+  const city = aliases.get(source.searchParams.get('city')) || "ruza";
+  const routes = {"mozhaysk":"/booking.html","ruza":"/ruza/booking.html","krasnoyarsk":"/krasnoyarsk/booking.html"};
+  const target = new URL(routes[city], "https://amora-med1ag-booking.ai-vipsup.chatgpt.site");
+  target.search = source.search;
+  target.searchParams.set('city', city);
+  target.hash = source.hash;
+  document.getElementById('continue-link').href = target.href;
+  window.location.replace(target.href);
+})();
+  </script>
 </body>
 </html>
