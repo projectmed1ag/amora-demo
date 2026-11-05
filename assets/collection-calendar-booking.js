@@ -24,7 +24,7 @@ function contextCity() {
   return 'ruza';
 }
 const bookingCity = contextCity();
-const TODAY = destinationLocalDate(new Date(), bookingCity);
+let TODAY = destinationLocalDate(new Date(), bookingCity);
 const requestedRoom = new URL(location.href).searchParams.get('room');
 const initialRoom = collectionDestinations[bookingCity].rooms.some(room => room.id === requestedRoom) ? requestedRoom : 'comfort';
 const INITIAL = { city: bookingCity, guests: 2, category: initialRoom, month: TODAY.slice(0, 7) + '-01', start: null, end: null };
@@ -171,6 +171,35 @@ function showDateError(message) {
   $('#dates-error').hidden = !message;
 }
 
+function refreshToday() {
+  const localToday = destinationLocalDate(new Date(), bookingCity);
+  if (localToday === TODAY) return '';
+  TODAY = localToday;
+  const currentMonth = TODAY.slice(0, 7) + '-01';
+  if (state.month < currentMonth) state.month = currentMonth;
+  let message = '';
+  if (state.start && state.start < TODAY) {
+    state.start = null;
+    state.end = null;
+    message = 'Наступил новый день: выбранный заезд уже в прошлом. Даты сброшены. Выберите новый период.';
+  }
+  renderCalendar();
+  renderSummary();
+  if (message) showDateError(message);
+  else if (state.end) showDateError(rangeProblem());
+  if ($('#contact-dialog').open) {
+    $('#contact-trip').textContent = `${destination().name} · ${category().name} · ${periodText()}`;
+    updatePayment();
+    const problem = rangeProblem();
+    $('#confirm-demo').disabled = Boolean(problem);
+    if (problem) {
+      $('#contact-error').textContent = message || problem;
+      $('#contact-error').hidden = false;
+    }
+  }
+  return message;
+}
+
 function renderSummary() {
   const problem = rangeProblem();
   const total = totalPrice();
@@ -188,6 +217,7 @@ function renderSummary() {
 }
 
 function resetDates(focusDate = null) {
+  refreshToday();
   state.start = null;
   state.end = null;
   showDateError('');
@@ -196,6 +226,13 @@ function resetDates(focusDate = null) {
 }
 
 function selectDate(value) {
+  refreshToday();
+  if (value < TODAY || isBlocked(value)) {
+    showDateError(value < TODAY
+      ? `Выберите заезд начиная с ${shortDate.format(date(TODAY))}.`
+      : `${shortDate.format(date(value))} недоступно для категории «${category().name}». Выберите другую дату.`);
+    return;
+  }
   if (value === state.start) { resetDates(value); return; }
   showDateError('');
   if (!state.start || state.end || value < state.start) {
@@ -211,6 +248,7 @@ function selectDate(value) {
 }
 
 function changeMonth(change) {
+  refreshToday();
   const current = date(state.month);
   const next = iso(new Date(Date.UTC(current.getUTCFullYear(), current.getUTCMonth() + change, 1)));
   if (next < TODAY.slice(0, 7) + '-01') return;
@@ -219,14 +257,23 @@ function changeMonth(change) {
 }
 
 function updateChoice() {
+  const dateMessage = refreshToday();
   const previous = state.category;
   const available = destination().rooms.filter(room => room.guests >= state.guests);
   if (!available.some(room => room.id === state.category)) state.category = available[0].id;
   $('#capacity-notice').textContent = previous !== state.category ? `Для ${guestText(state.guests)} выбрана категория «${category().name}» с подходящей вместимостью.` : '';
+  let clearedMessage = '';
+  if (state.start && (state.start < TODAY || isBlocked(state.start))) {
+    clearedMessage = state.start < TODAY
+      ? `Заезд ${shortDate.format(date(state.start))} уже в прошлом. Даты сброшены. Выберите новую дату заезда.`
+      : `Заезд ${shortDate.format(date(state.start))} недоступен для категории «${category().name}». Даты сброшены. Выберите новую дату заезда.`;
+    state.start = null;
+    state.end = null;
+  }
   renderCategory();
   renderCalendar();
   renderSummary();
-  const problem = state.end ? rangeProblem() : '';
+  const problem = clearedMessage || dateMessage || (state.end ? rangeProblem() : '');
   showDateError(problem);
 }
 
@@ -239,10 +286,12 @@ function updatePayment() {
 }
 
 function openContact() {
+  const dateMessage = refreshToday();
   const problem = rangeProblem();
-  if (problem) { showDateError(problem); return; }
+  if (problem) { showDateError(dateMessage || problem); return; }
   $('#contact-trip').textContent = `${destination().name} · ${category().name} · ${periodText()}`;
   $('#contact-error').hidden = true;
+  $('#confirm-demo').disabled = false;
   updatePayment();
   $('#contact-dialog').showModal();
   $('#contact-name').focus();
@@ -295,19 +344,23 @@ $('#sample-data').addEventListener('click', () => {
   $('#contact-name').value = 'Анна Смирнова';
   $('#contact-phone').value = '+7 900 000-00-00';
   $('#contact-email').value = 'guest@example.com';
-  $('#contact-error').hidden = true;
+  const problem = rangeProblem();
+  $('#contact-error').textContent = problem;
+  $('#contact-error').hidden = !problem;
 });
 document.querySelectorAll('#contact-form input[name="payment"]').forEach(input => input.addEventListener('change', updatePayment));
 $('#contact-form').addEventListener('submit', event => {
   event.preventDefault();
+  const dateMessage = refreshToday();
   const rangeError = rangeProblem();
-  if (rangeError) { $('#contact-error').textContent = rangeError; $('#contact-error').hidden = false; return; }
+  if (rangeError) { $('#contact-error').textContent = dateMessage || rangeError; $('#contact-error').hidden = false; return; }
   const error = contactProblem();
   if (error) { $('#contact-error').textContent = error[0]; $('#contact-error').hidden = false; $(error[1]).focus(); return; }
   renderSuccess();
 });
 $('#restart-booking').addEventListener('click', () => {
-  Object.assign(state, INITIAL);
+  refreshToday();
+  Object.assign(state, INITIAL, { month: TODAY.slice(0, 7) + '-01' });
   $('#stay-guests').value = String(state.guests);
   $('#contact-form').reset();
   $('#success-view').hidden = true;
@@ -322,12 +375,19 @@ $('#month-grid').addEventListener('keydown', event => {
   const movement = moves[event.key];
   if (!movement || !event.target.matches('button[data-date]')) return;
   event.preventDefault();
+  refreshToday();
   let target = addDays(event.target.dataset.date, movement);
   const direction = movement > 0 ? 1 : -1;
   for (let attempt = 0; attempt < 40 && (target < TODAY || isBlocked(target)); attempt++) target = addDays(target, direction);
   if (target < TODAY) return;
   state.month = target.slice(0, 7) + '-01';
   renderCalendar(target);
+});
+
+window.addEventListener('pageshow', () => refreshToday());
+window.addEventListener('focus', () => refreshToday());
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') refreshToday();
 });
 
 renderCategory();

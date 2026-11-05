@@ -237,6 +237,10 @@ export function initServiceBooking() {
   const visitSummary = document.getElementById('service-visit-summary');
   const controls = Object.fromEntries(fieldNames.map(name => [name, form.elements.namedItem(name)]));
   if (!result || !details || !resultTitle || !edit || !errorSummary || !submit || !next || !visitStep || !contactStep || !editVisit || !visitSummary || Object.values(controls).some(control => !control)) return;
+  const previewNotice = result.querySelector('.service-result-notice') || document.createElement('p');
+  previewNotice.className = 'service-result-notice';
+  previewNotice.textContent = 'Это предварительный просмотр. Заявка не отправлена. Контакты не сохраняются.';
+  resultTitle.after(previewNotice);
   const timeHelp = document.querySelector('[data-service-time-zone], #service-time-help');
   if (timeHelp) timeHelp.textContent = destination.timeHelp;
 
@@ -288,11 +292,13 @@ export function initServiceBooking() {
   function updateService() {
     if (fixedService) controls.service.value = fixedService;
     const service = services[controls.service.value];
+    if (controls.service.value === 'pavilion') controls.guests.removeAttribute('max');
+    else controls.guests.max = '20';
     const title = document.querySelector('[data-service-page-title]');
     const description = document.getElementById('service-aside-description');
     const link = document.getElementById('service-details-link');
     if (title) title.textContent = service?.title || 'Бронирование услуги.';
-    if (description) description.textContent = service?.description || 'Выберите баню или столик в ресторане. Дата, время и число гостей относятся только к выбранной услуге.';
+    if (description) description.textContent = service?.description || 'Выберите баню, столик в ресторане или аренду павильона. Дата, время и число гостей относятся только к выбранной услуге.';
     if (link) {
       link.hidden = !service;
       if (service) link.href = destinationURL(service.page, destination.id);

@@ -47,7 +47,7 @@ button:disabled { cursor: default; }
 .month-day.is-start .day-price, .month-day.is-end .day-price, .month-day.is-start .day-today, .month-day.is-end .day-today, .month-day.is-start .day-number, .month-day.is-end .day-number { color: #171b25; }
 .month-day:not(:disabled):hover { background: #e7e0d2; color: var(--ink); }
 .month-day.is-start:hover, .month-day.is-end:hover { background: #b9a782; color: #171b25; }
-.month-day:focus-visible { z-index: 1; outline-offset: -4px; }
+.month-day:focus-visible { z-index: 1; outline: 2px solid #171b25; outline-offset: -4px; }
 .calendar-help { color: var(--muted); font-size: 11px; margin-top: 10px; }
 .calendar-help p { margin: 3px 0; }
 .selection-instruction { margin: 9px 0 0; color: var(--muted); font-size: 11px; }
