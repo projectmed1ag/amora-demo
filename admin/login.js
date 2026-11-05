@@ -1,6 +1,7 @@
 (() => {
   'use strict';
   const views = new Set(['calendar', 'overview', 'bookings']);
+  const cities = new Set(['ruza', 'mozhaysk', 'krasnoyarsk']);
   const names = { calendar: 'Шахматка', overview: 'Обзор дня', bookings: 'Бронирования' };
   const $ = selector => document.querySelector(selector);
   const form = $('#login-form');
@@ -13,6 +14,7 @@
   let memoryKey = null;
   let frame = null;
   let activeView = 'bookings';
+  let selectedCity = 'ruza';
   let busy = false;
   const supported = !!(globalThis.isSecureContext && globalThis.crypto?.subtle && typeof TextEncoder === 'function' && typeof TextDecoder === 'function');
   function showError(message = '') { error.textContent = message; error.hidden = !message; }
@@ -62,8 +64,14 @@
   }
   function frameBridge(parentOrigin) {
     const allowedViews = new Set(['calendar', 'overview', 'bookings']);
+    const allowedCities = new Set(['ruza', 'mozhaysk', 'krasnoyarsk']);
     const send = (action, values = {}) => parent.postMessage({ type: 'amora-demo', action, ...values }, parentOrigin);
     document.addEventListener('click', event => {
+      if (event.target.closest('[data-panel-hotel]')) {
+        event.preventDefault();
+        send('open-hotel');
+        return;
+      }
       if (event.target.closest('[data-panel-logout]')) {
         event.preventDefault();
         send('logout');
@@ -78,6 +86,12 @@
       else if (href === 'index.html') send('navigate', { view: 'bookings' });
     }, true);
     document.addEventListener('auxclick', event => { if (event.target.closest('a')) event.preventDefault(); }, true);
+    const sendCity = () => {
+      const city = document.getElementById('city')?.value;
+      if (allowedCities.has(city)) send('context', { city });
+    };
+    document.addEventListener('change', sendCity);
+    sendCity();
   }
   function showView(view) {
     if (!payload || !views.has(view)) return;
@@ -94,6 +108,7 @@
     const styles = payload.styles.replace(/<\/style/gi, '<\\/style');
     const program = (payload.script + '\n;(' + frameBridge.toString() + ')(' + JSON.stringify(location.origin) + ');').replace(/<\/script/gi, '<\\/script');
     frame.srcdoc = payload.variants[view].template
+      .replace('<body ', () => '<body data-city="' + selectedCity + '" ')
       .replace('</head>', () => '<meta http-equiv="Content-Security-Policy" content="' + csp + '"><style>' + styles + '</style></head>')
       .replace('</body>', () => '<script nonce="' + nonce + '">' + program + '</script></body>');
     $('#frame-host').append(frame);
@@ -175,6 +190,13 @@
     const data = event.data;
     if (!data || typeof data !== 'object' || data.type !== 'amora-demo') return;
     if (data.action === 'navigate' && views.has(data.view)) showView(data.view);
+    else if (data.action === 'context' && cities.has(data.city)) selectedCity = data.city;
+    else if (data.action === 'open-hotel') {
+      const root = new URL('../', location.href);
+      const url = new URL((selectedCity === 'mozhaysk' ? '' : selectedCity + '/') + 'hotel.html', root);
+      url.searchParams.set('city', selectedCity);
+      window.location.assign(url.href);
+    }
     else if (data.action === 'logout') lock();
   });
   window.addEventListener('pagehide', () => { if (payload) lock(); });
