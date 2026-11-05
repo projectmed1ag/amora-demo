@@ -70,14 +70,22 @@ function rate(value) {
 function rangeProblem(start = state.start, end = state.end) {
   if (!start) return 'Выберите дату заезда.';
   if (start < TODAY) return `Выберите заезд начиная с ${shortDate.format(date(TODAY))}.`;
+  if (isBlocked(start)) return `Заезд ${shortDate.format(date(start))} недоступен для категории «${category().name}». Выберите другую дату заезда.`;
   if (!end) return 'Теперь выберите дату выезда.';
   if (nights(start, end) <= 0) return 'Дата выезда должна быть позже даты заезда.';
   if (category().guests < state.guests) return 'Для выбранного числа гостей нужна более вместительная категория.';
   for (let day = start; day < end; day = addDays(day, 1)) {
     if (isBlocked(day)) return `Ночь ${shortDate.format(date(day))} недоступна для категории «${category().name}». Выберите другой период или категорию.`;
   }
-  if (isBlocked(end)) return `${shortDate.format(date(end))} недоступно для выезда в этом демо. Выберите другую дату.`;
   return '';
+}
+
+function canCheckout(value) {
+  return Boolean(state.start && value > state.start && !rangeProblem(state.start, value));
+}
+
+function isDateSelectable(value) {
+  return value >= TODAY && (!isBlocked(value) || canCheckout(value));
 }
 
 function totalPrice() {
@@ -138,31 +146,35 @@ function renderCalendar(focusDate = null) {
     const value = iso(new Date(Date.UTC(year, monthIndex, day)));
     const past = value < TODAY;
     const unavailable = isBlocked(value);
+    const checkoutOnly = unavailable && !past && canCheckout(value);
     const classes = ['month-day'];
     if (value === TODAY) classes.push('is-today');
-    if (unavailable && !past) classes.push('is-unavailable');
+    if (unavailable && !past && !checkoutOnly) classes.push('is-unavailable');
+    if (checkoutOnly) classes.push('is-checkout-only');
     if (state.start && state.end && value > state.start && value < state.end) classes.push('is-range');
     if (value === state.start) classes.push('is-start');
     if (value === state.end) classes.push('is-end');
     const button = node('button', classes.join(' '));
     button.type = 'button';
     button.dataset.date = value;
-    button.disabled = past || unavailable;
+    button.disabled = past || (unavailable && !checkoutOnly);
     button.setAttribute('aria-pressed', String(value === state.start || value === state.end || Boolean(state.start && state.end && value > state.start && value < state.end)));
     const selected = value === state.start ? ', заезд' : value === state.end ? ', выезд' : '';
-    button.setAttribute('aria-label', `${fullDate.format(date(value))}${selected}${past ? ', прошедшая дата' : unavailable ? ', недоступно в демо' : `, ${money(rate(value))} за ночь`}`);
+    button.setAttribute('aria-label', `${fullDate.format(date(value))}${selected}${past ? ', прошедшая дата' : checkoutOnly ? ', только выезд, ночёвка недоступна' : unavailable ? ', занятая ночь, заезд недоступен' : `, ${money(rate(value))} за ночь`}`);
     button.append(node('span', 'day-number', day));
     if (value === TODAY) button.append(node('span', 'day-today', 'сегодня'));
     if (!unavailable) {
       const price = node('span', 'day-price', number.format(rate(value)));
       price.append(node('span', 'day-currency', ' ₽'));
       button.append(price);
-    }
+    } else if (checkoutOnly) button.append(node('span', 'day-checkout', 'только выезд'));
     button.addEventListener('click', () => selectDate(value));
     grid.append(button);
   }
   const blocked = blockedDays[state.category].filter(day => day <= dayCount).map(day => String(day)).join(', ');
-  $('#availability-note').textContent = `В демо недоступны ${blocked} ${shortDate.format(new Date(Date.UTC(year, monthIndex, 1))).split(' ').slice(1).join(' ')} для категории «${category().name}», включая выезд.`;
+  const help = document.querySelector('.calendar-help p');
+  if (help) help.textContent = 'Цена за ночь · Занятые ночи нельзя забронировать';
+  $('#availability-note').textContent = `В демо заняты ночи ${blocked} ${shortDate.format(new Date(Date.UTC(year, monthIndex, 1))).split(' ').slice(1).join(' ')} для категории «${category().name}». Выезд в занятую дату разрешён после свободных ночей.`;
   if (focusDate) grid.querySelector(`[data-date="${focusDate}"]`)?.focus();
 }
 
@@ -212,8 +224,10 @@ function renderSummary() {
   $('#selection-instruction').textContent = !state.start
     ? 'Выберите дату заезда, затем дату выезда.'
     : !state.end
-      ? 'Выберите дату выезда. Чтобы снять заезд, нажмите на него ещё раз.'
-      : 'Выбраны заезд и выезд. Повторное нажатие на заезд сбросит даты.';
+      ? 'Выберите дату выезда, в том числе с пометкой «только выезд». Чтобы снять заезд, нажмите на него ещё раз.'
+      : isBlocked(state.end)
+        ? 'Заезд и выезд выбраны. Повторное нажатие на заезд сбросит даты, на выезд — снимет дату выезда.'
+        : 'Выбраны заезд и выезд. Повторное нажатие на заезд сбросит даты.';
 }
 
 function resetDates(focusDate = null) {
@@ -227,15 +241,19 @@ function resetDates(focusDate = null) {
 
 function selectDate(value) {
   refreshToday();
-  if (value < TODAY || isBlocked(value)) {
+  const checkoutOnly = isBlocked(value) && canCheckout(value);
+  if (value < TODAY || (isBlocked(value) && !checkoutOnly)) {
+    const checkoutProblem = state.start && value > state.start ? rangeProblem(state.start, value) : '';
     showDateError(value < TODAY
       ? `Выберите заезд начиная с ${shortDate.format(date(TODAY))}.`
-      : `${shortDate.format(date(value))} недоступно для категории «${category().name}». Выберите другую дату.`);
+      : checkoutProblem || `Ночь ${shortDate.format(date(value))} занята. Эту дату можно выбрать только для выезда после свободных ночей. Для заезда выберите свободную дату.`);
     return;
   }
   if (value === state.start) { resetDates(value); return; }
   showDateError('');
-  if (!state.start || state.end || value < state.start) {
+  if (checkoutOnly) {
+    state.end = state.end === value ? null : value;
+  } else if (!state.start || state.end || value < state.start) {
     state.start = value;
     state.end = null;
   } else {
@@ -378,8 +396,8 @@ $('#month-grid').addEventListener('keydown', event => {
   refreshToday();
   let target = addDays(event.target.dataset.date, movement);
   const direction = movement > 0 ? 1 : -1;
-  for (let attempt = 0; attempt < 40 && (target < TODAY || isBlocked(target)); attempt++) target = addDays(target, direction);
-  if (target < TODAY) return;
+  for (let attempt = 0; attempt < 40 && !isDateSelectable(target); attempt++) target = addDays(target, direction);
+  if (!isDateSelectable(target)) return;
   state.month = target.slice(0, 7) + '-01';
   renderCalendar(target);
 });

@@ -42,6 +42,9 @@ button:disabled { cursor: default; }
 .month-day:disabled .day-price { color: #b0b2ba; }
 .month-day.is-unavailable .day-number { text-decoration: line-through; text-decoration-thickness: 1px; color: #9396a1; }
 .month-day.is-unavailable { background: #fafafa; }
+.month-day.is-checkout-only:not(.is-end) { background: #f7f2e8; }
+.day-checkout { max-width: 100%; color: var(--ink); font-size: 9px; line-height: 1.1; }
+.month-day.is-end .day-checkout { color: #171b25; }
 .month-day.is-range { background: #eee8dc; }
 .month-day.is-start, .month-day.is-end { background: var(--gold); color: #171b25; }
 .month-day.is-start .day-price, .month-day.is-end .day-price, .month-day.is-start .day-today, .month-day.is-end .day-today, .month-day.is-start .day-number, .month-day.is-end .day-number { color: #171b25; }
