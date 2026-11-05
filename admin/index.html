@@ -5,41 +5,34 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#303442">
   <meta name="robots" content="noindex,nofollow">
-  <title>Вход в демонстрацию — A’MORE Collection</title>
+  <title>Вход в панель управления — A’MORE Collection</title>
   <link rel="icon" href="data:;base64,iVBORw0KGgo=">
   <link rel="stylesheet" href="../assets/collection-brand.css">
-  <link rel="stylesheet" href="login.css?v=20261105-demo-2">
-  <script src="login.js?v=20261105-demo-2" defer></script>
+  <link rel="stylesheet" href="login.css?v=20261105-panel-1">
+  <script src="login.js?v=20261105-panel-1" defer></script>
 </head>
 <body>
-  <header class="gate-header">
+  <header class="gate-header" id="login-header">
     <a class="amore-logo" href="../" aria-label="A’MORE Collection — к выбору отеля"><span class="brand-name">A’MORE</span><span class="brand-collection">COLLECTION</span></a>
-    <span class="header-caption">Демонстрационная панель</span>
   </header>
   <main id="login-view" class="login-view">
     <div class="login-content">
       <p class="eyebrow">A’MORE Collection · доступ по логину и паролю</p>
-      <h1>Вход в демонстрацию</h1>
-      <p class="login-intro">Откройте временный просмотр админки с логином и паролем доступа.</p>
+      <h1>Вход в панель управления</h1>
+      <p class="login-intro">Введите логин и пароль для входа.</p>
       <form id="login-form" autocomplete="off" method="post">
         <label for="demo-username">Логин</label>
         <input class="username-control" id="demo-username" type="text" required maxlength="64" autocomplete="username" autocapitalize="off" spellcheck="false" aria-describedby="login-error">
         <label for="demo-password">Пароль доступа</label>
         <div class="password-control"><input id="demo-password" type="password" required maxlength="1024" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="login-error"><button id="toggle-password" type="button" aria-controls="demo-password" aria-pressed="false" aria-label="Показать пароль">Показать</button></div>
         <p id="login-error" class="login-error" role="alert" aria-live="polite" hidden></p>
-        <button class="primary-button" id="unlock-demo" type="submit" disabled>Открыть демонстрацию</button>
+        <button class="primary-button" id="unlock-demo" type="submit" disabled>Войти</button>
       </form>
-      <p class="demo-notice">Это демонстрация. Данные тестовые; изменения не сохраняются.</p>
-      <noscript><p class="login-error">Для открытия зашифрованной демонстрации включите JavaScript.</p></noscript>
+      <noscript><p class="login-error">Для входа включите JavaScript.</p></noscript>
       <a class="return-link" href="../">Вернуться к сайту отеля</a>
     </div>
   </main>
   <main id="workspace-view" class="workspace-view" hidden>
-    <div class="workspace-toolbar">
-      <nav id="view-navigation" aria-label="Варианты демонстрации"><button type="button" data-view="calendar">Шахматка</button><button type="button" data-view="overview">Обзор дня</button><button type="button" data-view="bookings">Бронирования</button></nav>
-      <div class="workspace-actions"><a id="public-booking" href="../booking.html?city=mozhaysk" target="_blank" rel="noopener noreferrer">Гостевая форма</a><button id="lock-demo" type="button">Выйти</button></div>
-    </div>
-    <p class="workspace-notice">Временная демонстрация · тестовые данные · изменения исчезнут при переходе между вариантами или обновлении.</p>
     <div id="frame-host"></div>
   </main>
   <p id="gate-announcer" class="sr-only" role="status" aria-live="polite"></p>

@@ -1,7 +1,6 @@
 (() => {
   'use strict';
   const views = new Set(['calendar', 'overview', 'bookings']);
-  const cities = new Set(['mozhaysk', 'ruza', 'krasnoyarsk']);
   const names = { calendar: 'Шахматка', overview: 'Обзор дня', bookings: 'Бронирования' };
   const $ = selector => document.querySelector(selector);
   const form = $('#login-form');
@@ -25,7 +24,7 @@
     usernameInput.disabled = value || !supported;
     passwordInput.disabled = value || !supported;
     toggle.disabled = value || !supported;
-    submit.textContent = value ? 'Открываем…' : 'Открыть демонстрацию';
+    submit.textContent = value ? 'Входим…' : 'Войти';
   }
   function bytes(value) {
     if (typeof value !== 'string' || !/^[A-Za-z0-9+/]+={0,2}$/.test(value)) throw new Error('format');
@@ -61,32 +60,24 @@
     for (const view of views) if (typeof value.variants?.[view]?.template !== 'string') throw new Error('format');
     return value;
   }
-  function updateGuestLink(city = 'mozhaysk') {
-    if (!payload || !cities.has(city)) return;
-    const url = new URL((city === 'mozhaysk' ? '' : city + '/') + 'booking.html', payload.publicRoot);
-    url.searchParams.set('city', city);
-    $('#public-booking').href = url.href;
-  }
   function frameBridge(parentOrigin) {
     const allowedViews = new Set(['calendar', 'overview', 'bookings']);
-    const allowedCities = new Set(['mozhaysk', 'ruza', 'krasnoyarsk']);
     const send = (action, values = {}) => parent.postMessage({ type: 'amora-demo', action, ...values }, parentOrigin);
     document.addEventListener('click', event => {
+      if (event.target.closest('[data-panel-logout]')) {
+        event.preventDefault();
+        send('logout');
+        return;
+      }
       const link = event.target.closest('a');
       if (!link) return;
       event.preventDefault();
       const href = link.getAttribute('href') || '';
       const target = href.match(/^(calendar|overview|bookings)\.html(?:[?#].*)?$/)?.[1];
       if (allowedViews.has(target)) send('navigate', { view: target });
-      else if (href === 'index.html') send('choose-view');
+      else if (href === 'index.html') send('navigate', { view: 'bookings' });
     }, true);
     document.addEventListener('auxclick', event => { if (event.target.closest('a')) event.preventDefault(); }, true);
-    const context = () => {
-      const city = document.getElementById('city')?.value;
-      if (allowedCities.has(city)) send('context', { city });
-    };
-    document.addEventListener('change', context);
-    context();
   }
   function showView(view) {
     if (!payload || !views.has(view)) return;
@@ -94,7 +85,7 @@
     if (frame) { frame.srcdoc = ''; frame.remove(); }
     frame = document.createElement('iframe');
     frame.className = 'demo-frame';
-    frame.title = 'A’MORE — ' + names[view] + ' · демонстрация';
+    frame.title = 'A’MORE — ' + names[view];
     frame.setAttribute('sandbox', 'allow-scripts allow-forms allow-modals');
     frame.referrerPolicy = 'no-referrer';
     const nonce = Array.from(crypto.getRandomValues(new Uint8Array(18)), value => value.toString(16).padStart(2, '0')).join('');
@@ -106,11 +97,9 @@
       .replace('</head>', () => '<meta http-equiv="Content-Security-Policy" content="' + csp + '"><style>' + styles + '</style></head>')
       .replace('</body>', () => '<script nonce="' + nonce + '">' + program + '</script></body>');
     $('#frame-host').append(frame);
-    document.querySelectorAll('[data-view]').forEach(button => {
-      if (button.dataset.view === view) button.setAttribute('aria-current', 'page'); else button.removeAttribute('aria-current');
-    });
-    document.title = names[view] + ' · демонстрация — A’MORE Collection';
-    announce('Открыт вариант «' + names[view] + '». Данные тестовые.');
+    document.title = names[view] + ' — A’MORE Collection';
+    announce('Открыт раздел «' + names[view] + '».');
+    frame.focus();
   }
   function lock() {
     if (frame) { frame.srcdoc = ''; frame.remove(); frame = null; }
@@ -124,11 +113,12 @@
     toggle.setAttribute('aria-pressed', 'false');
     $('#workspace-view').hidden = true;
     $('#login-view').hidden = false;
+    $('#login-header').hidden = false;
     showError();
     setBusy(false);
-    document.title = 'Вход в демонстрацию — A’MORE Collection';
+    document.title = 'Вход в панель управления — A’MORE Collection';
     usernameInput.focus();
-    announce('Демонстрация заблокирована. Введите логин и пароль, чтобы открыть её снова.');
+    announce('Сеанс завершён. Введите логин и пароль для входа.');
   }
   form.addEventListener('submit', async event => {
     event.preventDefault();
@@ -149,22 +139,22 @@
       try { payload = validatePayload(JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(plainBytes))); }
       finally { plainBytes.fill(0); }
       $('#login-view').hidden = true;
+      $('#login-header').hidden = true;
       $('#workspace-view').hidden = false;
-      updateGuestLink();
       showView(activeView);
-      $('#view-navigation [aria-current="page"]').focus();
     } catch (failure) {
       if (frame) { frame.srcdoc = ''; frame.remove(); frame = null; }
       payload = null;
       memoryKey = null;
       $('#workspace-view').hidden = true;
       $('#login-view').hidden = false;
+      $('#login-header').hidden = false;
       const messages = {
-        network: 'Не удалось загрузить демонстрацию. Проверьте соединение и попробуйте ещё раз.',
-        format: 'Файл демонстрации недоступен или повреждён. Обновите страницу и попробуйте снова.',
+        network: 'Не удалось загрузить панель. Проверьте соединение и попробуйте ещё раз.',
+        format: 'Файл панели недоступен или повреждён. Обновите страницу и попробуйте снова.',
         decrypt: 'Логин или пароль не подошли.',
       };
-      showError(messages[failure.message] || 'Не удалось открыть демонстрацию в этом браузере. Попробуйте обновить страницу.');
+      showError(messages[failure.message] || 'Не удалось открыть панель в этом браузере. Попробуйте обновить страницу.');
     } finally {
       password = '';
       passwordInput.value = '';
@@ -180,19 +170,16 @@
     toggle.setAttribute('aria-pressed', String(visible));
     passwordInput.focus();
   });
-  $('#lock-demo').addEventListener('click', lock);
-  document.querySelectorAll('[data-view]').forEach(button => button.addEventListener('click', () => showView(button.dataset.view)));
   window.addEventListener('message', event => {
     if (!payload || !frame || event.source !== frame.contentWindow || event.origin !== 'null') return;
     const data = event.data;
     if (!data || typeof data !== 'object' || data.type !== 'amora-demo') return;
     if (data.action === 'navigate' && views.has(data.view)) showView(data.view);
-    else if (data.action === 'choose-view') { $('#view-navigation button').focus(); $('#view-navigation').scrollIntoView({ block: 'nearest' }); }
-    else if (data.action === 'context' && cities.has(data.city)) updateGuestLink(data.city);
+    else if (data.action === 'logout') lock();
   });
   window.addEventListener('pagehide', () => { if (payload) lock(); });
   setBusy(false);
   if (!supported) {
-    showError('Для демонстрации нужен HTTPS или localhost и современный браузер с WebCrypto.');
+    showError('Для входа нужен HTTPS или localhost и современный браузер с WebCrypto.');
   }
 })();
