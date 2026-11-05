@@ -9,7 +9,12 @@ const headerSelector = '.home-header, .site-header';
 const cityNames = new Set(Object.keys(collectionDestinations));
 
 function addBookingLink(header) {
-  if (!header || header.querySelector('a[href*="booking.html"], [data-service-booking-link]')) return;
+  if (!header) return;
+  const existing = header.querySelector('a[href*="booking.html"], [data-service-booking-link]');
+  if (existing) {
+    if (existing.classList.contains('refine-booking')) addCompactBookingLabel(existing);
+    return;
+  }
   // Legacy destination headers already own their booking control.
   if (!header.classList.contains('home-header')) return;
   const source = header.querySelector('a[href*="rooms.html"], a[href*="hotel.html"]');
@@ -22,8 +27,23 @@ function addBookingLink(header) {
   const link = document.createElement('a');
   link.className = 'refine-booking';
   link.href = destination.href;
+  link.setAttribute('aria-label', 'Забронировать');
   link.textContent = 'Забронировать';
+  addCompactBookingLabel(link);
   (header.querySelector('.home-header-end') || header).prepend(link);
+}
+
+function addCompactBookingLabel(link) {
+  if (link.querySelector('.refine-booking-full')) return;
+  const label = link.textContent.trim();
+  const full = document.createElement('span');
+  full.className = 'refine-booking-full';
+  full.textContent = label;
+  const short = document.createElement('span');
+  short.className = 'refine-booking-short';
+  short.textContent = /аренд/i.test(label) ? 'Аренда' : /заявк/i.test(label) ? 'Заявка' : 'Бронь';
+  if (!link.hasAttribute('aria-label')) link.setAttribute('aria-label', label);
+  link.replaceChildren(full, short);
 }
 
 const primarySections = [

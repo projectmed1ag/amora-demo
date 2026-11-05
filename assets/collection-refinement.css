@@ -381,3 +381,22 @@ body :is(.home-service-photo,.room-photo-trigger) img { transition: filter 350ms
 
 /* Native format fallback keeps the existing image layout. */
 .collection-picture { display: contents; }
+
+/* Explicit hotel switcher and compact booking label; retain the newer pager. */
+.header-hotels-label-mobile, .refine-booking-short { display: none; }
+@media (max-width: 1099px) {
+  .header-hotels-label-wide { display: none; }
+  .header-hotels-label-mobile { display: inline; }
+  body .home-header-end > .header-hotels-link { display: inline-flex; justify-content: center; min-height: 44px; padding: 8px 10px; border: 1px solid currentColor; white-space: nowrap; }
+}
+@media (max-width: 700px) {
+  .refine-booking-full { display: none; }
+  .refine-booking-short { display: inline; }
+  body .home-header-end > .header-hotels-link { padding-inline: 7px; font-size: 10px; letter-spacing: 0; }
+  body .home-header .refine-booking { padding-inline: 10px; white-space: nowrap; }
+}
+@media (max-width: 359px) {
+  :root:has(.home-header) { --header-height: 68px; }
+  body .home-header { display: flex; gap: 6px; }
+  body .home-header-end { display: flex; gap: 4px; }
+}
