@@ -1,5 +1,5 @@
-// Additional catalogue entries are deliberately separate from bookable inventory.
-// Existing room data, gallery bindings and booking controls remain their own owners.
+// Additional houseboat cards use the same category IDs as the booking service.
+// Existing room data and gallery bindings remain their own owners.
 const collectionRoot = new URL('../', import.meta.url);
 const assetURL = path => new URL(path, collectionRoot).href;
 const arrow = '<svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10h22m-6-6 6 6-6 6"/></svg>';
@@ -54,20 +54,19 @@ function houseMarkup(house, home, number) {
   const heading = home ? 'h3' : 'h2';
   const titleID = `additional-house-${house.id}-title`;
   const roomURL = assetURL(`rooms.html?city=mozhaysk#stay-${house.id}`);
-  const contactURL = assetURL('contacts.html#contacts-mozhaysk-title');
+  const bookingURL = assetURL(`booking.html?city=mozhaysk&room=${house.id}`);
   return `<article class="additional-houses-card" ${home ? '' : `id="stay-${house.id}" tabindex="-1"`} aria-labelledby="${titleID}">
     ${home ? `<a class="additional-houses-cover" href="${roomURL}" aria-label="Выбрать хаусбот ${house.name}"><img src="${photosFor(house)[0].src}" alt="Хаусбот ${house.name}" width="1672" height="941" loading="lazy" decoding="async"></a>` : galleryMarkup(house)}
     ${home ? `<div class="home-panel-copy">
       <p class="home-room-meta">До ${house.guests} гостей <span aria-hidden="true">·</span> ${house.area} м²</p>
       <${heading} id="${titleID}">${house.name}</${heading}>
-      <p>${house.description}</p>
       <a class="home-link" href="${roomURL}" aria-label="Выбрать хаусбот ${house.name}"><span>Выбрать</span>${arrow}</a>
     </div>` : `<div class="room-card-copy">
       <p class="stays-number" aria-hidden="true">${String(number).padStart(2, '0')}</p><h2 id="${titleID}">${house.name}</h2>
       <dl class="room-specifications"><div><dt>Вместимость</dt><dd>До ${house.guests} гостей</dd></div><div><dt>Площадь</dt><dd>${house.area} м²</dd></div></dl>
       <p>${house.description}</p>
       <ul class="room-features"><li>${house.bedrooms}</li><li>Терраса на крыше</li></ul>
-      <a class="primary-action home-link" href="${contactURL}" aria-label="Уточнить доступность хаусбота ${house.name}"><span>Уточнить доступность</span>${arrow}</a>
+      <a class="primary-action home-link" href="${bookingURL}" aria-label="Выбрать хаусбот ${house.name}"><span>Выбрать хаусбот</span>${arrow}</a>
     </div>`}
   </article>`;
 }
@@ -77,7 +76,7 @@ function loadStyles() {
   const link = document.createElement('link');
   link.id = 'collection-additional-houses-style';
   link.rel = 'stylesheet';
-  link.href = new URL('./collection-additional-houses.css?v=20261106-catalogue-8', import.meta.url).href;
+  link.href = new URL('./collection-additional-houses.css?v=20261106-catalogue-9', import.meta.url).href;
   const loaded = new Promise(resolve => {
     link.addEventListener('load', resolve, { once: true });
     link.addEventListener('error', resolve, { once: true });
