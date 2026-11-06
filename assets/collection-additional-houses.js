@@ -57,11 +57,11 @@ function houseMarkup(house, home, number) {
   const contactURL = assetURL('contacts.html#contacts-mozhaysk-title');
   return `<article class="additional-houses-card" ${home ? '' : `id="stay-${house.id}" tabindex="-1"`} aria-labelledby="${titleID}">
     ${home ? `<a class="additional-houses-cover" href="${roomURL}" aria-label="Выбрать хаусбот ${house.name}"><img src="${photosFor(house)[0].src}" alt="Хаусбот ${house.name}" width="1672" height="941" loading="lazy" decoding="async"></a>` : galleryMarkup(house)}
-    ${home ? `<div class="additional-houses-copy">
-      <p class="additional-houses-meta">До ${house.guests} гостей <span aria-hidden="true">·</span> ${house.area} м²</p>
+    ${home ? `<div class="home-panel-copy">
+      <p class="home-room-meta">До ${house.guests} гостей <span aria-hidden="true">·</span> ${house.area} м²</p>
       <${heading} id="${titleID}">${house.name}</${heading}>
-      <p class="additional-houses-description">${house.description}</p>
-      <a class="additional-houses-action" href="${roomURL}" aria-label="Выбрать хаусбот ${house.name}"><span>Выбрать</span>${arrow}</a>
+      <p>${house.description}</p>
+      <a class="home-link" href="${roomURL}" aria-label="Выбрать хаусбот ${house.name}"><span>Выбрать</span>${arrow}</a>
     </div>` : `<div class="room-card-copy">
       <p class="stays-number" aria-hidden="true">${String(number).padStart(2, '0')}</p><h2 id="${titleID}">${house.name}</h2>
       <dl class="room-specifications"><div><dt>Вместимость</dt><dd>До ${house.guests} гостей</dd></div><div><dt>Площадь</dt><dd>${house.area} м²</dd></div></dl>
@@ -77,7 +77,7 @@ function loadStyles() {
   const link = document.createElement('link');
   link.id = 'collection-additional-houses-style';
   link.rel = 'stylesheet';
-  link.href = new URL('./collection-additional-houses.css?v=20261106-catalogue-7', import.meta.url).href;
+  link.href = new URL('./collection-additional-houses.css?v=20261106-catalogue-8', import.meta.url).href;
   const loaded = new Promise(resolve => {
     link.addEventListener('load', resolve, { once: true });
     link.addEventListener('error', resolve, { once: true });
