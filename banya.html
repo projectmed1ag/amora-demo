@@ -26,6 +26,8 @@
       <link rel="stylesheet" href="./assets/collection-trip-planner.css?v=20261022-1">
     <script type="module" src="./assets/collection-trip-planner.js?v=20261024-image-load-1"></script>
     <link rel="stylesheet" href="./assets/collection-service-content.css?v=20261023-menu-1">
+    <link rel="stylesheet" href="./assets/collection-render-services.css?v=20261106-render-photos-1">
+    <script type="module" src="./assets/collection-render-services.js?v=20261106-render-photos-1"></script>
       <style>html[data-collection-redirect] body { visibility: hidden; }</style>
     <script src="./assets/collection-route.js?v=20261024-all-hotels-1"></script>
   <link rel="icon" type="image/svg+xml" sizes="any" href="./assets/favicon.svg?v=20261105-emblem-1">
@@ -57,7 +59,11 @@
 
       </section>
       <div class="service-experience">
-        <figure class="service-hero media"><picture class="collection-picture"><img src="images/home/mozhaysk/banya-exterior.jpg" sizes="(max-width: 700px) 100vw, (max-width: 1000px) calc(100vw - 48px), 54vw" width="1536" height="1024" alt="Деревянная баня на лесном берегу у воды" fetchpriority="high" decoding="async" style=";background-image:url(&#x27;data:image/webp;base64,UklGRg4BAABXRUJQVlA4IAIBAADQBgCdASpAACsAPxF8s1MsJ6SiqBVdUYAiCWVij1p/I7+c6rqbZbBNJhqVwEW6pZ2MsTEEm/FPN0xHdN4eiAAA/vDZ/0spMBv/VfL69nyVFmbriN3JYrUoqCcNtvbaggkb6Gv/5bcIjdejSpnXt8wYAijdczBc0MrJvqFbJbtoEaq8kfghuVphXgDvvR2ABAubweV9U0A+W4TykQ8i11f4IUFwAsH76N+0WgooKM/0KgpBVxUiy1Lbs6AJWi0xFJfxaydSM5dEXNC0S0GJOD210t3/niW86sTWmYT/Uj9WdXRYu45SzNQ0IDPkId+JVgnvBhKFTAvBnF7RlaSxnvYAAAA=&#x27;);background-size:cover;background-position:center" data-progressive-photo="" loading="eager"></picture></figure>
+        <figure class="service-hero media">
+          <a class="render-service-gallery-hero-link" href="images/mozhaysk-render-photos-20261106/banya/exterior.jpg" data-render-service-photo data-render-service-title="Баня на воде" aria-label="Открыть фото: Баня на воде">
+            <img src="images/mozhaysk-render-photos-20261106/banya/exterior.jpg" width="1672" height="941" alt="Плавучая баня с панорамными окнами и открытой террасой на Можайском водохранилище" fetchpriority="high" decoding="async" loading="eager">
+          </a>
+        </figure>
         <section class="service-reservation-panel" id="reservation" tabindex="-1" aria-labelledby="service-reservation-title">
           <p class="service-eyebrow">Можайское водохранилище</p>
           <h2 id="service-reservation-title">Забронировать баню</h2>
@@ -95,6 +101,23 @@
           <noscript><p class="service-field-help">Для заполнения формы включите JavaScript.</p></noscript>
         </section>
       </div>
+      <section class="render-service-gallery" aria-labelledby="render-service-gallery-title">
+        <h2 id="render-service-gallery-title">Интерьеры бани</h2>
+        <div class="render-service-gallery-grid">
+          <figure class="render-service-gallery-item">
+            <a class="render-service-gallery-photo" href="images/mozhaysk-render-photos-20261106/banya/steam-room.jpg" data-render-service-photo data-render-service-title="Парная" aria-label="Открыть фото: Парная">
+              <img src="images/mozhaysk-render-photos-20261106/banya/steam-room.jpg" width="1672" height="941" alt="Парная с деревянными полками и окном на водохранилище" loading="lazy" decoding="async">
+            </a>
+            <figcaption>Парная</figcaption>
+          </figure>
+          <figure class="render-service-gallery-item">
+            <a class="render-service-gallery-photo" href="images/mozhaysk-render-photos-20261106/banya/lounge.jpg" data-render-service-photo data-render-service-title="Комната отдыха" aria-label="Открыть фото: Комната отдыха">
+              <img src="images/mozhaysk-render-photos-20261106/banya/lounge.jpg" width="1672" height="941" alt="Комната отдыха с диваном, обеденным столом и панорамными окнами на воду" loading="lazy" decoding="async">
+            </a>
+            <figcaption>Комната отдыха</figcaption>
+          </figure>
+        </div>
+      </section>
       <section class="service-description" id="service-about" aria-labelledby="service-description-title">
         <h2 id="service-description-title">О бане</h2>
         <div><p>Деревянная баня у берега — место для отдыха вдвоём, с семьёй или небольшой компанией. Внутри есть парная и комната отдыха, где можно собраться за столом, выпить чаю и провести время между заходами в парную.</p><p>Выберите сеанс на два, три или четыре часа. Парение, веники, банные принадлежности и чай можно добавить к бронированию отдельно. Стоимость программы указана за всю компанию; парение и дополнения оплачиваются по выбранному меню.</p><a class="service-text-link" href="#menu">Программы и меню <svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10h22m-6-6 6 6-6 6"></path></svg></a></div>
