@@ -450,6 +450,19 @@ export function initServiceBooking() {
   updateService();
   next.disabled = false;
   showStep('visit', false);
+  // A proposed itinerary may fill the visit fields, but never advances or submits.
+  const planQuery = new URLSearchParams(location.search);
+  if (planQuery.get('from') === 'holiday-plan') {
+    const proposed = { date: planQuery.get('date'), time: planQuery.get('time'), guests: planQuery.get('guests') };
+    if (validDate(proposed.date) && proposed.date >= serviceLocalDate()) controls.date.value = proposed.date;
+    if (/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(proposed.time || '')) controls.time.value = proposed.time;
+    if (/^(?:[1-9]|1\d|20)$/.test(proposed.guests || '')) controls.guests.value = proposed.guests;
+    const notice = document.createElement('p');
+    notice.className = 'service-field-help';
+    notice.textContent = 'Дата и время предложены помощником. Проверьте их и подтвердите посещение отдельно.';
+    form.prepend(notice);
+    refreshDateLimit();
+  }
 }
 
 if (typeof document !== 'undefined') {

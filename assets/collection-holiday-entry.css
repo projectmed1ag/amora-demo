@@ -1,0 +1,8 @@
+.holiday-planner-entry { position: fixed; right: 24px; bottom: calc(var(--chapter-bottom, 0px) + 20px); z-index: 35; display: inline-flex; align-items: center; gap: 12px; min-height: 56px; padding: 12px 18px; color: #fff; background: #303442; border: 1px solid #a89268; box-shadow: 0 6px 24px #20233124; font: 400 13px/1.4 Arial, sans-serif; text-decoration: none; }
+.holiday-planner-entry svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.3; }
+.holiday-planner-entry small { display: block; margin-top: 3px; color: #ded8ca; font-size: 9px; }
+.holiday-planner-entry:hover { background: #464b5b; }
+.holiday-planner-entry:focus-visible { outline: 2px solid #a89268; outline-offset: 4px; }
+@media (max-width: 700px) { .holiday-planner-entry { right: 14px; bottom: calc(var(--chapter-bottom, 0px) + 14px); padding: 10px 14px; } }
+@media (max-width: 1099px) { body.has-page-navigation .holiday-planner-entry { bottom: calc(78px + env(safe-area-inset-bottom, 0px)); } }
+@media print { .holiday-planner-entry { display: none; } }

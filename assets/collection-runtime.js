@@ -5,6 +5,10 @@ import { initHeadingFormat } from './collection-heading-format.js?v=20261023-loc
 // content is generated here, and ordinary links retain native navigation.
 initCollectionMotion();
 initHeadingFormat();
+// The optional planner never blocks the existing page controls.
+void import('./collection-holiday-entry.js?v=20261106-1')
+  .then(({ initHolidayPlannerEntry }) => initHolidayPlannerEntry())
+  .catch(() => {});
 const header = document.querySelector('.home-header');
 const toggle = header?.querySelector('.home-menu-toggle');
 const nav = header?.querySelector('.home-nav');
