@@ -1,6 +1,7 @@
 import { breakfastNotice, clock, dateLabel, excursionSettings } from './collection-holiday-engine.js?v=20261108-route-pdf-1';
 import { childActivityOptions, outingTransports } from './collection-holiday-data.js?v=20261108-route-pdf-1';
 import { prepareHolidayRouteGuide } from './collection-holiday-route-guide.js?v=20261108-map-labels-1';
+import { getSeasonForDate } from './collection-seasons.js';
 
 const width = 960;
 const height = 540;
@@ -24,13 +25,48 @@ const smallStyle = { font: 'bold 11px Arial, sans-serif', lineHeight: 15, color:
 const trackStyle = { font: 'bold 12px Arial, sans-serif', lineHeight: 16, color: ink };
 const display = size => `600 ${size}px "AMore Condensed", "Arial Narrow", Arial, sans-serif`;
 const headingStyle = { font: display(38), lineHeight: 45, color: ink };
-const gallery = {
+const galleryPhoto = name => `../images/mobile/mozhaysk/entertainment-gallery-v1/${name}.webp`;
+const seasonalPhoto = (season, name) => `../images/mobile/mozhaysk/entertainment-seasons-v1/${season}-${name}.webp`;
+const tripPhotos = {
   cover: '../images/mobile/rooms/mozhaysk/standard-houseboat/exterior-day.jpg',
-  arrival: '../images/mozhaysk-render-photos-20261106/panorama/exterior.jpg',
-  family: '../images/mobile/mozhaysk/entertainment-gallery-v1/children-01.webp',
-  nature: '../images/mobile/mozhaysk/entertainment-gallery-v1/routes-01.webp',
-  restaurant: '../images/responsive/home/mozhaysk/restaurant-768.webp',
-  banya: '../images/mobile/home/mozhaysk/banya-interior.jpg',
+  overview: '../images/mozhaysk-render-photos-20261106/panorama/exterior.jpg',
+  quiet: [
+    '../images/mozhaysk-render-photos-20261106/residence/exterior.jpg',
+    '../images/mobile/rooms/mozhaysk/standard-houseboat/exterior-evening.jpg',
+    '../images/mozhaysk-render-photos-20261106/panorama/exterior-angle-2.jpg',
+  ],
+};
+const activityPhotos = {
+  zoo: ['children-03'],
+  garden: ['garden-01', 'garden-02', 'garden-03'],
+  'play-area': ['children-02'],
+  'learning-games': ['children-01'],
+  family: ['children-01', 'children-02'],
+  walk: ['routes-01', 'routes-03'],
+  bike: ['routes-02', 'rental-01'],
+  beach: ['routes-03'],
+  sunbathing: ['sunbathing-01', 'sunbathing-02'],
+  fishing: ['fishing-01'],
+  sup: ['sup-01', 'sup-02'],
+  buggy: ['buggy-01', 'buggy-02'],
+  'table-tennis': ['rental-02'],
+  'ball-games': ['rental-03'],
+  'sport-rental': ['rental-03'],
+  firepit: ['firepit-01', 'firepit-02'],
+  barbecue: ['barbecue-01', 'barbecue-02', 'barbecue-03'],
+  pavilion: ['events-01', 'events-02'],
+};
+const winterPhotos = {
+  skating: ['ice-rink-02', 'ice-rink-03'],
+  snowmobile: ['snowmobiles-02', 'snowmobiles-03'],
+  tubing: ['tubing-02', 'tubing-03'],
+  family: ['children-01'],
+  walk: ['routes-01'],
+  beach: ['routes-01'],
+  buggy: ['buggy-01'],
+  firepit: ['firepit-01'],
+  barbecue: ['barbecue-01'],
+  pavilion: ['events-01'],
 };
 const primaryKinds = new Set(['activity', 'excursion', 'parallel', 'family', 'service', 'custom']);
 const dayNumber = index => String(index + 1).padStart(2, '0');
@@ -205,14 +241,39 @@ function coverImage(ctx, image, x, y, w, h) {
   ctx.drawImage(image, (image.naturalWidth - sw) / 2, (image.naturalHeight - sh) / 2, sw, sh, x, y, w, h);
 }
 
-function dayPhoto(day, index, count) {
-  if (index === 0) return 'arrival';
-  if (day.items.some(item => item.kind === 'excursion')) return 'nature';
-  if (day.items.some(item => item.service === 'banya')) return 'banya';
-  if (day.items.some(item => item.service === 'restaurant')) return 'restaurant';
-  if (day.items.some(item => item.tracks?.length || item.kind === 'family')) return 'family';
-  if (day.items.some(item => ['walk', 'bike'].includes(item.interest))) return 'nature';
-  return index === count - 1 ? 'cover' : 'arrival';
+function photosForActivity(activity, season) {
+  if (activity === 'restaurant') return ['../images/responsive/home/mozhaysk/restaurant-768.webp'];
+  if (activity === 'banya') return ['../images/mobile/home/mozhaysk/banya-interior.jpg'];
+  if (season === 'winter' && winterPhotos[activity]) {
+    return winterPhotos[activity].map(name => seasonalPhoto(season, name));
+  }
+  if (activity === 'fishing' && season === 'winter') return [galleryPhoto('fishing-03')];
+  if (activity === 'fishing' && season === 'autumn') return [galleryPhoto('fishing-02')];
+  if ((season === 'spring' || season === 'autumn') && (activity === 'garden' || activity === 'walk')) {
+    const name = activity === 'garden' ? 'garden-01' : 'routes-01';
+    return [seasonalPhoto(season, name), ...(activityPhotos[activity] || []).map(galleryPhoto)];
+  }
+  return (activityPhotos[activity] || []).map(galleryPhoto);
+}
+
+function selectDayPhotos(days) {
+  const uses = new Map([[tripPhotos.cover, 1], [tripPhotos.overview, 1]]);
+  let previous = tripPhotos.overview;
+  return days.map(day => {
+    const season = getSeasonForDate(day.date);
+    const themes = day.items.flatMap(item => photosForActivity(
+      item.kind === 'activity' ? item.interest : item.service, season,
+    ));
+    const context = [
+      ...(day.items.some(item => item.kind === 'excursion') ? photosForActivity('walk', season) : []),
+      ...(day.items.some(item => item.kind === 'family' || item.tracks?.length) ? photosForActivity('family', season) : []),
+    ];
+    const candidates = [...new Set([...themes, ...context, ...tripPhotos.quiet])].filter(path => path !== previous);
+    const choice = candidates.reduce((best, path) => (uses.get(path) || 0) < (uses.get(best) || 0) ? path : best);
+    uses.set(choice, (uses.get(choice) || 0) + 1);
+    previous = choice;
+    return choice;
+  });
 }
 
 function dayHighlights(day) {
@@ -233,11 +294,12 @@ function loadImage(path) {
 
 export async function buildHolidayPdf(plan, { lodging = '' } = {}) {
   if (!plan.days.length) throw new Error('Сначала составьте программу отдыха.');
-  const keys = [...new Set(['cover', ...plan.days.map((day, i) => dayPhoto(day, i, plan.days.length))])];
+  const dayPhotos = selectDayPhotos(plan.days);
+  const photoPaths = [...new Set([tripPhotos.cover, tripPhotos.overview, ...dayPhotos])];
   const [wordmark, routeGuide, images] = await Promise.all([
     loadImage('./collection-pdf-wordmark.png'),
     prepareHolidayRouteGuide(plan),
-    Promise.all(keys.map(async key => [key, await loadImage(gallery[key]).catch(() => null)])),
+    Promise.all(photoPaths.map(async path => [path, await loadImage(path).catch(() => null)])),
     // The canvas font already includes Cyrillic-capable system fallbacks.
     document.fonts?.load(display(52), 'ПРОГРАММА ОТДЫХА').catch(() => {}),
   ]);
@@ -308,8 +370,8 @@ export async function buildHolidayPdf(plan, { lodging = '' } = {}) {
     draw(ctx, { x, y, width: w, height: h });
     ctx.restore();
   }
-  function photoPanel(key, x, y, w, h, number) {
-    coverImage(ctx, photos[key] || photos.cover, x, y, w, h);
+  function photoPanel(path, x, y, w, h, number) {
+    coverImage(ctx, photos[path] || photos[tripPhotos.cover], x, y, w, h);
     const gradient = ctx.createLinearGradient(0, y + h * .50, 0, y + h);
     gradient.addColorStop(0, '#22263100');
     gradient.addColorStop(1, '#222631ed');
@@ -334,7 +396,7 @@ export async function buildHolidayPdf(plan, { lodging = '' } = {}) {
   const guestLine = `Взрослых: ${adults}   ·   Детей: ${children}${children ? ` (возраст: ${ages.join(', ')})` : ''}`;
 
   openPage('ЛИЧНЫЙ МАРШРУТ');
-  coverImage(ctx, photos.cover, 0, 78, width, height - 78);
+  coverImage(ctx, photos[tripPhotos.cover], 0, 78, width, height - 78);
   const wash = ctx.createLinearGradient(0, 0, width, 0);
   wash.addColorStop(0, '#181e2cef');
   wash.addColorStop(.52, '#181e2cbd');
@@ -364,7 +426,7 @@ export async function buildHolidayPdf(plan, { lodging = '' } = {}) {
     const w = 558;
     function overviewPage(continued = false) {
       openPage('ОБЗОР ПОЕЗДКИ');
-      photoPanel('cover', 624, 100, 298, 389);
+      photoPanel(tripPhotos.overview, 624, 100, 298, 389);
       at(continued ? 'ДНИ ПОЕЗДКИ · ПРОДОЛЖЕНИЕ' : 'ДНИ ПОЕЗДКИ', margin, 105, w, smallStyle);
       return at('Ваш отдых в A’MORE', margin, 125, w, headingStyle) + 8;
     }
@@ -392,7 +454,7 @@ export async function buildHolidayPdf(plan, { lodging = '' } = {}) {
     const px = photoLeft ? margin : width - margin - photoWidth;
     function dayPage(continued = false) {
       openPage(`РАСПИСАНИЕ   /   ДЕНЬ ${number}`);
-      photoPanel(dayPhoto(day, index, plan.days.length), px, 100, photoWidth, 389, number);
+      photoPanel(dayPhotos[index], px, 100, photoWidth, 389, number);
       at(`ДЕНЬ ${number}${continued ? '   /   ПРОДОЛЖЕНИЕ' : ''}`, tx, 103, scheduleWidth, smallStyle);
       return at(shortLabel(day.date), tx, 123, scheduleWidth, headingStyle) + 6;
     }
