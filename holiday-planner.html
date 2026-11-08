@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="./assets/collection-brand.css?v=original-1">
   <link rel="stylesheet" href="./assets/collection-holiday-planner.css?v=20261108-activity-choices-1">
   <script type="module" src="./assets/collection-runtime.js?v=20261107-holiday-plan-1"></script>
-  <script type="module" src="./assets/collection-holiday-planner.js?v=20261108-activity-choices-1"></script>
+  <script type="module" src="./assets/collection-holiday-planner.js?v=20261108-holiday-api-1"></script>
 </head>
 <body class="holiday-planner-page collection-site-page" data-page="holiday-planner">
   <a class="planner-skip" href="#content">К помощнику</a>
@@ -44,7 +44,7 @@
         <button type="button" class="planner-edit" data-cancel-reset>Оставить черновик</button>
       </div>
     </div>
-    <div id="planner-app"><p class="planner-loading" role="status">Готовим вопросы для вашей программы…</p></div>
+    <div id="planner-app" data-holiday-api-base="https://amora-med1ag-booking.ai-vipsup.chatgpt.site/api/v1/"><p class="planner-loading" role="status">Готовим вопросы для вашей программы…</p></div>
     <noscript><p>Для составления программы включите JavaScript. Вы также можете <a href="./spaces.html?city=mozhaysk">посмотреть развлечения</a> и выбрать время на страницах <a href="./restaurant.html?city=mozhaysk">ресторана</a> и <a href="./banya.html?city=mozhaysk">бани</a>.</p></noscript>
   </main>
   <footer class="home-footer planner-footer">

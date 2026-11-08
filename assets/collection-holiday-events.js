@@ -13,7 +13,7 @@ function eventEdit(event) {
   return { type: 'hotel-event', itemId: `hotel-event:${event.id}`, itemTitle: event.title, date: event.date, time: event.time, event };
 }
 
-export function mountHotelEvents(section, plan, city, onAdd) {
+export function mountHotelEvents(section, plan, city, onAdd, apiBase) {
   const status = section.querySelector('[data-events-status]');
   const notice = section.querySelector('[data-events-notice]');
   const list = section.querySelector('[data-events-list]');
@@ -21,7 +21,8 @@ export function mountHotelEvents(section, plan, city, onAdd) {
   const selected = new Map(plan.days.flatMap(day => day.items
     .filter(item => item.kind === 'hotel-event')
     .map(item => [item.eventId, { item, date: day.date }])));
-  const query = new URLSearchParams({ city, dateFrom: plan.answers.startDate, dateTo: plan.answers.endDate });
+  const url = new URL('events', apiBase);
+  url.search = new URLSearchParams({ city, dateFrom: plan.answers.startDate, dateTo: plan.answers.endDate });
 
   async function load() {
     refresh.disabled = true;
@@ -30,7 +31,7 @@ export function mountHotelEvents(section, plan, city, onAdd) {
     list.replaceChildren();
     status.textContent = 'Загружаем афишу…';
     try {
-      const response = await fetch(`/api/local-booking/events?${query}`, { cache: 'no-store' });
+      const response = await fetch(url, { cache: 'no-store', credentials: 'omit', redirect: 'error' });
       if (!response.ok) throw new Error('Events unavailable');
       const { events } = await response.json();
       if (!Array.isArray(events)) throw new Error('Invalid events');

@@ -1,11 +1,10 @@
 import { clock, dateLabel } from './collection-holiday-engine.js';
 
-const api = '/api/local-booking/plan-requests';
-const storageKey = 'amore-holiday-request-receipts:mozhaysk';
+const receiptKey = 'amore-holiday-request-receipts:mozhaysk';
 const statuses = { pending: 'На рассмотрении', confirmed: 'Подтверждено', declined: 'Отклонено' };
 const serviceLabels = { restaurant: 'Ресторан', banya: 'Баня', transfer: 'Трансфер', childcare: 'Сопровождение детей' };
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
-let recent = [];
+const recentReceipts = new Map();
 
 export function requestableServices(plan) {
   const { adults, children } = plan.answers;
@@ -31,7 +30,8 @@ export function requestableServices(plan) {
   return result;
 }
 
-function receipts() {
+function receipts(storageKey) {
+  const recent = recentReceipts.get(storageKey) || [];
   try {
     const saved = JSON.parse(localStorage.getItem(storageKey) || '[]');
     if (Array.isArray(saved)) {
@@ -41,12 +41,14 @@ function receipts() {
       }
     }
   } catch {}
+  recentReceipts.set(storageKey, recent);
   return recent;
 }
 
-function remember(request) {
+function remember(storageKey, request) {
   const { id, code, statusToken } = request;
-  recent = [{ id, code, statusToken }, ...receipts().filter(item => item.id !== id)].slice(0, 30);
+  const recent = [{ id, code, statusToken }, ...receipts(storageKey).filter(item => item.id !== id)].slice(0, 30);
+  recentReceipts.set(storageKey, recent);
   try {
     localStorage.setItem(storageKey, JSON.stringify(recent));
     return true;
@@ -55,11 +57,13 @@ function remember(request) {
   }
 }
 
-async function requestJSON(path = '', options = {}) {
-  const response = await fetch(api + path, { cache: 'no-store', credentials: 'same-origin', ...options });
+async function requestJSON(url, options = {}) {
+  const unavailable = 'Не удалось связаться с сервисом заявок. Попробуйте ещё раз.';
+  const response = await fetch(url, { cache: 'no-store', ...options, credentials: 'omit', redirect: 'error' }).catch(() => null);
+  if (!response) throw new Error(unavailable);
   const data = await response.json().catch(() => null);
   if (!response.ok || !data?.request) {
-    throw new Error(data?.error?.message || 'Не удалось связаться с сервисом заявок. Попробуйте ещё раз.');
+    throw new Error(data?.error?.message || unavailable);
   }
   return data.request;
 }
@@ -67,10 +71,13 @@ async function requestJSON(path = '', options = {}) {
 const schedule = item => `${dateLabel(item.date)} · ${item.time}–${item.endTime} · ${item.type === 'childcare' ? 'Детей' : 'Гостей'}: ${item.guests}`;
 const serviceTitle = item => item.title === serviceLabels[item.type] ? item.title : `${serviceLabels[item.type]} · ${item.title}`;
 
-export function mountPlanRequests(root, plan) {
+export function mountPlanRequests(root, plan, apiBase) {
   const toggle = root.querySelector('[data-plan-request]');
   const panel = root.querySelector('[data-plan-request-panel]');
   const candidates = requestableServices(plan);
+  const endpoint = new URL('plan-requests', apiBase);
+  const local = endpoint.origin === location.origin && endpoint.pathname === '/api/local-booking/plan-requests';
+  const storageKey = local ? receiptKey : `${receiptKey}:${endpoint.href}`;
   let selectedReceipt, viewEpoch = 0, lastBody, idempotencyKey;
   let sending = false;
 
@@ -80,7 +87,7 @@ export function mountPlanRequests(root, plan) {
   }
 
   function shell() {
-    const saved = receipts();
+    const saved = receipts(storageKey);
     panel.innerHTML = `<h3 id="planner-request-title" tabindex="-1">Согласовать с отелем</h3>
       ${saved.length ? `<div class="planner-request-toolbar">
         <label class="planner-field">Мои заявки<select data-receipts>${saved.map(item =>
@@ -120,7 +127,7 @@ export function mountPlanRequests(root, plan) {
     const message = panel.querySelector('[data-request-message]');
     message.textContent = 'Загружаем статусы заявки…';
     try {
-      const request = await requestJSON(`/${encodeURIComponent(receipt.id)}`, { headers: { 'X-Plan-Request-Token': receipt.statusToken } });
+      const request = await requestJSON(`${endpoint.href}/${encodeURIComponent(receipt.id)}`, { headers: { 'X-Plan-Request-Token': receipt.statusToken } });
       if (epoch === viewEpoch) showRequest(request);
     } catch (error) {
       if (epoch === viewEpoch) message.textContent = error.message;
@@ -182,11 +189,11 @@ export function mountPlanRequests(root, plan) {
       submit.disabled = true;
       submit.textContent = 'Отправляем…';
       try {
-        const request = await requestJSON('', {
+        const request = await requestJSON(endpoint, {
           method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...payload, idempotencyKey }),
         });
-        const stored = remember(request);
-        selectedReceipt = receipts()[0];
+        const stored = remember(storageKey, request);
+        selectedReceipt = receipts(storageKey)[0];
         lastBody = undefined;
         showRequest(request, stored ? 'Заявка отправлена. Услуги ожидают ответа отеля.'
           : 'Заявка отправлена. Браузер не смог сохранить доступ к статусам после закрытия страницы.');
@@ -208,7 +215,7 @@ export function mountPlanRequests(root, plan) {
     toggle.setAttribute('aria-expanded', String(!panel.hidden));
     if (panel.hidden) return;
     if (!panel.hasChildNodes()) {
-      const latest = receipts()[0];
+      const latest = receipts(storageKey)[0];
       if (latest) void showReceipt(latest);
       else showForm();
     }

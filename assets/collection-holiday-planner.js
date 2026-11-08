@@ -3,8 +3,8 @@ import { breakfastNotice, buildHolidayPlan, planToText, validateAnswers, addDays
 import { holidayLodgings } from './collection-holiday-lodging.js';
 import { canEditScheduleItem, scheduleReplacementOptions, applyScheduleEdit, replayScheduleEdits } from './collection-holiday-edits.js?v=20261108-activity-choices-1';
 import { loadHolidayDraft, saveHolidayDraft, clearHolidayDraft } from './collection-holiday-draft.js?v=20261108-activity-choices-1';
-import { mountPlanRequests } from './collection-holiday-requests.js?v=20261108-1';
-import { hotelEventLabels, mountHotelEvents } from './collection-holiday-events.js?v=20261108-hotel-events-1';
+import { mountPlanRequests } from './collection-holiday-requests.js?v=20261108-holiday-api-1';
+import { hotelEventLabels, mountHotelEvents } from './collection-holiday-events.js?v=20261108-holiday-api-1';
 import { destinationDateParts, destinationLocalDate } from './collection-destinations.js?v=20261024-all-hotels-1';
 
 const root = document.getElementById('planner-app');
@@ -41,6 +41,7 @@ const bookingFallbackStatus = 'Чтобы перенести данные бро
 let draftScope = draftCity;
 let bookingCompact = false;
 const localBookingHost = ['localhost', '127.0.0.1', '[::1]', '::1'].includes(location.hostname);
+const holidayApiBase = coordinationApiBase();
 let bookingConfigRequest;
 const overnight = () => answers.endDate > answers.startDate;
 const guestCount = () => answers.adults + answers.children;
@@ -65,6 +66,20 @@ const checked = value => value ? ' checked' : '';
 const outingField = (id, name) => `outing-${id}-${name}`;
 const field = (name, label, type, value, extra = '') => `<div class="planner-field"><label for="plan-${name}">${label}</label><input id="plan-${name}" name="${name}" type="${type}" value="${esc(value)}" ${extra}></div>`;
 const choice = (name, value, title, detail, active, type = 'radio') => `<label class="planner-choice"><input type="${type}" name="${name}" value="${value}"${checked(active)}><span><strong>${title}</strong>${detail ? `<small>${detail}</small>` : ''}</span></label>`;
+
+function coordinationApiBase() {
+  if (localBookingHost) return new URL('/api/local-booking/', location.origin);
+  const configured = root?.dataset.holidayApiBase?.trim();
+  if (!configured) return null;
+  try {
+    const base = new URL(configured, location.href);
+    if (base.protocol !== 'https:' || base.username || base.password || base.search || base.hash) return null;
+    base.pathname = `${base.pathname.replace(/\/+$/, '')}/`;
+    return base;
+  } catch {
+    return null;
+  }
+}
 
 function readBookingHandoff(token) {
   try {
@@ -851,7 +866,7 @@ function renderPlan({ scroll = true, message = '', save = true } = {}) {
       </div>
       <div class="planner-result-actions">
         <button class="planner-button" data-pdf${pdfInProgress ? ' disabled' : ''}>Скачать PDF</button>
-        <button type="button" class="planner-button planner-button-light" data-plan-request aria-expanded="false" aria-controls="planner-plan-request">Согласовать с отелем</button>
+        ${holidayApiBase ? '<button type="button" class="planner-button planner-button-light" data-plan-request aria-expanded="false" aria-controls="planner-plan-request">Согласовать с отелем</button>' : ''}
         <button class="planner-button planner-button-light" data-copy>Скопировать текст</button>
         <button class="planner-edit" data-edit-outings>Изменить занятия и поездки</button>
         <button class="planner-edit" data-edit-services>Изменить услуги</button>
@@ -861,10 +876,10 @@ function renderPlan({ scroll = true, message = '', save = true } = {}) {
       </div>
     </div>
     <p class="planner-feedback" role="status">${esc(message)}</p>
-    <section id="planner-plan-request" class="planner-item-editor planner-request" data-plan-request-panel aria-labelledby="planner-request-title" hidden></section>
+    ${holidayApiBase ? '<section id="planner-plan-request" class="planner-item-editor planner-request" data-plan-request-panel aria-labelledby="planner-request-title" hidden></section>' : ''}
     ${lodgingResult()}
     <p class="planner-note"><strong>${esc(breakfastNotice)}</strong> Это предварительная программа. Размещение, время посещения услуг и сопровождение детей подтверждаются отдельно.</p>
-    <section class="planner-afisha" data-hotel-events aria-labelledby="planner-afisha-title">
+    ${holidayApiBase ? `<section class="planner-afisha" data-hotel-events aria-labelledby="planner-afisha-title">
       <div class="planner-afisha-heading">
         <div><p class="planner-eyebrow">Мероприятия отеля</p><h3 id="planner-afisha-title">Афиша на ваши даты</h3></div>
         <button type="button" class="planner-edit" data-events-refresh>Обновить афишу</button>
@@ -872,7 +887,7 @@ function renderPlan({ scroll = true, message = '', save = true } = {}) {
       <p class="planner-afisha-status" role="status" data-events-status></p>
       <p class="planner-afisha-notice" role="status" data-events-notice hidden></p>
       <ul class="planner-afisha-list" data-events-list hidden></ul>
-    </section>
+    </section>` : ''}
     ${unappliedEdits.length ? `<section class="planner-unplaced">
       <h3>Правки, которые не удалось применить</h3>
       <p>После пересчёта изменились даты или время занятий. Эти пункты можно поправить в новом расписании.</p>
@@ -908,8 +923,10 @@ function renderPlan({ scroll = true, message = '', save = true } = {}) {
   const feedback = root.querySelector('.planner-feedback');
   const pdfButton = root.querySelector('[data-pdf]');
   void mountPlanBooking();
-  mountPlanRequests(root, plan);
-  mountHotelEvents(root.querySelector('[data-hotel-events]'), plan, draftCity, edit => saveItemEdit(edit, edit.date));
+  if (holidayApiBase) {
+    mountPlanRequests(root, plan, holidayApiBase);
+    mountHotelEvents(root.querySelector('[data-hotel-events]'), plan, draftCity, edit => saveItemEdit(edit, edit.date), holidayApiBase);
+  }
   root.querySelector('.planner-days').addEventListener('click', event => {
     const button = event.target.closest('[data-item-action]');
     if (!button) return;
