@@ -1,23 +1,12 @@
 // Additional houseboat cards use the same category IDs as the booking service.
 // Existing room data and gallery bindings remain their own owners.
+import { additionalHouses as houses } from './collection-additional-house-data.js';
+
 const collectionRoot = new URL('../', import.meta.url);
 const assetURL = path => new URL(path, collectionRoot).href;
 const arrow = '<svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10h22m-6-6 6 6-6 6"/></svg>';
 const previous = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 5-7 7 7 7"/></svg>';
 const next = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 5 7 7-7 7"/></svg>';
-const houses = [
-  {
-    id: 'panorama', name: 'Панорама', bedrooms: '2 спальни', guests: 6, area: 60,
-    description: 'Два жилых этажа, две спальни и открытая терраса на крыше. Панорамное остекление открывает вид на водохранилище.',
-    detail: 'Спальня в кормовой части',
-  },
-  {
-    id: 'residence', name: 'Резиденция', bedrooms: '5 спален', guests: 10, area: 120,
-    description: 'Два жилых этажа, пять спален и открытая терраса на крыше. Общая гостиная с кухней и обеденной зоной для встреч у воды.',
-    detail: 'Спальня верхнего этажа',
-  },
-];
-
 function photosFor(house) {
   return [
     ['exterior', 'Внешний вид'],

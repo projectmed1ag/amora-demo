@@ -1,34 +1,36 @@
 /* Planner UI is scoped; the original wordmark is owned by collection-brand.css. */
-body.holiday-planner-page { padding: 0; color: #303442; background: #faf9f6; --planner-gold: #a89268; }
+body.holiday-planner-page { color: #303442; background: #faf9f6; --planner-gold: #a89268; --planner-secondary: #5f6470; }
 .holiday-planner-page [hidden] { display: none !important; }
-.planner-header { display: flex; justify-content: space-between; align-items: center; gap: 24px; padding: 24px var(--g); border-bottom: 1px solid #e3e4e8; background: #fff; }
-.planner-return { font-size: 13px; min-height: 44px; display: inline-flex; align-items: center; gap: 16px; }
-.planner-skip { position: absolute; left: 20px; top: -100px; padding: 12px; background: #fff; z-index: 20; }
+.holiday-planner-page .home-menu-toggle:focus-visible ~ .home-header-end .home-menu { outline: 2px solid #a89268; outline-offset: -2px; }
+.planner-skip { position: fixed; left: 20px; top: -100px; padding: 12px; background: #fff; z-index: 200; }
 .planner-skip:focus { top: 16px; }
-.planner-main { max-width: 1320px; margin: 0 auto; padding: 64px var(--g) 80px; }
-.planner-intro { max-width: 820px; margin-bottom: 48px; }
+.planner-main { max-width: 1320px; margin: 0 auto; padding: 44px var(--g) 80px; }
+.planner-intro { max-width: 820px; margin-bottom: 32px; }
 .planner-eyebrow { font: 400 11px/1.6 var(--body-font); text-transform: uppercase; letter-spacing: .12em; color: #7a705d; }
-#content .planner-intro h1 { font-size: clamp(52px, 6vw, 88px); margin: 18px 0 24px; }
-.planner-intro > p:last-child { max-width: 610px; color: #747782; font-size: 16px; line-height: 1.8; }
+#content .planner-intro h1 { font-size: clamp(44px, 5.5vw, 80px); margin: 12px 0 16px; }
+.planner-intro > p:last-child { max-width: 610px; color: var(--planner-secondary); font-size: 16px; line-height: 1.65; }
+.planner-draft { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 16px; margin-bottom: 16px; padding: 4px 16px; border: 1px solid #ded8cc; background: #f4f0e8; }
+.planner-draft p { margin: 8px 0; color: var(--planner-secondary); font-size: 13px; }
+.planner-draft-actions { display: flex; flex-wrap: wrap; gap: 0 16px; }
 #planner-app { scroll-margin-top: 24px; }
 .planner-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 32px; align-items: start; }
 .planner-conversation { min-width: 0; padding: 36px; border: 1px solid #e3e4e8; background: #fff; }
-.planner-progress { display: flex; align-items: center; gap: 24px; margin-bottom: 30px; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+.planner-progress { display: flex; align-items: center; gap: 24px; margin-bottom: 22px; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
 .planner-progress span { flex-shrink: 0; }
 .planner-progress progress { width: 100%; height: 3px; accent-color: #a89268; border: 0; }
 .planner-progress progress::-webkit-progress-bar { background: #edeae3; }
 .planner-progress progress::-webkit-progress-value { background: #a89268; }
-.planner-assistant { display: flex; gap: 12px; align-items: center; margin-bottom: 32px; font-size: 12px; }
+.planner-assistant { display: flex; gap: 12px; align-items: center; margin-bottom: 24px; font-size: 12px; }
 .planner-assistant-mark { display: grid; place-items: center; background: #f4f0e8; color: #806b43; width: 42px; height: 42px; font: 400 24px/1 Georgia, serif; }
 .planner-assistant p { margin: 0; }
-.planner-assistant small { display: block; color: #747782; margin-top: 3px; font-size: 11px; }
+.planner-assistant small { display: block; color: var(--planner-secondary); margin-top: 3px; font-size: 11px; }
 #content #planner-question { font-size: clamp(32px, 3.3vw, 46px); margin: 0 0 22px; }
-.planner-help { margin: 0 0 24px; font-size: 14px; color: #747782; line-height: 1.8; }
+.planner-help { margin: 0 0 24px; font-size: 14px; color: var(--planner-secondary); line-height: 1.7; }
 .planner-fields, .planner-age-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
 .planner-field { min-width: 0; margin-bottom: 20px; }
 .planner-fields .planner-field, .planner-age-grid .planner-field { margin-bottom: 4px; }
 .planner-field label { display: block; margin-bottom: 8px; font-size: 12px; }
-.planner-field input { display: block; min-width: 0; max-width: 100%; width: 100%; min-height: 48px; padding: 12px; border: 1px solid #d4d5db; background: #fff; color: #303442; font: 400 16px/1.4 var(--body-font); }
+.planner-field :is(input, select) { display: block; min-width: 0; max-width: 100%; width: 100%; min-height: 48px; padding: 12px; border: 1px solid #d4d5db; background: #fff; color: #303442; font: 400 16px/1.4 var(--body-font); }
 .planner-conversation fieldset { padding: 0; margin: 26px 0 20px; border: 0; min-width: 0; }
 .planner-conversation legend { padding: 0; margin-bottom: 14px; font-size: 13px; }
 .planner-choices { display: grid; gap: 10px; }
@@ -38,24 +40,32 @@ body.holiday-planner-page { padding: 0; color: #303442; background: #faf9f6; --p
 .planner-choice:has(input:focus-visible) { outline: 2px solid #a89268; outline-offset: 3px; }
 .planner-choice input { flex: 0 0 17px; width: 17px; height: 17px; margin: 3px 0 0; accent-color: #303442; }
 .planner-choice strong { display: block; font-size: 14px; font-weight: 400; }
-.planner-choice small { display: block; margin-top: 5px; font-size: 12px; color: #747782; line-height: 1.6; }
-.planner-hint { color: #747782; font-size: 12px; line-height: 1.7; margin: 10px 0 24px; }
+.planner-choice small { display: block; margin-top: 5px; font-size: 12px; color: var(--planner-secondary); line-height: 1.6; }
+.planner-catalog { margin: 12px 0 0; }
+.planner-catalog a, .planner-lodging-links a { display: inline-flex; align-items: center; min-height: 44px; font-size: 12px; text-decoration: underline; text-underline-offset: 4px; }
+.planner-hint { color: var(--planner-secondary); font-size: 12px; line-height: 1.7; margin: 10px 0 24px; }
 .planner-note { font-size: 12px; line-height: 1.8; padding: 18px 20px; background: #f4f0e8; color: #686155; margin: 24px 0 0; }
+.planner-booking-summary { margin: 0 0 20px; }
+.planner-booking-actions { display: flex; flex-wrap: wrap; gap: 0 18px; }
 .planner-question-actions { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding-top: 28px; margin-top: 28px; border-top: 1px solid #e3e4e8; }
 .planner-button { display: inline-flex; justify-content: center; align-items: center; gap: 20px; padding: 14px 20px; min-height: 48px; border: 1px solid #303442; color: #fff; background: #303442; font: 400 12px/1.5 var(--body-font); cursor: pointer; }
 .planner-button:hover { background: #464b5b; }
+.planner-button:disabled { cursor: wait; opacity: .65; }
 .planner-button-light { color: #303442; border-color: #d4d5db; background: #fff; }
 .planner-button-light:hover { background: #f4f0e8; }
-.planner-edit { padding: 10px 0; min-height: 44px; border: 0; background: none; color: #303442; text-decoration: underline; text-underline-offset: 5px; font-size: 12px; cursor: pointer; }
+.planner-edit, .planner-event-edit { padding: 10px 0; min-height: 44px; border: 0; background: none; color: #303442; text-decoration: underline; text-underline-offset: 5px; font: inherit; font-size: 12px; cursor: pointer; }
+.planner-event-edit:hover { color: #655332; }
 .planner-sidebar { padding: 28px; background: #f1eee6; min-width: 0; }
-#content .planner-sidebar h2 { font-size: 40px; margin: 14px 0 24px; }
-.planner-sidebar img { display: block; width: 100%; height: auto; margin: 0 0 20px; }
-.planner-sidebar > p:not(.planner-eyebrow) { color: #747782; font-size: 12px; line-height: 1.8; }
-.planner-sidebar dl { margin: 24px 0; }
-.planner-sidebar dl > div { padding: 12px 0; border-top: 1px solid #dcd7cd; }
-.planner-sidebar dt { font-size: 10px; text-transform: uppercase; letter-spacing: .06em; color: #747782; }
-.planner-sidebar dd { margin: 5px 0 0; font-size: 12px; }
-.planner-history { font-size: 12px; margin: -6px 0 28px; color: #747782; }
+#content .planner-sidebar h2 { font-size: 34px; margin: 10px 0 16px; }
+.planner-sidebar img { display: block; width: 100%; height: auto; margin: 0 0 16px; }
+.planner-sidebar > p:not(.planner-eyebrow) { color: var(--planner-secondary); font-size: 12px; line-height: 1.7; }
+.planner-summary-values { margin: 12px 0 0; }
+.planner-summary-values > div { padding: 10px 0; border-top: 1px solid #dcd7cd; }
+.planner-summary-values dt { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--planner-secondary); }
+.planner-summary-values dd { margin: 4px 0 0; font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
+.planner-summary-values small { display: block; color: var(--planner-secondary); font-size: 12px; }
+.planner-mobile-summary { display: none; }
+.planner-history { font-size: 12px; margin: -6px 0 28px; color: var(--planner-secondary); }
 .planner-history summary, .planner-text summary { cursor: pointer; min-height: 44px; padding: 12px 0; text-decoration: underline; text-underline-offset: 4px; }
 .planner-history ol { padding: 0; margin: 10px 0; list-style: none; }
 .planner-history li { border-left: 2px solid #a89268; padding: 4px 0 4px 14px; margin: 18px 0; }
@@ -64,13 +74,23 @@ body.holiday-planner-page { padding: 0; color: #303442; background: #faf9f6; --p
 .planner-errors ul, .planner-unplaced ul { padding-left: 20px; margin-bottom: 0; }
 .planner-route-preview { display: grid; gap: 8px; margin: 20px 0 24px; }
 .planner-route-preview a { font-size: 12px; padding: 10px 0; text-decoration: underline; text-underline-offset: 4px; min-height: 44px; }
+.planner-conversation .planner-outing { padding: 16px; border: 1px solid #dcd7cd; background: #faf9f6; }
+.planner-outing legend { padding-inline: 6px; margin-bottom: 0; font-weight: 600; }
+.planner-outing .planner-hint, .planner-outing .planner-route-preview { margin: 12px 0 0; }
+.planner-outing-overview { margin: 0 0 12px; color: var(--planner-secondary); font-size: 13px; line-height: 1.6; }
+.planner-options { margin: 12px 0 20px; border-block: 1px solid #dcd7cd; }
+.planner-outing .planner-options { margin-bottom: 0; }
+.planner-options summary, .planner-mobile-summary summary { min-height: 44px; padding: 11px 0; color: #303442; font-size: 13px; font-weight: 600; line-height: 1.6; cursor: pointer; }
+.planner-options summary:hover, .planner-mobile-summary summary:hover { text-decoration: underline; text-underline-offset: 4px; }
+.planner-options[open] { padding-bottom: 12px; }
+.planner-options[open] > summary { margin-bottom: 8px; }
 .planner-service-options { display: grid; gap: 16px; }
 .planner-service-time { margin-top: 12px; padding-left: 18px; max-width: 260px; }
 .planner-review { margin: 24px 0; }
 .planner-review > div { padding: 16px 0; border-bottom: 1px solid #e3e4e8; }
-.planner-review dt { font-size: 11px; color: #747782; margin-bottom: 7px; }
+.planner-review dt { font-size: 11px; color: var(--planner-secondary); margin-bottom: 7px; }
 .planner-review dd { font-size: 14px; margin: 0; }
-.planner-review small { display: block; color: #747782; margin-top: 4px; font-size: 12px; }
+.planner-review small { display: block; color: var(--planner-secondary); margin-top: 4px; font-size: 12px; }
 .planner-result { padding: 40px; border: 1px solid #e3e4e8; background: #fff; }
 .planner-result-heading { display: flex; justify-content: space-between; gap: 32px; align-items: start; }
 #content .planner-result-heading h2 { margin: 14px 0 20px; font-size: clamp(42px, 5vw, 64px); }
@@ -78,6 +98,28 @@ body.holiday-planner-page { padding: 0; color: #303442; background: #faf9f6; --p
 .planner-result-actions { display: grid; gap: 10px; flex-shrink: 0; }
 .planner-feedback { font-size: 13px; color: #5f7151; }
 .planner-feedback:empty { display: none; }
+.planner-lodging-result { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px 28px; padding: 20px 24px; margin-top: 24px; border: 1px solid #dedbd4; }
+.planner-lodging-result p { margin: 0; }
+.planner-lodging-result strong { display: block; margin: 6px 0; font-size: 17px; font-weight: 500; }
+.planner-lodging-result p:last-child { font-size: 12px; color: #686155; }
+.planner-lodging-links { display: flex; flex-wrap: wrap; column-gap: 22px; }
+.planner-afisha { margin-top: 28px; padding: clamp(16px, 3vw, 28px); border: 1px solid #ded8cc; background: #f8f6f1; }
+.planner-afisha-heading { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 20px; }
+.planner-afisha-heading .planner-eyebrow { margin: 0 0 4px; }
+#content .planner-afisha-heading h3 { margin: 0; font-size: clamp(27px, 3vw, 36px); }
+.planner-afisha-status { margin: 10px 0 0; font-size: 13px; color: var(--planner-secondary); }
+.planner-afisha-notice { margin: 14px 0 0; padding: 10px 12px; background: #f0e7d8; color: #654c35; font-size: 13px; overflow-wrap: anywhere; }
+.planner-afisha-list { list-style: none; margin: 16px 0 0; padding: 0; border-top: 1px solid #ded8cc; }
+.planner-afisha-event { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; padding: 16px 0; }
+.planner-afisha-event + .planner-afisha-event { border-top: 1px solid #ded8cc; }
+.planner-afisha-event > div { flex: 1 1 260px; min-width: 0; overflow-wrap: anywhere; }
+.planner-afisha-event p { margin: 0; }
+#content .planner-afisha-event h4 { margin: 4px 0; font-size: 24px; line-height: 1.25; }
+.planner-afisha-time, .planner-afisha-description { color: var(--planner-secondary); font-size: 13px; line-height: 1.6; }
+.planner-afisha-event .planner-afisha-description { margin-top: 4px; white-space: pre-line; }
+.planner-afisha-added { color: #4f6443; font-size: 13px; font-weight: 600; }
+.planner-afisha-error { flex: 0 0 100%; color: #843f2e; font-size: 13px; }
+.planner-afisha-error:empty { display: none; }
 .planner-days { margin-top: 40px; }
 .planner-day + .planner-day { margin-top: 48px; }
 .planner-day-heading { padding-bottom: 20px; border-bottom: 1px solid #d4d5db; }
@@ -89,15 +131,45 @@ body.holiday-planner-page { padding: 0; color: #303442; background: #faf9f6; --p
 .planner-event time span { display: block; color: #747782; font-size: 12px; }
 #content .planner-event h4 { font-size: 27px; margin: 0 0 10px; }
 .planner-event p { font-size: 13px; color: #747782; line-height: 1.8; margin: 0; }
+.planner-event > div { overflow-wrap: anywhere; }
+.planner-event .planner-eyebrow { font-size: 11px; color: #7a705d; margin-bottom: 4px; }
 .planner-event-quiet { padding-block: 18px; }
 #content .planner-event-quiet h4 { font-size: 22px; color: #747782; }
 .planner-event-links { display: flex; flex-wrap: wrap; gap: 8px 24px; }
 .planner-event-links:empty { display: none; }
-.planner-event-links a { display: inline-flex; align-items: center; min-height: 44px; font-size: 12px; margin-top: 8px; text-decoration: underline; text-underline-offset: 5px; }
+.planner-event-links :is(a, .planner-event-edit) { display: inline-flex; align-items: center; min-height: 44px; font-size: 12px; margin-top: 8px; text-decoration: underline; text-underline-offset: 5px; }
+.planner-event-actions, .planner-item-editor-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-top: 14px; }
+.planner-event-actions .planner-event-edit { padding: 8px 12px; border: 1px solid #dcd7cd; border-radius: 2px; text-decoration: none; font-size: 13px; line-height: 1.4; }
+.planner-event-actions .planner-event-edit:is(:hover, [aria-expanded="true"]) { border-color: #a89268; background: #f4f0e8; color: #303442; }
+.planner-item-editor { min-width: 0; margin-top: 12px; padding: 18px; border: 1px solid #dcd7cd; background: #f8f6f1; }
+#content .planner-item-editor :is(h4, h5) { margin: 0 0 12px; color: #303442; font: 600 15px/1.45 var(--body-font); }
+.planner-item-editor p { color: var(--planner-secondary); }
+.planner-item-editor .planner-errors { padding: 12px; margin: 0 0 14px; }
+.planner-item-editor .planner-errors p { color: inherit; }
+.planner-item-editor .planner-fields { gap: 12px; }
+.planner-request { margin: 18px 0; }
+#content .planner-request h3 { margin: 0 0 16px; font-size: 29px; }
+.planner-request fieldset { padding: 0; border: 0; min-width: 0; margin: 16px 0; }
+.planner-request legend { margin-bottom: 8px; font-size: 13px; }
+.planner-request form > p { font-size: 13px; }
+.planner-request-toolbar { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: flex-end; margin-bottom: 12px; }
+.planner-request-toolbar .planner-field { flex: 0 1 220px; margin: 0; }
+.planner-request-list { list-style: none; padding: 0; margin: 0; }
+.planner-request-list li { padding: 10px 0; border-top: 1px solid #ded8cc; font-size: 13px; }
+.planner-request-list li p { margin: 6px 0 0; }
+.planner-request-meta { display: block; color: var(--planner-secondary); }
+.planner-request-state { display: inline-block; padding: 2px 8px; margin-top: 5px; background: #ede7dc; color: #604e34; }
+.planner-request-state[data-request-state="confirmed"] { background: #e6efdf; color: #37552d; }
+.planner-request-state[data-request-state="declined"] { background: #faebe5; color: #8b3c22; }
+.planner-item-editor :is(input, select)[aria-invalid="true"] { border-color: #8b3c22; }
+.planner-item-feedback { display: flex; flex-wrap: wrap; align-items: center; gap: 0 16px; padding: 4px 12px; margin-top: 12px; background: #f0f2e9; color: #4d6240; }
+.planner-item-feedback p { margin: 4px 0; color: inherit; font-size: 13px; }
 .planner-tracks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 18px; }
 .planner-tracks > div { padding: 18px; background: #f7f5f0; }
 .planner-tracks span { font-size: 10px; text-transform: uppercase; color: #a08b63; letter-spacing: .06em; }
 #content .planner-tracks h5 { font-size: 22px; margin: 8px 0 10px; }
+.planner-event .planner-fallback { margin-top: 12px; }
+.planner-fallback strong { color: #303442; font-weight: 500; }
 .planner-confirmations { background: #f7f5f0; padding: 26px; margin-top: 36px; }
 #content .planner-confirmations h3, #content .planner-unplaced h3 { font-size: 30px; margin: 0 0 16px; }
 .planner-confirmations ul { list-style: none; margin: 0; padding: 0; }
@@ -108,18 +180,22 @@ body.holiday-planner-page { padding: 0; color: #303442; background: #faf9f6; --p
 .planner-plan-notes { padding-top: 24px; }
 .planner-text { margin-top: 28px; font-size: 13px; }
 .planner-text textarea { width: 100%; max-width: 100%; min-height: 350px; border: 1px solid #d4d5db; padding: 16px; font: 400 13px/1.8 var(--body-font); color: #303442; background: #fff; resize: vertical; }
-.planner-footer { display: flex; justify-content: space-between; gap: 24px; padding: 24px var(--g); border-top: 1px solid #e3e4e8; font-size: 11px; color: #747782; background: #fff; }
-.planner-footer a { text-decoration: underline; }
+.planner-text button { margin-top: 12px; }
+.planner-footer { display: flex; align-items: center; justify-content: space-between; font-size: 12px; }
+.planner-footer > a:not(.amore-logo) { display: inline-flex; align-items: center; min-height: 44px; text-decoration: underline; text-underline-offset: 4px; }
 .planner-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
-.holiday-planner-page :is(a, button, input, textarea):focus-visible { outline: 2px solid #a89268; outline-offset: 4px; }
+.holiday-planner-page :is(a, button, input, select, textarea):focus-visible { outline: 2px solid #a89268; outline-offset: 4px; }
+.holiday-planner-page :is(.planner-event-edit, summary):focus-visible { outline: 2px solid #806b43; outline-offset: 4px; }
 @media (max-width: 1000px) { .planner-layout { grid-template-columns: minmax(0, 1fr) 250px; gap: 20px; } .planner-conversation { padding: 26px; } .planner-sidebar { padding: 22px; } }
 @media (max-width: 760px) {
-  .planner-main { padding: 36px 20px 48px; }
-  .planner-intro { margin-bottom: 30px; }
+  .planner-main { padding: 26px 20px 48px; }
+  .planner-intro { margin-bottom: 22px; }
   .planner-intro > p:last-child { font-size: 14px; }
   .planner-layout { grid-template-columns: 1fr; }
   .planner-sidebar { display: none; }
   .planner-conversation { padding: 24px 20px; }
+  .planner-mobile-summary { display: block; margin: 0 0 16px; padding: 0 12px; border: 1px solid #dcd7cd; background: #f8f6f1; }
+  .planner-mobile-summary .planner-summary-values { margin: 0; }
   .planner-result { padding: 26px 20px; }
   .planner-result-heading { flex-direction: column; gap: 20px; }
   .planner-result-actions { display: flex; flex-wrap: wrap; width: 100%; }
@@ -127,9 +203,7 @@ body.holiday-planner-page { padding: 0; color: #303442; background: #faf9f6; --p
   .planner-result-actions .planner-edit { width: 100%; }
   .planner-event { grid-template-columns: 68px minmax(0, 1fr); gap: 14px; }
   .planner-tracks { grid-template-columns: 1fr; }
-  .planner-footer { flex-direction: column; }
-  .planner-header { padding: 18px 20px; gap: 12px; }
-  .planner-return { font-size: 11px; max-width: 110px; }
+  body .planner-footer { flex-direction: column; align-items: flex-start; gap: 12px; padding-block: 24px; }
 }
 @media (max-width: 420px) {
   .planner-main { padding-inline: 14px; }
@@ -140,10 +214,12 @@ body.holiday-planner-page { padding: 0; color: #303442; background: #faf9f6; --p
   .planner-choice { padding: 15px; }
   .planner-event { grid-template-columns: 1fr; gap: 8px; }
   .planner-event time span { display: inline; margin-left: 6px; }
+  .planner-event-actions, .planner-item-editor-actions { gap: 8px; }
+  .planner-item-editor { padding: 12px; }
 }
 @media print {
-  body.holiday-planner-page { background: #fff; }
-  .planner-header, .planner-footer, .planner-intro, .planner-result-actions, .planner-event-links, .planner-text, .planner-feedback { display: none; }
+  body.holiday-planner-page { padding-top: 0; background: #fff; }
+  body.holiday-planner-page :is(.home-header, .planner-footer), .planner-intro, .planner-draft, .planner-result-actions, .planner-afisha, .planner-event-links, .planner-event-edit, .planner-event-actions, .planner-item-editor, .planner-item-feedback, .planner-lodging-links, .planner-text, .planner-feedback { display: none; }
   .planner-main, .planner-result { padding: 0; border: 0; }
   .planner-event { break-inside: avoid; }
 }
