@@ -1024,7 +1024,7 @@ function renderPlan({ scroll = true, message = '', save = true } = {}) {
     pdfButton.disabled = true;
     feedback.textContent = 'Готовим PDF…';
     try {
-      const { prepareHolidayPdfDownload } = await import('./collection-holiday-pdf.js?v=20261108-illustrations-1');
+      const { prepareHolidayPdfDownload } = await import('./collection-holiday-pdf.js?v=20261108-no-photo-caption-1');
       const result = await prepareHolidayPdfDownload(schedule, { lodging });
       if (!pdfButton.isConnected) {
         result.release();
