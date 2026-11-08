@@ -376,7 +376,6 @@ export async function buildHolidayPdf(plan, { lodging = '' } = {}) {
     gradient.addColorStop(0, '#22263100');
     gradient.addColorStop(1, '#222631ed');
     rect(x, y, w, h, gradient);
-    at('ИЛЛЮСТРАЦИЯ A’MORE', x + 15, y + h - 23, w - 30, { ...smallStyle, color: '#fff' });
     if (number) {
       ctx.save();
       ctx.textAlign = 'right';
@@ -419,7 +418,6 @@ export async function buildHolidayPdf(plan, { lodging = '' } = {}) {
   at(plan.timeZone, margin, 401, 520, white);
   at(breakfastNotice, margin, 431, 550, { ...titleStyle, color: '#fff' });
   at(notice, margin, 458, 540, white);
-  at('ИЛЛЮСТРАЦИЯ A’MORE', margin, 515, 430, { ...smallStyle, color: '#fff' });
   await savePage(true);
 
   if (plan.days.length > 1) {
