@@ -12,9 +12,17 @@ export const localRouteDescriptions = {
 
 // One-way estimates from the reference routes in collection-holiday-map-data.js.
 // Valhalla / FOSSGIS · OpenStreetMap contributors (ODbL), 7 November 2026.
-const referenceTravelSeconds = {
-  auto: { borodino: 2298.38, nikolsky: 1549.51, luzhetsky: 1460.293 },
-  walk: { borodino: 20878.072, nikolsky: 14935.898, luzhetsky: 14277.625 },
+const referenceTravel = {
+  auto: {
+    borodino: { distanceKm: 31.976, durationSeconds: 2298.38 },
+    nikolsky: { distanceKm: 19.964, durationSeconds: 1549.51 },
+    luzhetsky: { distanceKm: 20.026, durationSeconds: 1460.293 },
+  },
+  walk: {
+    borodino: { distanceKm: 28.207, durationSeconds: 20878.072 },
+    nikolsky: { distanceKm: 20.178, durationSeconds: 14935.898 },
+    luzhetsky: { distanceKm: 19.392, durationSeconds: 14277.625 },
+  },
 };
 
 function parseCoordinates(value) {
@@ -32,26 +40,39 @@ function straightLineKm([lat, lon], [targetLat, targetLon]) {
   return 6371 * 2 * Math.atan2(Math.sqrt(angle), Math.sqrt(Math.max(0, 1 - angle)));
 }
 
-function distanceMinutes(point, destination, mode) {
-  // A planning allowance for longer paths and different paces, without geocoding or live traffic.
+const nearReferenceOrigin = point => straightLineKm(point, referenceOrigin) <= 0.02;
+
+export function isReferenceOutingOrigin(origin = '') {
+  const value = typeof origin === 'string' ? origin.trim() : '';
+  const point = parseCoordinates(value);
+  return !value || Boolean(point && nearReferenceOrigin(point));
+}
+
+function distanceMinutes(distanceKm, mode) {
+  // Planning speeds without live traffic.
   const speed = mode === 'walk' ? 4 : 35;
   const minimum = mode === 'walk' ? 10 : 5;
-  const estimatedMinutes = straightLineKm(point, destination) * 1.4 / speed * 60;
-  return Math.max(minimum, Math.ceil(estimatedMinutes));
+  return Math.max(minimum, Math.ceil(distanceKm / speed * 60));
 }
 
 export function estimateOutingTravel(place, transport, origin = demoOrigin) {
-  if (!place) return { travelMinutes: NaN, travelEstimateSource: 'unavailable' };
+  const destination = place?.coordinates;
+  if (!Array.isArray(destination) || destination.length !== 2 || !destination.every(Number.isFinite)) {
+    return { travelMinutes: NaN, travelDistanceKm: null, travelEstimateSource: 'unavailable', travelDistanceSource: 'unavailable' };
+  }
   const value = typeof origin === 'string' ? origin.trim() : '';
   const point = parseCoordinates(value);
   // Coordinates copied from a map may be rounded without changing the departure point.
-  const atReferenceOrigin = !point || straightLineKm(point, referenceOrigin) <= 0.02;
+  const atReferenceOrigin = !point || nearReferenceOrigin(point);
   const mode = transport === 'walk' ? 'walk' : 'auto';
-  const seconds = referenceTravelSeconds[mode][place.id];
-  const hasReference = atReferenceOrigin && Number.isFinite(seconds);
+  const route = atReferenceOrigin && referenceTravel[mode][place.id];
+  // Use a detour factor when only the endpoints are available.
+  const travelDistanceKm = route ? route.distanceKm : straightLineKm(point || referenceOrigin, destination) * 1.4;
   return {
-    travelMinutes: hasReference ? Math.round(seconds / 60) : distanceMinutes(point || referenceOrigin, place.coordinates, mode),
-    travelEstimateSource: value && !point ? 'default-origin' : hasReference ? 'reference' : 'coordinates',
+    travelMinutes: route ? Math.round(route.durationSeconds / 60) : distanceMinutes(travelDistanceKm, mode),
+    travelDistanceKm,
+    travelEstimateSource: value && !point ? 'default-origin' : route ? 'reference' : 'coordinates',
+    travelDistanceSource: route ? 'reference' : 'estimate',
   };
 }
 const allSeasons = Object.keys(seasonLabels);
