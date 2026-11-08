@@ -1,4 +1,4 @@
-import { attractions, demoLocalRoute, demoOrigin, localRouteDescriptions, mapRoute, outingTransports } from './collection-holiday-data.js?v=20261108-route-pdf-1';
+import { attractions, demoLocalRoute, demoOrigin, estimateOutingTravel, isReferenceOutingOrigin, localRouteDescriptions, mapRoute, outingTransports } from './collection-holiday-data.js?v=20261108-map-labels-1';
 import { excursionSettings, includesSightseeing, isWarm } from './collection-holiday-engine.js?v=20261108-route-pdf-1';
 import { referenceRoutes, reservoirRings } from './collection-holiday-map-data.js';
 import { localReferenceRoutes } from './collection-holiday-local-routes.js';
@@ -12,6 +12,7 @@ const mapCredit = '© OpenStreetMap contributors · openstreetmap.org/copyright'
 const radians = Math.PI / 180;
 const mercatorY = lat => Math.log(Math.tan(Math.PI / 4 + lat * radians / 2)) / radians;
 const clamp = (value, low, high) => Math.max(low, Math.min(high, value));
+const kilometerFormat = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1 });
 
 function coordinates(value) {
   if (!/^[-+]?\d+(?:\.\d+)?\s*,\s*[-+]?\d+(?:\.\d+)?$/.test(value)) return null;
@@ -235,7 +236,7 @@ function localRoute(mode, title, linkLabel, color, basemap) {
   const { distanceKm, durationSeconds, legs } = localReferenceRoutes[mode];
   const distance = distanceKm < 1
     ? `${Math.round(distanceKm * 20) * 50} м`
-    : `${new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1 }).format(distanceKm)} км`;
+    : `${kilometerFormat.format(distanceKm)} км`;
   const minutes = Math.ceil(durationSeconds / 300) * 5;
   return {
     title,
@@ -245,6 +246,17 @@ function localRoute(mode, title, linkLabel, color, basemap) {
     linkLabel,
     drawMap: (ctx, box) => drawLocalRoute(ctx, box, legs, color, basemap),
   };
+}
+
+function attractionMetrics({ travelDistanceKm, travelDistanceSource, travelMinutes }) {
+  const parts = [];
+  if (Number.isFinite(travelDistanceKm)) {
+    const distance = travelDistanceKm < 1 ? `${Math.round(travelDistanceKm * 100) * 10} м` : `${kilometerFormat.format(travelDistanceKm)} км`;
+    const calculated = travelDistanceSource === 'estimate' ? ' (расчёт)' : '';
+    parts.push(`≈ ${distance}${calculated}`);
+  }
+  if (Number.isFinite(travelMinutes)) parts.push(`≈ ${travelMinutes} мин`);
+  return parts.join(' · ');
 }
 
 function guideSelection(plan) {
@@ -287,14 +299,19 @@ export function buildHolidayRouteGuide(plan, { local, overview } = {}, selection
   const { walk, bike, seasonalWalk, destinations, scheduledTrips } = selection;
   const { origin } = plan.answers;
   const routeOrigin = origin?.trim() || demoOrigin;
-  const defaultOrigin = routeOrigin === demoOrigin;
-  const start = coordinates(routeOrigin);
+  const defaultOrigin = isReferenceOutingOrigin(routeOrigin);
+  const start = defaultOrigin ? defaultPoint : coordinates(routeOrigin);
   const trips = destinations.map(place => {
     const scheduled = scheduledTrips.get(place.id);
     const transport = scheduled?.transport ?? excursionSettings(plan.answers, place.id).transport;
     const mode = transport === 'walk' ? 'walk' : 'auto';
-    const { title, detail } = outingTransports[transport] || outingTransports.auto;
-    return { place, mode, detail: `${title}. ${scheduled?.confirmation || detail}` };
+    const estimate = estimateOutingTravel(place, transport, routeOrigin);
+    const { title } = outingTransports[transport] || outingTransports.auto;
+    return {
+      place, mode, detail: title,
+      metrics: attractionMetrics({ ...estimate, travelMinutes: scheduled?.travelMinutes ?? estimate.travelMinutes }),
+      travelEstimateSource: scheduled?.travelEstimateSource ?? estimate.travelEstimateSource,
+    };
   });
   const paths = trips.map(({ place, mode }) => defaultOrigin ? referenceRoutes[mode][place.id] : null);
   const hasRoadRoutes = paths.some(Boolean);
@@ -310,21 +327,22 @@ export function buildHolidayRouteGuide(plan, { local, overview } = {}, selection
       walk && localRoute('walk', 'Пешком · по Прибрежной улице', 'Открыть пеший маршрут в Яндекс Картах', '#416d59', local),
       bike && localRoute('bike', 'На велосипеде · до центра Горетова', 'Открыть веломаршрут в Яндекс Картах', blue, local),
     ].filter(Boolean),
-    attractions: trips.map(({ place, mode, detail }, index) => ({
+    attractions: trips.map(({ place, mode, metrics, detail }, index) => ({
       title: `${index + 1}. ${place.title}`,
       href: mapRoute(place, mode, routeOrigin),
+      metrics,
       detail,
     })),
     drawMap: destinations.length
       ? (ctx, box) => drawOverview(ctx, box, destinations, start, paths, overview, defaultOrigin)
       : null,
     mapCaption: [
-      'Отмечены места из программы.',
-      defaultOrigin ? 'Маршруты начинаются от примерной точки A’MORE на перекрёстке Лесной и Прибрежной улиц в Горетове.'
-        : start ? '0 — указанная точка старта.' : 'Ваш старт учитывается в ссылках на Яндекс Карты.',
-      hasRoadRoutes ? 'Сплошные линии показывают примеры маршрутов по данным Valhalla / FOSSGIS.' : '',
+      defaultOrigin ? 'A — примерная точка A’MORE на перекрёстке Лесной и Прибрежной улиц в Горетове.'
+        : start ? '0 — указанная точка старта.' : 'Ваш старт учтён в ссылках на Яндекс Карты.',
+      trips.some(trip => trip.travelEstimateSource === 'default-origin') ? 'Расстояние и время рассчитаны от примерной точки A’MORE в Горетове.' : '',
+      hasRoadRoutes ? 'Сплошные линии — маршруты по данным Valhalla / FOSSGIS.' : '',
       hasDirectionLines ? 'Пунктир показывает направление по прямой.' : '',
-      'Актуальный путь проверьте по ссылкам.',
+      'Проверьте актуальный путь и время по ссылкам.',
     ].filter(Boolean).join(' '),
   };
 }

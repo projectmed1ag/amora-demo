@@ -1,6 +1,6 @@
 import { breakfastNotice, clock, dateLabel, excursionSettings } from './collection-holiday-engine.js?v=20261108-route-pdf-1';
 import { childActivityOptions, outingTransports } from './collection-holiday-data.js?v=20261108-route-pdf-1';
-import { prepareHolidayRouteGuide } from './collection-holiday-route-guide.js?v=20261108-route-pdf-1';
+import { prepareHolidayRouteGuide } from './collection-holiday-route-guide.js?v=20261108-map-labels-1';
 
 const width = 960;
 const height = 540;
@@ -475,24 +475,30 @@ export async function buildHolidayPdf(plan, { lodging = '' } = {}) {
     const hasMap = Boolean(routeGuide.drawMap);
     if (hasMap) {
       const caption = wrap(ctx, routeGuide.mapCaption || '', mapWidth, emphasisStyle);
-      const mapHeight = 260;
+      const mapHeight = Math.min(260, bottom - y - caption.height - 8);
       map(routeGuide.drawMap, margin, y, mapWidth, mapHeight);
       paint(ctx, caption, margin, y + mapHeight + 8);
     }
     let x = hasMap ? sideX : margin;
     let w = hasMap ? sideWidth : contentWidth;
+    const legendTitle = 'РАССТОЯНИЕ И ВРЕМЯ В ОДНУ СТОРОНУ';
+    y = at(legendTitle, x, y, w, smallStyle) + 4;
     for (const place of routeGuide.attractions) {
+      let metrics = wrap(ctx, place.metrics || '', w, trackStyle);
       let detail = wrap(ctx, place.detail || '', w, bodyStyle);
       const linkHeight = wrap(ctx, place.title, w, linkStyle).height;
-      if (y + detail.height + linkHeight + 16 > bottom) {
+      if (y + metrics.height + detail.height + linkHeight + 15 > bottom) {
         await savePage();
         openPage('МАРШРУТЫ ОТ ОТЕЛЯ');
         y = sectionHeading('Маршруты к достопримечательностям', 'ССЫЛКИ НА КАРТУ');
         x = margin;
         w = contentWidth;
+        y = at(legendTitle, x, y, w, smallStyle) + 4;
+        metrics = wrap(ctx, place.metrics || '', w, trackStyle);
         detail = wrap(ctx, place.detail || '', w, bodyStyle);
       }
-      y = link(place.title, place.href, x, y + 5, w) + 4;
+      y = link(place.title, place.href, x, y + 5, w) + 2;
+      y = paint(ctx, metrics, x, y);
       y = paint(ctx, detail, x, y) + 8;
       line(x, y, w);
     }
