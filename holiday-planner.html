@@ -3,25 +3,54 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#303442">
   <title>Помощник по отдыху — A’MORE Collection</title>
-  <meta name="description" content="Составьте личную программу отдыха у Можайского водохранилища: занятия для семьи, маршруты и предложенное время посещения ресторана, бани и мангальной зоны.">
+  <meta name="description" content="Выберите хаусбот и составьте программу отдыха у Можайского водохранилища с занятиями для детей и взрослых. Скачайте расписание в PDF.">
   <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg?v=20261105-emblem-1">
   <link rel="stylesheet" href="./assets/collection-refinement.css?v=20261104-mobile-header-navigation-1">
   <link rel="stylesheet" href="./assets/collection-brand.css?v=original-1">
-  <link rel="stylesheet" href="./assets/collection-holiday-planner.css?v=20261106-1">
-  <script type="module" src="./assets/collection-holiday-planner.js?v=20261106-1"></script>
+  <link rel="stylesheet" href="./assets/collection-holiday-planner.css?v=20261108-route-pdf-1">
+  <script type="module" src="./assets/collection-runtime.js?v=20261108-cta-1"></script>
+  <script type="module" src="./assets/collection-holiday-planner.js?v=20261108-route-pdf-1"></script>
 </head>
-<body class="holiday-planner-page" data-page="holiday-planner">
+<body class="holiday-planner-page collection-site-page" data-page="holiday-planner">
   <a class="planner-skip" href="#content">К помощнику</a>
-  <header class="planner-header">
-    <a class="amore-logo" href="./hotel.html?city=mozhaysk" aria-label="A’MORE Collection — главная"><span class="brand-name">A’MORE</span><span class="brand-collection">COLLECTION</span></a>
-    <a class="planner-return" href="./hotel.html?city=mozhaysk">Вернуться к отелю <span aria-hidden="true">↗</span></a>
+  <header class="home-header" data-header="">
+    <a class="home-brand amore-logo" href="./hotel.html?city=mozhaysk" aria-label="A’MORE Collection — на главную"><span class="brand-name">A’MORE</span><span class="brand-collection">COLLECTION</span></a>
+    <input class="home-menu-toggle" id="home-menu-toggle" type="checkbox" aria-label="Меню разделов" aria-controls="home-nav">
+    <nav class="home-nav" id="home-nav" aria-label="Разделы сайта">
+      <a href="./hotel.html?city=mozhaysk">Главная</a>
+      <a href="./rooms.html?city=mozhaysk">Хаусботы</a>
+      <a href="./restaurant.html?city=mozhaysk">Ресторан</a>
+      <a href="./banya.html?city=mozhaysk">Баня</a>
+      <a href="./pavilions.html?city=mozhaysk">Аренда павильонов</a>
+      <a href="./spaces.html?city=mozhaysk">Развлечения и активный отдых</a>
+      <a href="./about.html?city=mozhaysk">Об отеле</a>
+      <a class="mobile-hotels-link" href="./">Все отели</a>
+    </nav>
+    <div class="home-header-end">
+      <a class="refine-booking" href="./booking.html?city=mozhaysk">Забронировать</a>
+      <a href="./">Отели</a>
+      <label class="home-menu" for="home-menu-toggle"><span></span><span></span></label>
+    </div>
   </header>
   <main id="content" class="planner-main" tabindex="-1">
-    <div class="planner-intro"><p class="planner-eyebrow">Можайское водохранилище · Личный маршрут отдыха</p><h1>Ваш отдых.<br>В вашем ритме.</h1><p>Несколько вопросов — и у вас будет программа по дням: для всей семьи, с дорогой, перерывами и временем для себя.</p></div>
-    <div id="planner-app"><p class="planner-loading" role="status">Готовим вопросы для вашей программы…</p></div>
+    <div class="planner-intro"><p class="planner-eyebrow">Можайское водохранилище · Личный маршрут отдыха</p><h1>Ваш отдых.<br>В вашем ритме.</h1><p>Выберите даты, хаусбот и любимые занятия. Помощник составит расписание для всей семьи, которое можно скачать в PDF.</p></div>
+    <div class="planner-draft" id="planner-draft" hidden>
+      <p data-draft-status role="status"></p>
+      <button type="button" class="planner-edit" data-reset-draft>Начать заново</button>
+      <div class="planner-draft-actions" data-reset-actions hidden>
+        <button type="button" class="planner-edit" data-confirm-reset>Удалить черновик</button>
+        <button type="button" class="planner-edit" data-cancel-reset>Оставить черновик</button>
+      </div>
+    </div>
+    <div id="planner-app" data-holiday-api-base="https://amora-med1ag-booking.ai-vipsup.chatgpt.site/api/v1/"><p class="planner-loading" role="status">Готовим вопросы для вашей программы…</p></div>
     <noscript><p>Для составления программы включите JavaScript. Вы также можете <a href="./spaces.html?city=mozhaysk">посмотреть развлечения</a> и выбрать время на страницах <a href="./restaurant.html?city=mozhaysk">ресторана</a> и <a href="./banya.html?city=mozhaysk">бани</a>.</p></noscript>
   </main>
-  <footer class="planner-footer"><span>План — это предложение. Занятия и бронирования подтверждаются отдельно.</span><a href="./spaces.html?city=mozhaysk">Все развлечения</a></footer>
+  <footer class="home-footer planner-footer">
+    <a class="home-brand amore-logo" href="./hotel.html?city=mozhaysk" aria-label="A’MORE Collection — на главную"><span class="brand-name">A’MORE</span><span class="brand-collection">COLLECTION</span></a>
+    <span>План — это предложение. Занятия и бронирования подтверждаются отдельно.</span>
+    <a href="./spaces.html?city=mozhaysk">Все развлечения</a>
+  </footer>
 </body>
 </html>
