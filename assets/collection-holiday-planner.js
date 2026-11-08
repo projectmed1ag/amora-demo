@@ -526,8 +526,10 @@ function renderQuestion(focus = true) {
     <section class="planner-conversation" aria-labelledby="planner-question">
       <div class="planner-progress">${quickEdit ? '<span>Настройка плана</span>' : `<span>Вопрос ${index + 1} из <b data-step-count>${sequence.length}</b></span><progress value="${index + 1}" max="${sequence.length}" aria-label="Ход составления программы"></progress>`}</div>
       <div class="planner-assistant">
-        <span class="planner-assistant-mark amore-logo" aria-hidden="true"><span class="brand-name">A’MORE</span><span class="brand-collection">COLLECTION</span></span>
-        <p>Помощник по отдыху</p>
+        <div class="planner-assistant-mark">
+          <span class="amore-logo" aria-hidden="true"><span class="brand-name">A’MORE</span><span class="brand-collection">COLLECTION</span></span>
+          <span class="planner-assistant-caption">Помощник по отдыху</span>
+        </div>
       </div>
       ${index > 0 && !quickEdit ? `<details class="planner-history"><summary>Ваши предыдущие ответы</summary><ol>${sequence.slice(0, index).map(step => `<li><span>${questions[step]}</span><p>${esc(answerLabel(step))}</p></li>`).join('')}</ol></details>` : ''}
       <details class="planner-mobile-summary"><summary>Ваш отдых</summary><dl class="planner-summary-values" data-trip-summary>${summaryValuesMarkup()}</dl></details>
