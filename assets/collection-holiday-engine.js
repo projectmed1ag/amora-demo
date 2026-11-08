@@ -1,10 +1,13 @@
-import { onsiteInterests, services, attractions, childActivityOptions, outingTransports, routeIdeas, mapRoute, demoOrigin, demoOriginLabel, estimateOutingTravel, demoLocalRoute, localRouteDescriptions } from './collection-holiday-data.js';
+import { onsiteInterests, services, attractions, childActivityOptions, outingTransports, routeIdeas, mapRoute, demoOrigin, demoOriginLabel, estimateOutingTravel, demoLocalRoute, localRouteDescriptions } from './collection-holiday-data.js?v=20261108-route-pdf-1';
+import { getSeasonForDate, seasonLabels } from './collection-seasons.js';
 
 const DAY = 86400000;
 const breakfastStart = 7 * 60;
-const breakfastEnd = 10 * 60;
+const breakfastEnd = 11 * 60;
 const outingReserveMinutes = 30;
 const visitReserveMinutes = 75;
+const maxStayDays = 31;
+const interestCatalog = new Map(onsiteInterests.map(item => [item.id, item]));
 export const minutes = value => /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(value || '') ? Number(value.slice(0, 2)) * 60 + Number(value.slice(3)) : NaN;
 export const clock = value => `${String(Math.floor(value / 60)).padStart(2, '0')}:${String(value % 60).padStart(2, '0')}`;
 export const breakfastNotice = `Завтрак подают ежедневно с ${clock(breakfastStart)} до ${clock(breakfastEnd)}.`;
@@ -16,8 +19,26 @@ export function dateNumber(value) {
 }
 export const addDays = (value, count) => new Date(dateNumber(value) + count * DAY).toISOString().slice(0, 10);
 export const dateLabel = value => new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', weekday: 'short', timeZone: 'UTC' }).format(new Date(dateNumber(value)));
-export const isWarm = date => [5, 6, 7, 8, 9].includes(Number(date.slice(5, 7)));
-const summer = date => [6, 7, 8].includes(Number(date.slice(5, 7)));
+export const availableInterestOnDate = (id, date) => Boolean(interestCatalog.get(id)?.seasons.includes(getSeasonForDate(date)));
+export const isWarm = date => availableInterestOnDate('bike', date);
+
+export function availableInterestInStay(id, startDate, endDate) {
+  const count = (dateNumber(endDate) - dateNumber(startDate)) / DAY + 1;
+  if (!(count >= 1 && count <= maxStayDays)) return false;
+  for (let index = 0; index < count; index++) {
+    if (availableInterestOnDate(id, addDays(startDate, index))) return true;
+  }
+  return false;
+}
+
+export function interestSeasonLabel(id) {
+  const seasons = interestCatalog.get(id)?.seasons ?? [];
+  return seasons.length === Object.keys(seasonLabels).length ? 'Круглый год' : seasons.map(season => seasonLabels[season]).join(', ');
+}
+
+export function unavailableInterestReason(id) {
+  return `Занятие вне сезона для выбранных дат. На сайте оно указано для следующих сезонов — ${interestSeasonLabel(id).toLocaleLowerCase('ru')}.`;
+}
 
 const transportConfirmations = {
   taxi: 'Проверьте вместимость, стоимость и возможность заказать такси на обратный путь.',
@@ -49,7 +70,7 @@ export function validateAnswers(a, today = '', currentMinute = -1) {
   const start = dateNumber(a.startDate), end = dateNumber(a.endDate);
   if (!Number.isFinite(start) || (today && a.startDate < today)) errors.startDate = 'Выберите дату начала отдыха не раньше сегодняшнего дня.';
   if (!Number.isFinite(end) || end < start) errors.endDate = 'Дата отъезда должна быть не раньше даты приезда.';
-  else if ((end - start) / DAY > 30) errors.endDate = 'Помощник составляет программу максимум на 31 календарный день.';
+  else if ((end - start) / DAY >= maxStayDays) errors.endDate = 'Помощник составляет программу максимум на 31 календарный день.';
   if (!Number.isFinite(minutes(a.arrival))) errors.arrival = 'Укажите время приезда.';
   else if (a.startDate === today && minutes(a.arrival) <= currentMinute) errors.arrival = 'Выберите время приезда позже текущего московского времени.';
   if (!Number.isFinite(minutes(a.departure))) errors.departure = 'Укажите время отъезда.';
@@ -65,7 +86,7 @@ export function validateAnswers(a, today = '', currentMinute = -1) {
   }
   if (!['calm', 'balanced', 'active'].includes(a.pace)) errors.pace = 'Выберите желаемый темп.';
   if (!['together', 'separate'].includes(a.familyMode)) errors.familyMode = 'Выберите формат семейного отдыха.';
-  if (a.interests != null && (!Array.isArray(a.interests) || a.interests.some(id => id !== 'sights' && !onsiteInterests.some(item => item.id === id)))) errors.interests = 'Проверьте выбранные занятия.';
+  if (a.interests != null && (!Array.isArray(a.interests) || a.interests.some(id => id !== 'sights' && !interestCatalog.has(id)))) errors.interests = 'Проверьте выбранные занятия.';
   if (a.outingMode != null && !['stay', 'visit'].includes(a.outingMode)) errors.outingMode = 'Выберите отдых на территории или выезды к достопримечательностям.';
   if (!Number.isFinite(minutes(a.wake)) || !Number.isFinite(minutes(a.rest)) || minutes(a.rest) - minutes(a.wake) < 120) errors.wake = 'Между началом дня и вечерним отдыхом должно быть хотя бы 2 часа.';
   if (a.services?.some(id => !services.some(item => item.id === id))) errors.services = 'Проверьте выбранные услуги.';
@@ -155,20 +176,20 @@ function placeClosestOuting(days, item, preferred, { from, to, oncePerDay }) {
   return slots.length ? scheduleItem(slots[0].day, item, slots[0].start) : null;
 }
 
-function activity(id, date, a) {
-  const winter = !isWarm(date);
+function activity(id, a) {
   if (id === 'beach') return {
-    title: summer(date) ? 'Отдых на пляже' : 'Тихий отдых с видом на воду', duration: a.pace === 'calm' ? 120 : 60,
-    seasonal: summer(date) ? '' : 'quiet-shore',
-    detail: summer(date) ? 'Книга, спокойный отдых и время у воды. Зону отдыха выбирайте с учётом погоды.' : 'Вместо пляжного отдыха — уютная пауза с видом на водохранилище; при хорошей погоде можно выйти к берегу.',
-    page: summer(date) ? 'spaces.html#sunbathing' : 'leisure-firepit.html',
+    title: 'Спокойный отдых у воды', duration: a.pace === 'calm' ? 120 : 60,
+    detail: 'Оставьте время для чтения и отдыха с видом на водохранилище. К берегу можно выйти при подходящей погоде.',
   };
-  if (id === 'bike' && winter) return { title: 'Прогулка вместо велосипеда', duration: 60, seasonal: 'winter-walk', detail: `Для холодного сезона велосипед заменён прогулкой. ${routeIdeas.walk}`, page: 'leisure-nature.html' };
   const suggestion = {
     walk: { title: 'Прогулка у воды', duration: 60, detail: routeIdeas.walk, page: 'leisure-nature.html' },
     bike: { title: 'Велопрогулка', duration: a.pace === 'active' ? 90 : 60, detail: routeIdeas.bike, page: 'leisure-active.html' },
     buggy: { title: 'Багги с инструктором', duration: 90, detail: routeIdeas.buggy, page: 'leisure-buggy.html', confirmation: 'Подтвердить прокат, инструктора и условия участия.' },
   }[id];
+  if (!suggestion) {
+    const { title, detail, duration, page, confirmation } = interestCatalog.get(id);
+    return { title, detail, duration, page, ...(confirmation && { confirmation }) };
+  }
   if (['walk', 'bike'].includes(id) && (!a.origin?.trim() || a.origin.trim() === demoOrigin)) return {
     ...suggestion,
     detail: `${localRouteDescriptions[id]} Это временная точка старта A’MORE Collection. Точное место въезда в отель уточняется. Проверьте движение и состояние дороги.`,
@@ -181,7 +202,10 @@ function activity(id, date, a) {
   return suggestion;
 }
 
-export const createInterestItem = (id, date, a) => ({ kind: 'activity', ...activity(id, date, a), interest: id });
+export function createInterestItem(id, date, a) {
+  if (!availableInterestOnDate(id, date)) return null;
+  return { kind: 'activity', ...activity(id, a), interest: id };
+}
 
 function childrenProgramme(a, together = false) {
   if (a.childActivities?.length) {
@@ -267,10 +291,8 @@ export function createServiceItem(a, id) {
 export function notesForSchedule({ answers, days }) {
   const items = days.flatMap(day => day.items);
   const notes = [];
-  if (items.some(item => item.kind === 'excursion') && (!answers.origin?.trim() || answers.origin.trim() === demoOrigin)) notes.push(`${demoOriginLabel} Время в пути заложено как резерв. Перед поездкой уточните точку старта и сверьтесь с картой.`);
+  if (items.some(item => item.kind === 'excursion') && (!answers.origin?.trim() || answers.origin.trim() === demoOrigin)) notes.push(`${demoOriginLabel} Время в пути ориентировочное, без учёта пробок. Перед поездкой уточните точку старта и сверьтесь с картой.`);
   if (items.some(item => item.kind === 'family') && answers.familyMode === 'separate' && !canSplitFamily(answers)) notes.push('При одном взрослом и ребёнке до 3 лет помощник предлагает совместную программу. Для раздельного отдыха нужно отдельно организовать сопровождение малыша.');
-  if (items.some(item => item.seasonal === 'winter-walk')) notes.push('Для холодных месяцев велопрогулка заменяется пешей. Наличие проката и состояние троп нужно уточнить по погоде.');
-  if (items.some(item => item.seasonal === 'quiet-shore')) notes.push('За пределами лета вместо пляжа предложен спокойный отдых с видом на воду.');
   if (items.some(item => ['walk', 'bike', 'buggy'].includes(item.interest))) notes.push('Маршруты активностей — предложенные схемы. Утверждённые треки отеля пока не предоставлены; точный путь покажет команда отеля или инструктор.');
   return notes;
 }
@@ -328,7 +350,8 @@ export function buildHolidayPlan(a, { today = '', currentMinute = -1 } = {}) {
       const place = attractions.find(item => item.id === id);
       const transportConfirmation = transportConfirmations[transport];
       const desiredTime = excursionTime ? ` Желаемое отправление ${excursionTime}.` : '';
-      const originNote = travelEstimateSource === 'default-origin' ? ' Оценка от условной точки в Горетове.' : '';
+      const originNote = travelEstimateSource === 'default-origin' ? ' Оценка от условной точки в Горетове.'
+        : travelEstimateSource === 'coordinates' ? ' Оценка по расстоянию между точками.' : '';
       const baseDetail = `${outingTransports[transport].title}. Дорога примерно по ${road} мин в каждую сторону. На посещение заложено ${visit} мин, ещё ${outingReserveMinutes} мин на сборы и остановки.${originNote}`;
       const item = {
         id: `excursion:${id}`, kind: 'excursion', placeId: id, transport, travelMinutes: road, travelEstimateSource, visitMinutes: visit,
@@ -380,9 +403,21 @@ export function buildHolidayPlan(a, { today = '', currentMinute = -1 } = {}) {
 
   function placeInterest(id) {
     const itemId = `activity:${id}`;
+    const eligible = days.filter(day => availableInterestOnDate(id, day.date));
+    const { preferred, from, to } = interestHours(id);
     const factory = day => ({ ...interestItem(id, day.date), id: itemId });
-    const placed = placeAcross(days, factory, 10 * 60 + 30, { from: 9 * 60, to: id === 'beach' ? 19 * 60 : 17 * 60, oncePerDay: 'activity' });
-    if (!placed && !suggestActivities) unplaced.push({ id: itemId, title: onsiteInterests.find(item => item.id === id).title, reason: 'Не хватило цельного интервала с учётом дороги, еды и отдыха. Измените даты или сократите программу.' });
+    const placed = placeAcross(eligible, factory, preferred, { from, to, oncePerDay: 'activity' });
+    if (!placed && !suggestActivities) unplaced.push({
+      id: itemId, title: interestCatalog.get(id).title,
+      reason: eligible.length
+        ? 'Не хватило цельного интервала с учётом дороги, еды и отдыха. Измените даты или сократите программу.'
+        : unavailableInterestReason(id),
+    });
+  }
+
+  function interestHours(id, later = false) {
+    if (id === 'firepit') return { preferred: 19 * 60 + 30, from: 17 * 60, to: 21 * 60 };
+    return { preferred: later ? 15 * 60 : 10 * 60 + 30, from: 9 * 60, to: id === 'beach' ? 19 * 60 : 17 * 60 };
   }
 
   // A selected buggy ride can be the adult programme in the same block.
@@ -423,10 +458,12 @@ export function buildHolidayPlan(a, { today = '', currentMinute = -1 } = {}) {
   days.forEach((day, index) => {
     const target = a.pace === 'active' ? 2 : 1;
     const planned = () => day.items.filter(item => ['activity', 'excursion', 'family', 'parallel'].includes(item.kind)).length;
-    for (let attempt = 0; recurring.length && planned() < target && attempt < target; attempt++) {
-      const id = recurring[(index + attempt) % recurring.length];
+    const eligible = recurring.filter(id => id !== 'pavilion' && availableInterestOnDate(id, day.date));
+    for (let attempt = 0; eligible.length && planned() < target && attempt < target; attempt++) {
+      const id = eligible[(index + attempt) % eligible.length];
       if (day.items.some(item => item.interest === id || (id === 'buggy' && separate && item.kind === 'parallel'))) continue;
-      insert(day, { ...interestItem(id, day.date), id: `activity:${id}:${day.date}` }, attempt ? 15 * 60 : 10 * 60 + 30, 9 * 60, id === 'beach' ? 19 * 60 : 17 * 60);
+      const { preferred, from, to } = interestHours(id, attempt > 0);
+      insert(day, { ...interestItem(id, day.date), id: `activity:${id}:${day.date}` }, preferred, from, to);
     }
   });
 

@@ -1,5 +1,5 @@
-import { attractions, demoLocalRoute, demoOrigin, localRouteDescriptions, mapRoute, outingTransports } from './collection-holiday-data.js';
-import { excursionSettings, includesSightseeing, isWarm } from './collection-holiday-engine.js';
+import { attractions, demoLocalRoute, demoOrigin, localRouteDescriptions, mapRoute, outingTransports } from './collection-holiday-data.js?v=20261108-route-pdf-1';
+import { excursionSettings, includesSightseeing, isWarm } from './collection-holiday-engine.js?v=20261108-route-pdf-1';
 import { referenceRoutes, reservoirRings } from './collection-holiday-map-data.js';
 import { localReferenceRoutes } from './collection-holiday-local-routes.js';
 import { holidayBasemaps } from './collection-holiday-basemaps.js';

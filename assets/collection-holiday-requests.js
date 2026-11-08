@@ -1,4 +1,4 @@
-import { clock, dateLabel } from './collection-holiday-engine.js';
+import { clock, dateLabel } from './collection-holiday-engine.js?v=20261108-route-pdf-1';
 
 const receiptKey = 'amore-holiday-request-receipts:mozhaysk';
 const statuses = { pending: 'На рассмотрении', confirmed: 'Подтверждено', declined: 'Отклонено' };

@@ -1,10 +1,10 @@
-import { onsiteInterests, services, attractions, mapRoute, demoOrigin, demoOriginLabel, outingTransports, childActivityOptions } from './collection-holiday-data.js?v=20261108-activity-choices-1';
-import { breakfastNotice, buildHolidayPlan, planToText, validateAnswers, addDays, dateLabel, dateNumber, clock, excursionSettings, outingDurationMinutes } from './collection-holiday-engine.js';
+import { onsiteInterests, services, attractions, mapRoute, demoOrigin, demoOriginLabel, outingTransports, childActivityOptions } from './collection-holiday-data.js?v=20261108-route-pdf-1';
+import { breakfastNotice, buildHolidayPlan, planToText, validateAnswers, addDays, dateLabel, dateNumber, clock, excursionSettings, outingDurationMinutes, availableInterestInStay, interestSeasonLabel } from './collection-holiday-engine.js?v=20261108-route-pdf-1';
 import { holidayLodgings } from './collection-holiday-lodging.js';
-import { canEditScheduleItem, scheduleReplacementOptions, applyScheduleEdit, replayScheduleEdits } from './collection-holiday-edits.js?v=20261108-activity-choices-1';
-import { loadHolidayDraft, saveHolidayDraft, clearHolidayDraft } from './collection-holiday-draft.js?v=20261108-activity-choices-1';
-import { mountPlanRequests } from './collection-holiday-requests.js?v=20261108-holiday-api-1';
-import { hotelEventLabels, mountHotelEvents } from './collection-holiday-events.js?v=20261108-holiday-api-1';
+import { canEditScheduleItem, scheduleReplacementOptions, applyScheduleEdit, replayScheduleEdits } from './collection-holiday-edits.js?v=20261108-route-pdf-1';
+import { loadHolidayDraft, saveHolidayDraft, clearHolidayDraft } from './collection-holiday-draft.js?v=20261108-route-pdf-1';
+import { mountPlanRequests } from './collection-holiday-requests.js?v=20261108-route-pdf-1';
+import { hotelEventLabels, mountHotelEvents } from './collection-holiday-events.js?v=20261108-route-pdf-1';
 import { destinationDateParts, destinationLocalDate } from './collection-destinations.js?v=20261024-all-hotels-1';
 
 const root = document.getElementById('planner-app');
@@ -28,14 +28,10 @@ const questions = {
 };
 const stepFields = { dates: ['startDate', 'endDate', 'arrival', 'departure'], party: ['adults', 'children', 'ages', 'familyMode', 'childActivities'], lodging: ['lodging'], rhythm: ['pace', 'wake'], outings: ['outingMode', 'interests', 'suggestActivities'], routes: ['places'], services: ['services', 'restaurant', 'banya', 'barbecue'], review: [] };
 let current = 'dates', plan, quickEdit;
-let planEdits = [], unappliedEdits = [], undoEdit, itemEditor, pdfInProgress = false;
+let planEdits = [], unappliedEdits = [], undoEdit, itemEditor, pdfInProgress = false, preparedPdf;
 const draftBanner = document.getElementById('planner-draft');
 const draftCity = 'mozhaysk';
-const query = new URLSearchParams(location.search);
-const bookingToken = query.get('city') === draftCity ? query.get('booking') : null;
-const bookingScope = /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(bookingToken || '')
-  ? `${draftCity}:booking:${bookingToken}` : '';
-const bookingHandoff = bookingScope ? readBookingHandoff(bookingToken) : null;
+const { token: bookingToken, scope: bookingScope, handoff: bookingHandoff } = bookingContext();
 const bookingStatus = 'Даты, хаусбот и число гостей взяты из бронирования. Уточните состав компании.';
 const bookingFallbackStatus = 'Чтобы перенести данные бронирования, откройте планировщик со страницы подтверждения.';
 let draftScope = draftCity;
@@ -65,7 +61,7 @@ const lodgingLabel = () => overnight() ? lodgingChoice()?.label || 'Пока н�
 const checked = value => value ? ' checked' : '';
 const outingField = (id, name) => `outing-${id}-${name}`;
 const field = (name, label, type, value, extra = '') => `<div class="planner-field"><label for="plan-${name}">${label}</label><input id="plan-${name}" name="${name}" type="${type}" value="${esc(value)}" ${extra}></div>`;
-const choice = (name, value, title, detail, active, type = 'radio') => `<label class="planner-choice"><input type="${type}" name="${name}" value="${value}"${checked(active)}><span><strong>${title}</strong>${detail ? `<small>${detail}</small>` : ''}</span></label>`;
+const choice = (name, value, title, detail, active, type = 'radio', disabled = false) => `<label class="planner-choice"><input type="${type}" name="${name}" value="${value}"${checked(active)}${disabled ? ' disabled' : ''}><span><strong>${title}</strong>${detail ? `<small>${detail}</small>` : ''}</span></label>`;
 
 function coordinationApiBase() {
   if (localBookingHost) return new URL('/api/local-booking/', location.origin);
@@ -81,16 +77,48 @@ function coordinationApiBase() {
   }
 }
 
-function readBookingHandoff(token) {
+function validatedBookingHandoff(saved) {
+  if (saved?.city !== draftCity) return null;
+  const { checkIn, checkOut, roomId, guests } = saved;
+  if (!(dateNumber(checkOut) > dateNumber(checkIn))) return null;
+  if (!Number.isInteger(guests) || guests < 1 || guests > 20 || !holidayLodgings.some(room => room.id === roomId)) return null;
+  return { startDate: checkIn, endDate: checkOut, lodging: roomId, adults: guests };
+}
+
+function bookingContext() {
+  const url = new URL(location.href);
+  if (url.searchParams.get('city') !== draftCity) return {};
+  const fragment = new URLSearchParams(url.hash.slice(1));
+  if (fragment.get('stay') === '1') {
+    const stay = {
+      city: draftCity, checkIn: fragment.get('checkIn'), checkOut: fragment.get('checkOut'),
+      roomId: fragment.get('roomId'), guests: Number(fragment.get('guests')),
+    };
+    const handoff = validatedBookingHandoff(stay);
+    if (handoff) {
+      const tripKey = `${draftCity}:stay:${stay.checkIn}:${stay.checkOut}:${stay.roomId}:${stay.guests}`;
+      let token;
+      try {
+        token = sessionStorage.getItem(tripKey) || crypto.randomUUID();
+        sessionStorage.setItem(tripKey, token);
+        sessionStorage.setItem(`amore-holiday-booking:${token}`, JSON.stringify(stay));
+        url.hash = '';
+        url.searchParams.set('booking', token);
+        history.replaceState(history.state, '', url);
+      } catch {
+        // Keep the fragment available on reload when browser storage is blocked.
+      }
+      return { token, scope: token ? `${draftCity}:booking:${token}` : tripKey, handoff };
+    }
+  }
+  const token = url.searchParams.get('booking');
+  if (!/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(token || '')) return {};
+  const scope = `${draftCity}:booking:${token}`;
   try {
     const saved = JSON.parse(sessionStorage.getItem(`amore-holiday-booking:${token}`));
-    if (saved?.city !== draftCity) return null;
-    const { checkIn, checkOut, roomId, guests } = saved;
-    if (typeof checkIn !== 'string' || typeof checkOut !== 'string' || !(dateNumber(checkOut) > dateNumber(checkIn))) return null;
-    if (!Number.isInteger(guests) || guests < 1 || guests > 20 || !holidayLodgings.some(room => room.id === roomId)) return null;
-    return { startDate: checkIn, endDate: checkOut, lodging: roomId, adults: guests };
+    return { token, scope, handoff: validatedBookingHandoff(saved) };
   } catch {
-    return null;
+    return { token, scope };
   }
 }
 
@@ -244,17 +272,32 @@ function lodgingMarkup() {
 }
 
 function interestsMarkup() {
-  const suggested = {
-    calm: ['beach', 'walk'],
-    balanced: ['walk', 'beach'],
-    active: ['walk', 'bike', 'buggy'],
-  }[answers.pace];
-  const ordered = [...onsiteInterests].sort((a, b) => Number(suggested.includes(b.id)) - Number(suggested.includes(a.id)));
+  const groups = {
+    family: 'Детям и всей семье',
+    nature: 'На природе и у воды',
+    active: 'Спорт и активный отдых',
+    gatherings: 'Посиделки и праздники',
+  };
+  const available = item => availableInterestInStay(item.id, answers.startDate, answers.endDate);
   return `<div class="planner-choices">
     ${choice('suggestActivities', 'yes', 'Предложите за меня', 'Помощник учтёт ваш ритм, сезон и состав компании.', answers.suggestActivities && !selectedInterests().length, 'checkbox')}
-    <div class="planner-choices planner-choices-inline">
-      ${ordered.map(item => choice('interests', item.id, item.title, item.detail, answers.interests.includes(item.id), 'checkbox')).join('')}
-    </div>
+    <div class="planner-activity-groups">${Object.entries(groups).map(([id, title]) => {
+      const items = onsiteInterests.filter(item => (item.group || 'nature') === id)
+        .sort((a, b) => Number(available(b)) - Number(available(a)));
+      if (!items.length) return '';
+      const open = ['family', 'nature'].includes(id) || (id === 'active' && answers.pace === 'active')
+        || items.some(item => answers.interests.includes(item.id));
+      return `<details class="planner-options planner-activity-group"${open ? ' open' : ''}>
+        <summary>${title}</summary>
+        <div class="planner-choices planner-choices-inline">${items.map(item => {
+          const selected = answers.interests.includes(item.id);
+          const inSeason = available(item);
+          const season = !inSeason
+            ? ` · Вне сезона на выбранные даты. Сезон: ${interestSeasonLabel(item.id)}` : '';
+          return choice('interests', item.id, esc(item.title), esc(item.detail + season), selected, 'checkbox', !selected && !inSeason);
+        }).join('')}</div>
+      </details>`;
+    }).join('')}</div>
   </div>`;
 }
 
@@ -474,6 +517,7 @@ function continueLabel() {
 }
 
 function renderQuestion(focus = true) {
+  releasePreparedPdf();
   const sequence = steps(), index = sequence.indexOf(current);
   const title = current === 'party'
     ? quickEdit ? 'Как проведём семейный отдых?' : bookingCompact ? 'Сколько из гостей — дети?' : questions.party
@@ -789,12 +833,18 @@ function lodgingResult() {
   if (!lodging) return '';
   const booked = isBookedLodging(lodging.id);
   const local = !booked && localBookingHost;
+  const bookingUrl = new URL(lodging.bookingHref);
+  if (!booked && !local) {
+    bookingUrl.hash = new URLSearchParams({
+      plan: '1', checkIn: answers.startDate, checkOut: answers.endDate, roomId: lodging.id, guests: String(guestCount()),
+    }).toString();
+  }
   return `<section class="planner-lodging-result" aria-label="Выбранное размещение">
     <div><p class="planner-eyebrow">Выбранное размещение</p><strong>${esc(lodging.label)}</strong><p${local ? ' data-plan-booking-status role="status"' : ''}>${booked ? 'Категория перенесена из бронирования' : `До ${lodging.capacity} гостей · доступность проверяется отдельно`}</p></div>
     <div class="planner-lodging-links">
       <a href="${esc(lodging.detailsHref)}" target="_blank" rel="noopener">О хаусботе ↗</a>
       ${local ? '<button type="button" class="planner-edit" data-plan-booking hidden>Перейти к бронированию</button>'
-        : booked ? '' : `<a href="${esc(lodging.bookingHref)}" target="_blank" rel="noopener">Проверить даты ↗</a>`}
+        : booked ? '' : `<a href="${esc(bookingUrl.href)}" target="_blank" rel="noopener">Перейти к бронированию ↗</a>`}
     </div>
   </section>`;
 }
@@ -849,7 +899,13 @@ async function mountPlanBooking() {
   });
 }
 
+function releasePreparedPdf() {
+  preparedPdf?.release();
+  preparedPdf = undefined;
+}
+
 function renderPlan({ scroll = true, message = '', save = true } = {}) {
+  releasePreparedPdf();
   itemEditor = undefined;
   if (save) persistDraft(true);
   const lodging = lodgingLabel();
@@ -876,6 +932,7 @@ function renderPlan({ scroll = true, message = '', save = true } = {}) {
       </div>
     </div>
     <p class="planner-feedback" role="status">${esc(message)}</p>
+    <p class="planner-feedback" data-pdf-ready hidden><a data-pdf-link>Скачать готовый PDF</a></p>
     ${holidayApiBase ? '<section id="planner-plan-request" class="planner-item-editor planner-request" data-plan-request-panel aria-labelledby="planner-request-title" hidden></section>' : ''}
     ${lodgingResult()}
     <p class="planner-note"><strong>${esc(breakfastNotice)}</strong> Это предварительная программа. Размещение, время посещения услуг и сопровождение детей подтверждаются отдельно.</p>
@@ -922,6 +979,8 @@ function renderPlan({ scroll = true, message = '', save = true } = {}) {
   </section>`;
   const feedback = root.querySelector('.planner-feedback');
   const pdfButton = root.querySelector('[data-pdf]');
+  const pdfReady = root.querySelector('[data-pdf-ready]');
+  const pdfLink = root.querySelector('[data-pdf-link]');
   void mountPlanBooking();
   if (holidayApiBase) {
     mountPlanRequests(root, plan, holidayApiBase);
@@ -951,14 +1010,27 @@ function renderPlan({ scroll = true, message = '', save = true } = {}) {
   });
   pdfButton.addEventListener('click', async () => {
     if (pdfInProgress) return;
+    if (preparedPdf) {
+      pdfLink.click();
+      return;
+    }
     const schedule = plan;
     pdfInProgress = true;
     pdfButton.disabled = true;
     feedback.textContent = 'Готовим PDF…';
     try {
-      const { downloadHolidayPdf } = await import('./collection-holiday-pdf.js?v=20261108-visit-allowance-1');
-      await downloadHolidayPdf(schedule, { lodging });
-      feedback.textContent = 'Программа готова к скачиванию.';
+      const { prepareHolidayPdfDownload } = await import('./collection-holiday-pdf.js?v=20261108-route-pdf-1');
+      const result = await prepareHolidayPdfDownload(schedule, { lodging });
+      if (!pdfButton.isConnected) {
+        result.release();
+        return;
+      }
+      preparedPdf = result;
+      pdfLink.href = result.url;
+      pdfLink.download = result.filename;
+      pdfReady.hidden = false;
+      feedback.textContent = 'PDF готов. Если скачивание не началось, воспользуйтесь ссылкой ниже.';
+      pdfLink.click();
     } catch (error) {
       console.error('Holiday plan PDF export failed', error);
       feedback.textContent = 'PDF не удалось подготовить. Можно повторить попытку или скачать текстовый файл.';
@@ -1002,7 +1074,8 @@ function restoreDraft() {
       bookingCompact = canUseCompactBooking();
       current = steps()[0];
       const saved = saveHolidayDraft(draftScope, { answers, step: current, edits: planEdits, completed: false });
-      showDraftStatus(bookingStatus, saved);
+      const dateError = validateAnswers(answers, today(), nowMinute()).endDate;
+      showDraftStatus(dateError || bookingStatus, saved);
     } else if (bookingUnavailable) showDraftStatus(bookingFallbackStatus, false);
     renderQuestion(false);
     return;

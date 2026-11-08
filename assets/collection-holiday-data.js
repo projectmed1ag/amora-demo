@@ -1,5 +1,6 @@
 import { nearbyPlaces } from './mozhaysk-nearby-data.js';
 import { localReferenceRoutes } from './collection-holiday-local-routes.js';
+import { getSeasonActivities, seasonLabels } from './collection-seasons.js';
 
 export const attractions = nearbyPlaces.map(({ id, title, coordinates, source }) => ({ id, title, coordinates, source }));
 export const demoOrigin = '55.6114867,35.7982525';
@@ -34,35 +35,59 @@ function straightLineKm([lat, lon], [targetLat, targetLon]) {
 function distanceMinutes(point, destination, mode) {
   // A planning allowance for longer paths and different paces, without geocoding or live traffic.
   const speed = mode === 'walk' ? 4 : 35;
+  const minimum = mode === 'walk' ? 10 : 5;
   const estimatedMinutes = straightLineKm(point, destination) * 1.4 / speed * 60;
-  return Math.max(10, Math.ceil(estimatedMinutes / 5) * 5);
+  return Math.max(minimum, Math.ceil(estimatedMinutes));
 }
 
 export function estimateOutingTravel(place, transport, origin = demoOrigin) {
   if (!place) return { travelMinutes: NaN, travelEstimateSource: 'unavailable' };
   const value = typeof origin === 'string' ? origin.trim() : '';
   const point = parseCoordinates(value);
-  const atReferenceOrigin = !value || point?.every((coordinate, index) => coordinate === referenceOrigin[index]);
+  // Coordinates copied from a map may be rounded without changing the departure point.
+  const atReferenceOrigin = !point || straightLineKm(point, referenceOrigin) <= 0.02;
   const mode = transport === 'walk' ? 'walk' : 'auto';
   const seconds = referenceTravelSeconds[mode][place.id];
-  if (atReferenceOrigin && seconds) return { travelMinutes: Math.ceil(seconds / 300) * 5, travelEstimateSource: 'reference' };
-  if (value && !point) return {
-    travelMinutes: seconds ? Math.ceil(seconds / 300) * 5 : distanceMinutes(referenceOrigin, place.coordinates, mode),
-    travelEstimateSource: 'default-origin',
-  };
+  const hasReference = atReferenceOrigin && Number.isFinite(seconds);
   return {
-    travelMinutes: distanceMinutes(point || referenceOrigin, place.coordinates, mode),
-    travelEstimateSource: 'coordinates',
+    travelMinutes: hasReference ? Math.round(seconds / 60) : distanceMinutes(point || referenceOrigin, place.coordinates, mode),
+    travelEstimateSource: value && !point ? 'default-origin' : hasReference ? 'reference' : 'coordinates',
   };
 }
+const allSeasons = Object.keys(seasonLabels);
+const siteInterestsBySeason = allSeasons.map(season => [
+  season, new Set(getSeasonActivities(season, 'mozhaysk').map(item => item.title)),
+]);
+const siteSeasons = title => siteInterestsBySeason.filter(([, titles]) => titles.has(title)).map(([season]) => season);
+const outdoorConditions = 'Уточните у команды отеля доступность с учётом погоды и текущих условий.';
+const equipmentConditions = 'Уточните наличие инвентаря и условия участия у команды отеля.';
+
+export const onsiteInterests = [
+  { id: 'beach', group: 'nature', title: 'Спокойный отдых у воды', detail: 'Тишина, книга и свободное время', seasons: allSeasons },
+  { id: 'walk', group: 'nature', title: 'Пешие тропы', detail: 'Неспешный маршрут с остановками' },
+  { id: 'fishing', group: 'nature', title: 'Рыбалка', detail: 'Рыбалка на водохранилище. Уточните место, условия и ограничения для выбранной даты.', duration: 90, page: 'spaces.html#fishing', confirmation: outdoorConditions },
+  { id: 'sunbathing', group: 'nature', title: 'Места для загара', detail: 'Чтение и спокойный отдых на солнце у воды в подходящую погоду.', duration: 60, page: 'spaces.html#sunbathing' },
+  { id: 'garden', group: 'nature', title: 'Садовые парники', detail: 'Прогулка к парникам и знакомство с растениями на территории отеля.', duration: 30, page: 'leisure-garden.html', confirmation: outdoorConditions },
+  { id: 'bike', group: 'active', title: 'Велосипеды', detail: 'Взрослый и детский прокат, прогулка по велотропам' },
+  { id: 'table-tennis', group: 'active', title: 'Настольный теннис', detail: 'Партия в настольный теннис с прокатным инвентарём.', duration: 45, page: 'spaces.html#rental', confirmation: equipmentConditions },
+  { id: 'ball-games', group: 'active', title: 'Мячи', detail: 'Совместная игра с мячом на открытом воздухе.', duration: 45, page: 'spaces.html#rental', confirmation: equipmentConditions },
+  { id: 'sport-rental', group: 'active', title: 'Спортивный инвентарь', detail: 'Выберите доступный инвентарь в прокате и оставьте время для игры.', duration: 45, page: 'spaces.html#rental', confirmation: equipmentConditions },
+  { id: 'sup', group: 'active', title: 'SUP-прогулки', detail: 'Прогулка на доске вдоль берега при подходящих условиях на воде.', duration: 60, page: 'leisure-sup.html', confirmation: 'Уточните погоду, наличие досок и спасательных жилетов, допустимый возраст и условия выхода на воду.' },
+  { id: 'buggy', group: 'active', title: 'Багги', detail: 'Выезд по маршруту с инструктором' },
+  { id: 'skating', group: 'active', title: 'Каток', detail: 'Катание на коньках на открытом катке.', duration: 60, page: 'spaces.html#ice-rink', confirmation: 'Уточните состояние льда, доступность катка и условия проката.' },
+  { id: 'snowmobile', group: 'active', title: 'Снегоходы', detail: 'Поездка по заснеженному маршруту в подходящих условиях.', duration: 90, page: 'spaces.html#snowmobiles', confirmation: 'Согласуйте условия выезда, экипировку и возрастные ограничения с командой отеля.' },
+  { id: 'tubing', group: 'active', title: 'Ватрушки', detail: 'Катание на ватрушках на подходящей снежной горке.', duration: 60, page: 'spaces.html#tubing', confirmation: 'Уточните состояние горки, доступность проката и правила катания.' },
+  { id: 'zoo', group: 'family', title: 'Контактный зоопарк', detail: 'Знакомство с животными вместе со взрослым. Следуйте правилам зоопарка.', duration: 45, page: 'leisure-children.html#zoo', confirmation: 'Уточните часы посещения и правила контакта с животными.' },
+  { id: 'play-area', group: 'family', title: 'Детские игровые зоны', detail: 'Игры в детской зоне на территории с сопровождающим взрослым.', duration: 45, page: 'leisure-children.html#play-area', confirmation: outdoorConditions },
+  { id: 'learning-games', group: 'family', title: 'Развивающие игры', detail: 'Игры на внимание, память и логику по возрасту ребёнка.', duration: 30, page: 'leisure-children.html#games' },
+  { id: 'firepit', group: 'gatherings', title: 'Костровая зона', detail: 'Встреча с близкими и спокойный отдых у огня на берегу.', duration: 60, page: 'leisure-firepit.html', confirmation: 'Уточните доступность костровой зоны и правила разведения огня.' },
+  { id: 'pavilion', group: 'gatherings', title: 'Павильоны для праздников', detail: 'Обсудите аренду павильона для семейного праздника или встречи.', duration: 30, page: 'pavilions.html', confirmation: 'Отдельно согласуйте аренду павильона, время и условия с командой отеля.' },
+].map(item => ({ ...item, seasons: item.seasons ?? siteSeasons(item.title) }));
+
 export const interests = [
-  { id: 'beach', title: 'Пляж и отдых у воды', detail: 'Тишина, книга и свободное время' },
-  { id: 'walk', title: 'Прогулки', detail: 'Неспешный маршрут с остановками' },
-  { id: 'bike', title: 'Велосипеды', detail: 'Прогулка по разрешённым велотропам' },
-  { id: 'buggy', title: 'Багги', detail: 'Выезд по маршруту с инструктором' },
+  ...onsiteInterests,
   { id: 'sights', title: 'Достопримечательности', detail: 'Бородино, Можайск и окрестности' },
 ];
-export const onsiteInterests = interests.filter(item => item.id !== 'sights');
 export const childActivityOptions = [
   { id: 'creative', title: 'Рисование и поделки', detail: 'Спокойные творческие занятия', minAge: 3 },
   { id: 'games', title: 'Подвижные игры', detail: 'Игры на территории с учётом погоды', minAge: 3 },
@@ -79,7 +104,7 @@ export const outingTransports = {
 export const services = [
   { id: 'restaurant', title: 'Ресторан', detail: 'Ужин или обед за общим столом', duration: 60, preferred: '19:00', page: 'restaurant.html' },
   { id: 'banya', title: 'Баня', detail: 'Два часа с перерывами на отдых', duration: 120, preferred: '16:00', page: 'banya.html' },
-  { id: 'barbecue', title: 'Мангальная зона', detail: 'Два часа для неспешного пикника', duration: 120, preferred: '18:00', page: 'spaces.html#barbecue' },
+  { id: 'barbecue', title: 'Мангалы и беседки', detail: 'Два часа для неспешного пикника', duration: 120, preferred: '18:00', page: 'spaces.html#barbecue' },
 ];
 
 export const routeIdeas = {

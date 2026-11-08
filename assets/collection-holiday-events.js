@@ -1,5 +1,5 @@
-import { clock, dateLabel } from './collection-holiday-engine.js';
-import { isHotelEventEdit } from './collection-holiday-edits.js?v=20261108-hotel-events-1';
+import { clock, dateLabel } from './collection-holiday-engine.js?v=20261108-route-pdf-1';
+import { isHotelEventEdit } from './collection-holiday-edits.js?v=20261108-route-pdf-1';
 
 export const hotelEventLabels = {
   event: 'Событие отеля',

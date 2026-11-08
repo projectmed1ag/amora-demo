@@ -1,6 +1,6 @@
-import { breakfastNotice, clock, dateLabel, excursionSettings } from './collection-holiday-engine.js';
-import { childActivityOptions, outingTransports } from './collection-holiday-data.js';
-import { prepareHolidayRouteGuide } from './collection-holiday-route-guide.js';
+import { breakfastNotice, clock, dateLabel, excursionSettings } from './collection-holiday-engine.js?v=20261108-route-pdf-1';
+import { childActivityOptions, outingTransports } from './collection-holiday-data.js?v=20261108-route-pdf-1';
+import { prepareHolidayRouteGuide } from './collection-holiday-route-guide.js?v=20261108-route-pdf-1';
 
 const width = 960;
 const height = 540;
@@ -222,11 +222,13 @@ function dayHighlights(day) {
     .map(item => item.title).join(' · ') || 'Отдых в своём ритме';
 }
 
-async function loadImage(path) {
-  const image = new Image();
-  image.src = new URL(path, import.meta.url).href;
-  await image.decode();
-  return image;
+function loadImage(path) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error(`Не удалось загрузить изображение для PDF: ${path}`));
+    image.src = new URL(path, import.meta.url).href;
+  });
 }
 
 export async function buildHolidayPdf(plan, { lodging = '' } = {}) {
@@ -236,7 +238,8 @@ export async function buildHolidayPdf(plan, { lodging = '' } = {}) {
     loadImage('./collection-pdf-wordmark.png'),
     prepareHolidayRouteGuide(plan),
     Promise.all(keys.map(async key => [key, await loadImage(gallery[key]).catch(() => null)])),
-    document.fonts.load(display(52), 'ПРОГРАММА ОТДЫХА'),
+    // The canvas font already includes Cyrillic-capable system fallbacks.
+    document.fonts?.load(display(52), 'ПРОГРАММА ОТДЫХА').catch(() => {}),
   ]);
   const photos = Object.fromEntries(images);
   const pages = [];
@@ -498,14 +501,12 @@ export async function buildHolidayPdf(plan, { lodging = '' } = {}) {
   return makePdf(pages, canvas.width, canvas.height);
 }
 
-export async function downloadHolidayPdf(plan, options) {
+export async function prepareHolidayPdfDownload(plan, options) {
   const blob = await buildHolidayPdf(plan, options);
   const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = `amore-plan-${plan.answers.startDate}.pdf`;
-  document.body.append(link);
-  link.click();
-  link.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 10000);
+  return {
+    url,
+    filename: `amore-plan-${plan.answers.startDate}.pdf`,
+    release: () => URL.revokeObjectURL(url),
+  };
 }

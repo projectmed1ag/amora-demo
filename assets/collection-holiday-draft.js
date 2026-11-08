@@ -1,6 +1,6 @@
-import { attractions, childActivityOptions, interests, outingTransports, services } from './collection-holiday-data.js';
-import { dateNumber, minutes } from './collection-holiday-engine.js';
-import { isHotelEventEdit } from './collection-holiday-edits.js?v=20261108-hotel-events-1';
+import { attractions, childActivityOptions, interests, outingTransports, services } from './collection-holiday-data.js?v=20261108-route-pdf-1';
+import { dateNumber, minutes } from './collection-holiday-engine.js?v=20261108-route-pdf-1';
+import { isHotelEventEdit } from './collection-holiday-edits.js?v=20261108-route-pdf-1';
 import { holidayLodgings } from './collection-holiday-lodging.js';
 
 const version = 1;

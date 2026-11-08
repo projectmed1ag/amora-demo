@@ -6,7 +6,7 @@ import { initHeadingFormat } from './collection-heading-format.js?v=20261023-loc
 initCollectionMotion();
 initHeadingFormat();
 // The optional planner never blocks the existing page controls.
-void import('./collection-holiday-entry.js?v=20261106-1')
+void import('./collection-holiday-entry.js?v=20261108-cta-1')
   .then(({ initHolidayPlannerEntry }) => initHolidayPlannerEntry())
   .catch(() => {});
 const header = document.querySelector('.home-header');

@@ -37,6 +37,7 @@ body.holiday-planner-page { color: #303442; background: #faf9f6; --planner-gold:
 .planner-choices-inline { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .planner-choice { display: flex; align-items: flex-start; gap: 13px; cursor: pointer; padding: 18px; border: 1px solid #e3e4e8; background: #fff; }
 .planner-choice:has(input:checked) { border-color: #a89268; background: #f8f6f1; }
+.planner-choice:has(input:disabled) { cursor: default; background: #f3f2ef; }
 .planner-choice:has(input:focus-visible) { outline: 2px solid #a89268; outline-offset: 3px; }
 .planner-choice input { flex: 0 0 17px; width: 17px; height: 17px; margin: 3px 0 0; accent-color: #303442; }
 .planner-choice strong { display: block; font-size: 14px; font-weight: 400; }
@@ -84,6 +85,8 @@ body.holiday-planner-page { color: #303442; background: #faf9f6; --planner-gold:
 .planner-options summary:hover, .planner-mobile-summary summary:hover { text-decoration: underline; text-underline-offset: 4px; }
 .planner-options[open] { padding-bottom: 12px; }
 .planner-options[open] > summary { margin-bottom: 8px; }
+.planner-activity-group { margin: 0; border-top: 0; }
+.planner-activity-group:first-child { border-top: 1px solid #dcd7cd; }
 .planner-service-options { display: grid; gap: 16px; }
 .planner-service-time { margin-top: 12px; padding-left: 18px; max-width: 260px; }
 .planner-review { margin: 24px 0; }

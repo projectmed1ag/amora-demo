@@ -1,5 +1,5 @@
-import { onsiteInterests, services } from './collection-holiday-data.js';
-import { clock, createInterestItem, createServiceItem, dateNumber, familyActivity, isBreakfastTime, minutes, notesForSchedule, withScheduleGaps } from './collection-holiday-engine.js';
+import { onsiteInterests, services } from './collection-holiday-data.js?v=20261108-route-pdf-1';
+import { availableInterestOnDate, breakfastNotice, clock, createInterestItem, createServiceItem, dateNumber, familyActivity, isBreakfastTime, minutes, notesForSchedule, unavailableInterestReason, withScheduleGaps } from './collection-holiday-engine.js?v=20261108-route-pdf-1';
 
 const fixedKinds = new Set(['arrival', 'departure', 'visit', 'free']);
 const hotelEventTypes = new Set(['event', 'activity', 'theme-night']);
@@ -46,7 +46,8 @@ function replacementTemplates(answers, date) {
     );
   }
   for (const { id } of onsiteInterests) {
-    templates.push({ ...createInterestItem(id, date, answers), id: `activity:${id}` });
+    const item = createInterestItem(id, date, answers);
+    if (item) templates.push({ ...item, id: `activity:${id}` });
   }
   for (const { id } of services) templates.push({ ...createServiceItem(answers, id), id: `service:${id}` });
   return templates;
@@ -108,15 +109,21 @@ export function applyScheduleEdit(plan, edit) {
         template = { kind: 'custom', title, duration: edit.duration, detail: 'Добавлено вручную.' };
       } else {
         template = replacementTemplates(plan.answers, targetDay.date).find(option => option.id === replacementId);
-        if (!template) return reject('Выберите занятие из списка.');
+        if (!template) {
+          const interest = onsiteInterests.find(item => replacementId === `activity:${item.id}`);
+          return reject(interest ? unavailableInterestReason(interest.id) : 'Выберите занятие из списка.');
+        }
       }
     }
 
+    if (template.interest && !availableInterestOnDate(template.interest, targetDay.date)) {
+      return reject(unavailableInterestReason(template.interest));
+    }
     const end = start + template.duration;
     if (start < targetDay.start || end > targetDay.end) return reject(hotelEvent
       ? 'Событие отеля выходит за пределы расписания этого дня.'
       : 'Занятие выходит за пределы выбранного дня. Укажите другое время или дату.');
-    if (template.meal === 'breakfast' && !isBreakfastTime(start, end)) return reject('Завтрак должен полностью уложиться в интервал с 07:00 до 10:00.');
+    if (template.meal === 'breakfast' && !isBreakfastTime(start, end)) return reject(`${breakfastNotice} Выберите время, чтобы завтрак полностью поместился в этот интервал.`);
     const conflict = targetDay.items.find(item => item.id !== edit.itemId && item.kind !== 'free' && start < item.end && item.start < end);
     if (conflict) return reject(`Пересечение с «${conflict.title}» в ${clock(conflict.start)}.${hotelEvent ? '' : ' Выберите свободное время.'}`);
     if (adding) {
