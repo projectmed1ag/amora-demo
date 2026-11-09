@@ -220,13 +220,22 @@ function tripSummaryLines() {
   ];
 }
 
-function summaryValuesMarkup() {
-  return [...tripSummaryLines(), ...(answers.children > 0 ? [['Семейный формат', familyModeLabel()]] : []), ['Формат отдыха', outingModeLabel()]]
+function previousSteps() {
+  const sequence = steps();
+  return quickEdit ? [] : sequence.slice(0, Math.max(0, sequence.indexOf(current)));
+}
+
+function summaryValuesMarkup(includeHistory = false) {
+  const history = includeHistory ? previousSteps().filter(step => ['rhythm', 'outings', 'routes', 'services'].includes(step))
+    .map(step => step === 'outings' ? ['Занятия', interestsLabel()] : [questions[step], answerLabel(step)]) : [];
+  return [...tripSummaryLines(), ...(answers.children > 0 ? [['Семейный формат', familyModeLabel()]] : []), ['Формат отдыха', outingModeLabel()], ...history]
     .map(([label, value]) => `<div><dt>${label}</dt><dd>${esc(value)}</dd></div>`).join('');
 }
 
 function renderSummaryValues() {
-  for (const summary of root.querySelectorAll('[data-trip-summary]')) summary.innerHTML = summaryValuesMarkup();
+  for (const summary of root.querySelectorAll('[data-trip-summary]')) {
+    summary.innerHTML = summaryValuesMarkup(summary.dataset.tripSummary === 'history');
+  }
 }
 
 function summaryLines() {
@@ -271,6 +280,10 @@ function lodgingMarkup() {
     <p class="planner-catalog"><a href="./rooms.html?city=mozhaysk" target="_blank" rel="noopener">Посмотреть фотографии и описание хаусботов ↗</a></p>`;
 }
 
+function interestCountLabel() {
+  return answers.suggestActivities ? 'Подбор помощника' : `Выбрано: ${selectedInterests().length}`;
+}
+
 function interestsMarkup() {
   const groups = {
     family: 'Детям и всей семье',
@@ -278,33 +291,43 @@ function interestsMarkup() {
     active: 'Спорт и активный отдых',
     gatherings: 'Посиделки и праздники',
   };
-  const available = item => availableInterestInStay(item.id, answers.startDate, answers.endDate);
+  const inSeason = [];
+  const outOfSeason = [];
+  for (const item of onsiteInterests) {
+    const list = availableInterestInStay(item.id, answers.startDate, answers.endDate) ? inSeason : outOfSeason;
+    list.push(item);
+  }
+  const selected = item => answers.interests.includes(item.id);
   return `<div class="planner-choices">
     ${choice('suggestActivities', 'yes', 'Предложите за меня', 'Помощник учтёт ваш ритм, сезон и состав компании.', answers.suggestActivities && !selectedInterests().length, 'checkbox')}
     <div class="planner-activity-groups">${Object.entries(groups).map(([id, title]) => {
-      const items = onsiteInterests.filter(item => (item.group || 'nature') === id)
-        .sort((a, b) => Number(available(b)) - Number(available(a)));
+      const items = inSeason.filter(item => (item.group || 'nature') === id);
       if (!items.length) return '';
       const open = ['family', 'nature'].includes(id) || (id === 'active' && answers.pace === 'active')
-        || items.some(item => answers.interests.includes(item.id));
+        || items.some(selected);
       return `<details class="planner-options planner-activity-group"${open ? ' open' : ''}>
         <summary>${title}</summary>
-        <div class="planner-choices planner-choices-inline">${items.map(item => {
-          const selected = answers.interests.includes(item.id);
-          const inSeason = available(item);
-          const season = !inSeason
-            ? ` · Вне сезона на выбранные даты. Сезон: ${interestSeasonLabel(item.id)}` : '';
-          return choice('interests', item.id, esc(item.title), esc(item.detail + season), selected, 'checkbox', !selected && !inSeason);
-        }).join('')}</div>
+        <div class="planner-choices planner-choices-inline">${items.map(item =>
+          choice('interests', item.id, esc(item.title), esc(item.detail), selected(item), 'checkbox')
+        ).join('')}</div>
       </details>`;
     }).join('')}</div>
+    ${outOfSeason.length ? `<details class="planner-options planner-offseason" data-out-of-season${outOfSeason.some(selected) ? ' open' : ''}>
+      <summary>Занятия вне сезона (${outOfSeason.length})</summary>
+      <div class="planner-choices planner-choices-inline">${outOfSeason.map(item =>
+        choice('interests', item.id, esc(item.title), esc(`Сезон: ${interestSeasonLabel(item.id)}`), selected(item), 'checkbox', !selected(item))
+      ).join('')}</div>
+    </details>` : ''}
   </div>`;
 }
 
 function outingsMarkup() {
   return `<fieldset>
       <legend>Занятия в отеле и рядом</legend>
-      <p class="planner-help">Выберите то, что нравится. Можно оставить это время свободным.</p>
+      <div class="planner-selection-help">
+        <p class="planner-help">Можно выбрать несколько занятий или оставить это время свободным.</p>
+        <p class="planner-selection-count" role="status" data-interest-count>${interestCountLabel()}</p>
+      </div>
       ${interestsMarkup()}
     </fieldset>
     <fieldset>
@@ -365,8 +388,7 @@ function familyModeNote() {
 function questionMarkup() {
   if (current === 'dates') return `<p class="planner-help">Можно приехать одним днём или остаться с ночёвкой. Учитываю время приезда и отъезда. Всё расписание — по московскому времени.</p><div class="planner-fields">${field('startDate', 'Дата приезда', 'date', answers.startDate, `min="${today()}" required`)}${field('endDate', 'Дата отъезда', 'date', answers.endDate, `min="${answers.startDate}" required`)}${field('arrival', 'Время приезда', 'time', answers.arrival, 'required')}${field('departure', 'Время отъезда', 'time', answers.departure, 'required')}</div>`;
   if (current === 'party') return partyMarkup();
-  if (current === 'rhythm') return `<div class="planner-choices">${choice('pace', 'calm', 'Никуда не спешить', 'Больше пауз, тишины и отдыха у воды', answers.pace === 'calm')}${choice('pace', 'balanced', 'Всего понемногу', 'Занятия чередуются со свободным временем', answers.pace === 'balanced')}${choice('pace', 'active', 'Больше впечатлений', 'Больше времени для занятий по интересам', answers.pace === 'active')}</div>
-    ${overnight() ? `<details class="planner-options"><summary>Настроить время начала дня и вечернего отдыха</summary><div class="planner-fields">${field('wake', 'Начало дня', 'time', answers.wake, 'required')}${field('rest', 'Вечерний отдых с', 'time', answers.rest, 'required')}</div></details>` : ''}`;
+  if (current === 'rhythm') return `<div class="planner-choices">${choice('pace', 'calm', 'Никуда не спешить', 'Больше пауз, тишины и отдыха у воды', answers.pace === 'calm')}${choice('pace', 'balanced', 'Всего понемногу', 'Занятия чередуются со свободным временем', answers.pace === 'balanced')}${choice('pace', 'active', 'Больше впечатлений', 'Больше времени для занятий по интересам', answers.pace === 'active')}</div>`;
   if (current === 'lodging') return lodgingMarkup();
   if (current === 'outings') return outingsMarkup();
   if (current === 'routes') return `${quickEdit ? '<button type="button" class="planner-edit" data-change-outing-mode>Изменить занятия и поездки</button>' : ''}${routesMarkup()}`;
@@ -512,13 +534,19 @@ function continueLabel() {
   if (quickEdit && current === 'outings' && !stayingAtHotel()) return 'Выбрать места';
   if (quickEdit) return quickEdit.source === 'result' ? 'Пересчитать план' : 'Применить';
   if (current === 'review') return 'Составить программу';
-  if (current === 'services' && !answers.services.length) return 'Пропустить';
-  return 'Продолжить';
+  const sequence = steps();
+  const next = sequence[sequence.indexOf(current) + 1];
+  return {
+    party: 'Указать гостей', lodging: 'Выбрать размещение', rhythm: 'Выбрать ритм',
+    outings: 'Выбрать занятия', routes: 'Настроить поездки', services: 'Выбрать услуги', review: 'Проверить программу',
+  }[next] || 'Продолжить';
 }
 
 function renderQuestion(focus = true) {
   releasePreparedPdf();
   const sequence = steps(), index = sequence.indexOf(current);
+  const history = previousSteps();
+  const stickyActions = ['lodging', 'outings', 'routes', 'services', 'review'].includes(current);
   const title = current === 'party'
     ? quickEdit ? 'Как проведём семейный отдых?' : bookingCompact ? 'Сколько из гостей — дети?' : questions.party
     : questions[current];
@@ -531,17 +559,21 @@ function renderQuestion(focus = true) {
           <span class="planner-assistant-caption">Помощник по отдыху</span>
         </div>
       </div>
-      ${index > 0 && !quickEdit ? `<details class="planner-history"><summary>Ваши предыдущие ответы</summary><ol>${sequence.slice(0, index).map(step => `<li><span>${questions[step]}</span><p>${esc(answerLabel(step))}</p></li>`).join('')}</ol></details>` : ''}
-      <details class="planner-mobile-summary"><summary>Ваш отдых</summary><dl class="planner-summary-values" data-trip-summary>${summaryValuesMarkup()}</dl></details>
+      <details class="planner-step-summary${history.length ? ' has-history' : ''}">
+        <summary><span class="planner-summary-desktop">Ваши предыдущие ответы</span><span class="planner-summary-mobile">${history.length ? 'Ваш отдых и ответы' : 'Ваш отдых'}</span></summary>
+        <ol class="planner-summary-desktop">${history.map(step => `<li><span>${questions[step]}</span><p>${esc(answerLabel(step))}</p></li>`).join('')}</ol>
+        <dl class="planner-summary-values planner-summary-mobile" data-trip-summary="history">${summaryValuesMarkup(true)}</dl>
+      </details>
       <h2 id="planner-question" tabindex="-1">${title}</h2>
       <form id="holiday-questions" novalidate>
         <div class="planner-errors" role="alert" hidden></div>
         ${questionMarkup()}
-        <div class="planner-question-actions">
-          ${index > 0 || quickEdit ? `<button type="button" class="planner-button planner-button-light" data-back>${quickEdit ? 'Отмена' : 'Назад'}</button>` : '<span></span>'}
+        <div class="planner-question-actions${stickyActions ? ' planner-question-actions-sticky' : ''}">
+          ${index > 0 || quickEdit ? `<button type="button" class="planner-button planner-button-light" data-back>${quickEdit ? 'Отмена' : 'Назад'}</button>` : ''}
+          <button class="planner-button planner-next" type="submit"><span data-continue-label>${continueLabel()}</span> <span aria-hidden="true">→</span></button>
           ${!quickEdit && current === 'outings' ? `<button class="planner-button planner-button-light" type="submit" data-first-plan${canBuildFirstPlan() ? '' : ' hidden'}>Составить первый план</button>` : ''}
-          <button class="planner-button" type="submit"><span data-continue-label>${continueLabel()}</span> <span aria-hidden="true">→</span></button>
         </div>
+        ${current === 'rhythm' && overnight() ? `<details class="planner-options planner-rhythm-options"><summary>Настроить время начала дня и вечернего отдыха</summary><div class="planner-fields">${field('wake', 'Начало дня', 'time', answers.wake, 'required')}${field('rest', 'Вечерний отдых с', 'time', answers.rest, 'required')}</div></details>` : ''}
       </form>
     </section>
     <aside class="planner-sidebar">
@@ -565,6 +597,15 @@ function renderQuestion(focus = true) {
     form.querySelector('[data-continue-label]').textContent = continueLabel();
     const firstPlan = form.querySelector('[data-first-plan]');
     if (firstPlan) firstPlan.hidden = !canBuildFirstPlan();
+    const interestCount = form.querySelector('[data-interest-count]');
+    if (interestCount) {
+      const label = interestCountLabel();
+      if (interestCount.textContent !== label) interestCount.textContent = label;
+      for (const input of form.querySelectorAll('[data-out-of-season] input')) {
+        if (!input.checked && document.activeElement === input) input.closest('details').querySelector('summary').focus();
+        input.disabled = !input.checked;
+      }
+    }
     const progress = root.querySelector('.planner-progress progress');
     if (progress) {
       progress.max = steps().length;

@@ -70,6 +70,7 @@ body.holiday-planner-page {
 .planner-booking-summary { margin: 0 0 20px; }
 .planner-booking-actions { display: flex; flex-wrap: wrap; gap: 0 18px; }
 .planner-question-actions { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding-top: 28px; margin-top: 28px; border-top: 1px solid #e3e4e8; }
+.planner-question-actions .planner-next { margin-inline-start: auto; }
 .planner-button { display: inline-flex; justify-content: center; align-items: center; gap: 20px; padding: 14px 20px; min-height: 48px; border: 1px solid #303442; color: #fff; background: #303442; font: 400 12px/1.5 var(--body-font); cursor: pointer; }
 .planner-button:hover { background: #464b5b; }
 .planner-button:disabled { cursor: wait; opacity: .65; }
@@ -91,12 +92,13 @@ body.holiday-planner-page {
 .planner-summary-values dt { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--planner-secondary); }
 .planner-summary-values dd { margin: 4px 0 0; font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
 .planner-summary-values small { display: block; color: var(--planner-secondary); font-size: 12px; }
-.planner-mobile-summary { display: none; }
-.planner-history { font-size: 12px; margin: -6px 0 28px; color: var(--planner-secondary); }
-.planner-history summary, .planner-text summary { cursor: pointer; min-height: 44px; padding: 12px 0; text-decoration: underline; text-underline-offset: 4px; }
-.planner-history ol { padding: 0; margin: 10px 0; list-style: none; }
-.planner-history li { border-left: 2px solid #a89268; padding: 4px 0 4px 14px; margin: 18px 0; }
-.planner-history p { margin: 8px 0 0; color: #303442; }
+.planner-step-summary, .planner-summary-mobile { display: none; }
+.planner-step-summary.has-history { display: block; }
+.planner-step-summary { font-size: 12px; margin: -6px 0 28px; color: var(--planner-secondary); }
+.planner-step-summary summary, .planner-text summary { cursor: pointer; min-height: 44px; padding: 12px 0; text-decoration: underline; text-underline-offset: 4px; }
+.planner-step-summary ol { padding: 0; margin: 10px 0; list-style: none; }
+.planner-step-summary li { border-left: 2px solid #a89268; padding: 4px 0 4px 14px; margin: 18px 0; }
+.planner-step-summary p { margin: 8px 0 0; color: #303442; }
 .planner-errors, .planner-unplaced { padding: 20px; background: #fcf1eb; color: #8b3c22; font-size: 13px; line-height: 1.7; margin-bottom: 24px; }
 .planner-errors ul, .planner-unplaced ul { padding-left: 20px; margin-bottom: 0; }
 .planner-route-preview { display: grid; gap: 8px; margin: 20px 0 24px; }
@@ -107,14 +109,19 @@ body.holiday-planner-page {
 .planner-outing-overview { margin: 0 0 12px; color: var(--planner-secondary); font-size: 13px; line-height: 1.6; }
 .planner-options { margin: 12px 0 20px; border-block: 1px solid #dcd7cd; }
 .planner-outing .planner-options { margin-bottom: 0; }
-.planner-options summary, .planner-mobile-summary summary { min-height: 44px; padding: 11px 0; color: #303442; font-size: 13px; font-weight: 600; line-height: 1.6; cursor: pointer; }
-.planner-options summary:hover, .planner-mobile-summary summary:hover { text-decoration: underline; text-underline-offset: 4px; }
+.planner-options summary, .planner-step-summary summary { min-height: 44px; padding: 11px 0; color: #303442; font-size: 13px; font-weight: 600; line-height: 1.6; cursor: pointer; }
+.planner-options summary:hover, .planner-step-summary summary:hover { text-decoration: underline; text-underline-offset: 4px; }
 .planner-options[open] { padding-bottom: 12px; }
 .planner-options[open] > summary { margin-bottom: 8px; }
 .planner-activity-group { margin: 0; border-top: 0; }
 .planner-activity-group:first-child { border-top: 1px solid #dcd7cd; }
 .planner-activity-group > summary { padding-inline: 12px; background: #edf1f7; color: #263a59; }
 .planner-activity-group[open] > summary { background: #e1e8f2; }
+.planner-offseason { margin: 0; }
+.planner-rhythm-options { margin: 18px 0 0; }
+.planner-selection-help { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-bottom: 16px; }
+.planner-selection-help .planner-help { margin: 0; }
+.planner-selection-count { margin: 0; padding: 3px 10px; border-radius: 5px; background: #edf1f7; color: #263a59; font-size: 12px; font-weight: 600; }
 .planner-service-options { display: grid; gap: 16px; }
 .planner-service-time { margin-top: 12px; padding-left: 18px; max-width: 260px; }
 .planner-review { margin: 24px 0; }
@@ -225,8 +232,15 @@ body.holiday-planner-page {
   .planner-layout { grid-template-columns: 1fr; }
   .planner-sidebar { display: none; }
   .planner-conversation { padding: 24px 20px; }
-  .planner-mobile-summary { display: block; margin: 0 0 16px; padding: 0 12px; border: 1px solid #dcd7cd; background: #f8f6f1; }
-  .planner-mobile-summary .planner-summary-values { margin: 0; }
+  .planner-step-summary { display: block; margin: 0 0 16px; padding: 0 12px; border: 1px solid #dcd7cd; background: #f8f6f1; }
+  .planner-summary-desktop { display: none; }
+  .planner-summary-mobile { display: inline; }
+  .planner-step-summary summary { text-decoration: none; }
+  .planner-step-summary .planner-summary-values { display: block; margin: 0; }
+  .planner-question-actions { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px; padding-top: 16px; margin-top: 20px; }
+  .planner-question-actions .planner-next { margin-inline-start: 0; gap: 10px; }
+  .planner-question-actions .planner-button { padding-inline: 12px; }
+  .planner-question-actions > :is(.planner-next:only-child, [data-first-plan]) { grid-column: 1 / -1; }
   .planner-result { padding: 26px 20px; }
   .planner-result-heading { flex-direction: column; gap: 20px; }
   .planner-result-actions { display: flex; flex-wrap: wrap; width: 100%; }
@@ -240,13 +254,21 @@ body.holiday-planner-page {
   .planner-main { padding-inline: 14px; }
   .planner-conversation { padding-inline: 16px; }
   .planner-fields, .planner-age-grid, .planner-choices-inline { grid-template-columns: 1fr; gap: 14px; }
-  .planner-question-actions { flex-direction: column-reverse; }
-  .planner-question-actions > span { display: none; }
   .planner-choice { padding: 15px; }
   .planner-event { grid-template-columns: 1fr; gap: 8px; }
   .planner-event time span { display: inline; margin-left: 6px; }
   .planner-event-actions, .planner-item-editor-actions { gap: 8px; }
   .planner-item-editor { padding: 12px; }
+}
+@media (max-width: 760px) and (min-height: 500px) {
+  .planner-question-actions-sticky {
+    position: sticky; bottom: 0; z-index: 2; padding-block: 8px max(8px, env(safe-area-inset-bottom));
+    background: #fff; box-shadow: 0 -6px 14px #30344214;
+  }
+  #holiday-questions:has(:is(input:not([type="checkbox"]):not([type="radio"]), select, textarea):focus) .planner-question-actions-sticky {
+    position: static;
+  }
+  #holiday-questions:has(.planner-question-actions-sticky) :is(input, select, summary) { scroll-margin-bottom: 120px; }
 }
 @media (forced-colors: active) {
   .planner-choice:has(input:checked:not(:disabled)) { border: 2px solid Highlight; }
