@@ -1,5 +1,9 @@
 /* Planner UI is scoped; the original wordmark is owned by collection-brand.css. */
-body.holiday-planner-page { color: #303442; background: #faf9f6; --planner-gold: #a89268; --planner-secondary: #5f6470; }
+body.holiday-planner-page {
+  color: #303442; background: #faf9f6;
+  --planner-gold: #a89268; --planner-secondary: #5f6470;
+  --planner-action: #e6c275; --planner-action-hover: #efd18c; --planner-control-border: #7b8798;
+}
 .holiday-planner-page [hidden] { display: none !important; }
 .holiday-planner-page .home-menu-toggle:focus-visible ~ .home-header-end .home-menu { outline: 2px solid #a89268; outline-offset: -2px; }
 .planner-skip { position: fixed; left: 20px; top: -100px; padding: 12px; background: #fff; z-index: 200; }
@@ -14,12 +18,12 @@ body.holiday-planner-page { color: #303442; background: #faf9f6; --planner-gold:
 .planner-draft-actions { display: flex; flex-wrap: wrap; gap: 0 16px; }
 #planner-app { scroll-margin-top: 24px; }
 .planner-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 32px; align-items: start; }
-.planner-conversation { min-width: 0; padding: 36px; border: 1px solid #e3e4e8; background: #fff; }
-.planner-progress { display: flex; align-items: center; gap: 24px; margin-bottom: 22px; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+.planner-conversation { min-width: 0; padding: 36px; border: 1px solid #e3e4e8; border-top: 3px solid #b78c4a; background: #fff; }
+.planner-progress { display: flex; align-items: center; gap: 24px; margin-bottom: 22px; color: #41495a; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
 .planner-progress span { flex-shrink: 0; }
-.planner-progress progress { width: 100%; height: 3px; accent-color: #a89268; border: 0; }
-.planner-progress progress::-webkit-progress-bar { background: #edeae3; }
-.planner-progress progress::-webkit-progress-value { background: #a89268; }
+.planner-progress progress { width: 100%; height: 6px; accent-color: #a87b36; border: 0; }
+.planner-progress progress::-webkit-progress-bar { background: #e3e6eb; }
+.planner-progress progress::-webkit-progress-value { background: #a87b36; }
 .planner-assistant { display: flex; margin-bottom: 24px; }
 .planner-assistant-mark {
   display: inline-flex; flex-direction: column; align-items: center; gap: 5px; max-width: 100%;
@@ -36,17 +40,29 @@ body.holiday-planner-page { color: #303442; background: #faf9f6; --planner-gold:
 .planner-fields .planner-field, .planner-age-grid .planner-field { margin-bottom: 4px; }
 .planner-field label { display: block; margin-bottom: 8px; font-size: 12px; }
 .planner-field :is(input, select) { display: block; min-width: 0; max-width: 100%; width: 100%; min-height: 48px; padding: 12px; border: 1px solid #d4d5db; background: #fff; color: #303442; font: 400 16px/1.4 var(--body-font); }
+.planner-conversation .planner-field :is(input, select) { border-color: var(--planner-control-border); border-radius: 8px; background: #f7f8fa; }
 .planner-conversation fieldset { padding: 0; margin: 26px 0 20px; border: 0; min-width: 0; }
 .planner-conversation legend { padding: 0; margin-bottom: 14px; font-size: 13px; }
 .planner-choices { display: grid; gap: 10px; }
 .planner-choices-inline { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.planner-choice { display: flex; align-items: flex-start; gap: 13px; cursor: pointer; padding: 18px; border: 1px solid #e3e4e8; background: #fff; }
-.planner-choice:has(input:checked) { border-color: #a89268; background: #f8f6f1; }
-.planner-choice:has(input:disabled) { cursor: default; background: #f3f2ef; }
-.planner-choice:has(input:focus-visible) { outline: 2px solid #a89268; outline-offset: 3px; }
-.planner-choice input { flex: 0 0 17px; width: 17px; height: 17px; margin: 3px 0 0; accent-color: #303442; }
-.planner-choice strong { display: block; font-size: 14px; font-weight: 400; }
-.planner-choice small { display: block; margin-top: 5px; font-size: 12px; color: var(--planner-secondary); line-height: 1.6; }
+.planner-choice {
+  display: flex; align-items: flex-start; gap: 14px; min-width: 0; min-height: 58px; padding: 16px 18px;
+  border: 1px solid var(--planner-control-border); border-radius: 10px; background: #f5f7fa; color: #303442; cursor: pointer;
+}
+.planner-choice > span { min-width: 0; overflow-wrap: anywhere; }
+.planner-choice:has(input:checked:not(:disabled)) {
+  border-color: #303442; background: #303442; color: #fff; box-shadow: inset 4px 0 var(--planner-action);
+}
+.planner-choice:has(input:checked:not(:disabled)) small { color: #eef0f5; }
+.planner-choice:has(input:checked:not(:disabled)) input { accent-color: var(--planner-action); }
+.planner-choice:has(input:disabled) { border-color: #d7d4cc; background: #f3f2ef; color: #595d67; cursor: default; }
+.planner-choice:has(input:focus-visible) { outline: 2px solid #263a59; outline-offset: 3px; }
+.planner-choice input { flex: 0 0 22px; width: 22px; height: 22px; margin: 0; accent-color: #303442; }
+.planner-choice strong { display: block; font-size: 15px; font-weight: 650; }
+.planner-choice small { display: block; margin-top: 4px; font-size: 13px; color: var(--planner-secondary); line-height: 1.5; }
+@media (hover: hover) {
+  .planner-choice:hover:has(input:not(:checked):not(:disabled)) { border-color: #52647d; background: #e9eef6; }
+}
 .planner-catalog { margin: 12px 0 0; }
 .planner-catalog a, .planner-lodging-links a { display: inline-flex; align-items: center; min-height: 44px; font-size: 12px; text-decoration: underline; text-underline-offset: 4px; }
 .planner-hint { color: var(--planner-secondary); font-size: 12px; line-height: 1.7; margin: 10px 0 24px; }
@@ -59,6 +75,11 @@ body.holiday-planner-page { color: #303442; background: #faf9f6; --planner-gold:
 .planner-button:disabled { cursor: wait; opacity: .65; }
 .planner-button-light { color: #303442; border-color: #d4d5db; background: #fff; }
 .planner-button-light:hover { background: #f4f0e8; }
+.planner-question-actions .planner-button { border-radius: 8px; font-size: 14px; font-weight: 600; }
+.planner-question-actions button[type="submit"]:not(.planner-button-light) {
+  min-height: 52px; padding-inline: 24px; border-color: #9a702f; background: var(--planner-action); color: #282a30;
+}
+.planner-question-actions button[type="submit"]:not(.planner-button-light):hover { background: var(--planner-action-hover); }
 .planner-edit, .planner-event-edit { padding: 10px 0; min-height: 44px; border: 0; background: none; color: #303442; text-decoration: underline; text-underline-offset: 5px; font: inherit; font-size: 12px; cursor: pointer; }
 .planner-event-edit:hover { color: #655332; }
 .planner-sidebar { padding: 28px; background: #f1eee6; min-width: 0; }
@@ -92,6 +113,8 @@ body.holiday-planner-page { color: #303442; background: #faf9f6; --planner-gold:
 .planner-options[open] > summary { margin-bottom: 8px; }
 .planner-activity-group { margin: 0; border-top: 0; }
 .planner-activity-group:first-child { border-top: 1px solid #dcd7cd; }
+.planner-activity-group > summary { padding-inline: 12px; background: #edf1f7; color: #263a59; }
+.planner-activity-group[open] > summary { background: #e1e8f2; }
 .planner-service-options { display: grid; gap: 16px; }
 .planner-service-time { margin-top: 12px; padding-left: 18px; max-width: 260px; }
 .planner-review { margin: 24px 0; }
@@ -224,6 +247,9 @@ body.holiday-planner-page { color: #303442; background: #faf9f6; --planner-gold:
   .planner-event time span { display: inline; margin-left: 6px; }
   .planner-event-actions, .planner-item-editor-actions { gap: 8px; }
   .planner-item-editor { padding: 12px; }
+}
+@media (forced-colors: active) {
+  .planner-choice:has(input:checked:not(:disabled)) { border: 2px solid Highlight; }
 }
 @media print {
   body.holiday-planner-page { padding-top: 0; background: #fff; }
