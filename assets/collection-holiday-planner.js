@@ -227,7 +227,7 @@ function previousSteps() {
 
 function summaryValuesMarkup(includeHistory = false) {
   const history = includeHistory ? previousSteps().filter(step => ['rhythm', 'outings', 'routes', 'services'].includes(step))
-    .map(step => [questions[step], answerLabel(step)]) : [];
+    .map(step => step === 'outings' ? ['Занятия', interestsLabel()] : [questions[step], answerLabel(step)]) : [];
   return [...tripSummaryLines(), ...(answers.children > 0 ? [['Семейный формат', familyModeLabel()]] : []), ['Формат отдыха', outingModeLabel()], ...history]
     .map(([label, value]) => `<div><dt>${label}</dt><dd>${esc(value)}</dd></div>`).join('');
 }
@@ -601,7 +601,10 @@ function renderQuestion(focus = true) {
     if (interestCount) {
       const label = interestCountLabel();
       if (interestCount.textContent !== label) interestCount.textContent = label;
-      for (const input of form.querySelectorAll('[data-out-of-season] input')) input.disabled = !input.checked;
+      for (const input of form.querySelectorAll('[data-out-of-season] input')) {
+        if (!input.checked && document.activeElement === input) input.closest('details').querySelector('summary').focus();
+        input.disabled = !input.checked;
+      }
     }
     const progress = root.querySelector('.planner-progress progress');
     if (progress) {
