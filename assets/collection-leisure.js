@@ -1,4 +1,4 @@
-import { renderLeisureDetails } from './collection-leisure-details.js?v=20261023-entertainment-2';
+import { renderLeisureDetails } from './collection-leisure-details.js?v=20261109-no-captions-1';
 import { renderNearbyPlaces } from './collection-nearby.js?v=20261025-progressive-photos-1';
 
 const arrow = '<svg viewBox="0 0 28 20" aria-hidden="true" focusable="false"><path d="M2 10h22m-6-6 6 6-6 6"/></svg>';
@@ -49,7 +49,6 @@ export function renderCollectionLeisure() {
     <section class="cl-winter" id="winter" aria-labelledby="cl-winter-title">
       <header class="cl-winter-heading"><h2 id="cl-winter-title">Зимние дни.</h2><p>У зимы — свои маленькие радости.</p></header>
       <div class="cl-winter-row">${winterPanels.map((item, index) => panel(item, index, true)).join('')}</div>
-      <p class="cl-image-note">Атмосфера отдыха · иллюстрации</p>
     </section>
     ${renderNearbyPlaces()}
   </div>`;

@@ -2,7 +2,7 @@
   position: fixed; right: 24px; bottom: calc(var(--chapter-bottom, 0px) + 20px); z-index: 35;
   display: inline-flex; align-items: center; gap: 12px; min-height: 62px; padding: 10px 15px 10px 10px;
   border: 1px solid #c7aa76; border-radius: 12px; color: #fff; background: #303442;
-  box-shadow: 0 10px 30px #20233142; text-decoration: none; font: 400 14px/1.25 Arial, sans-serif;
+  box-shadow: 0 10px 30px #20233142; text-decoration: none; font: 400 14px/1.25 var(--body-font);
 }
 .holiday-planner-entry-mark {
   flex: 0 0 40px; width: 40px; height: 40px; display: grid; place-items: center;

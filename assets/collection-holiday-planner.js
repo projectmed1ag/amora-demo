@@ -38,6 +38,8 @@ let draftScope = draftCity;
 let bookingCompact = false;
 const localBookingHost = ['localhost', '127.0.0.1', '[::1]', '::1'].includes(location.hostname);
 const holidayApiBase = coordinationApiBase();
+const lodgingAvailabilityUrl = holidayApiBase
+  ? new URL(localBookingHost ? 'availability' : 'planner-availability', holidayApiBase) : null;
 let bookingConfigRequest;
 const overnight = () => answers.endDate > answers.startDate;
 const guestCount = () => answers.adults + answers.children;
@@ -175,6 +177,11 @@ function bookingEditButtons() {
     <button type="button" class="planner-edit" data-edit-booking="lodging">Изменить размещение</button>`;
 }
 
+function lodgingEditButton() {
+  return lodgingAvailabilityUrl && overnight()
+    ? '<button type="button" class="planner-edit" data-edit-booking="lodging">Проверить или изменить хаусбот</button>' : '';
+}
+
 function bookingPartyMarkup() {
   return `<div class="planner-note planner-booking-summary">
     <strong>Из бронирования</strong>
@@ -269,15 +276,133 @@ function answerLabel(step) {
 
 function lodgingMarkup() {
   const options = lodgingOptions();
+  const later = choice('lodging', '', 'Выбрать позже', '', !answers.lodging);
+  const catalog = '<p class="planner-catalog"><a href="./rooms.html?city=mozhaysk" target="_blank" rel="noopener">Посмотреть фотографии и описание хаусботов ↗</a></p>';
+  if (lodgingAvailabilityUrl && overnight() && options.length && answers.startDate >= today()) {
+    return `<div class="planner-lodging-availability" data-lodging-availability>
+      <p class="planner-lodging-status" role="status">Проверяем свободные хаусботы на ваши даты…</p>
+      <div data-lodging-options></div>
+      <button type="button" class="planner-edit" data-lodging-retry hidden>Проверить ещё раз</button>
+      <div class="planner-choices">${later}</div>
+    </div>${catalog}`;
+  }
   const prompt = options.length
     ? 'Показываю хаусботы, в которых поместится вся компания. Свободные даты можно проверить отдельно в сервисе бронирования.'
     : 'Для всей компании понадобится несколько хаусботов. Составьте общий план, а размещение можно подобрать отдельно в каталоге.';
   return `<p class="planner-help">${prompt}</p>
     <div class="planner-choices">
       ${options.map(item => choice('lodging', item.id, esc(item.label), isBookedLodging(item.id) ? 'Из бронирования' : `До ${item.capacity} гостей`, answers.lodging === item.id)).join('')}
-      ${choice('lodging', '', 'Выбрать позже', '', !answers.lodging)}
-    </div>
-    <p class="planner-catalog"><a href="./rooms.html?city=mozhaysk" target="_blank" rel="noopener">Посмотреть фотографии и описание хаусботов ↗</a></p>`;
+      ${later}
+    </div>${catalog}`;
+}
+
+function mountLodgingAvailability(form) {
+  const panel = form.querySelector('[data-lodging-availability]');
+  if (!panel) return;
+  const status = panel.querySelector('[role="status"]');
+  const cards = panel.querySelector('[data-lodging-options]');
+  const retry = panel.querySelector('[data-lodging-retry]');
+  const next = form.querySelector('.planner-next');
+  const later = panel.querySelector('input[value=""]');
+  const rooms = lodgingOptions();
+  const url = new URL(lodgingAvailabilityUrl);
+  url.search = new URLSearchParams({
+    city: draftCity, checkin: answers.startDate, checkout: answers.endDate, guests: guestCount(),
+  });
+  if (localBookingHost) url.searchParams.set('kind', 'stay');
+  let unavailable = new Map();
+  let loading = true;
+  let message = status.textContent;
+  let bookingFailure = false;
+
+  const selectionError = () => unavailable.get(answers.lodging) || '';
+  function updateStatus() {
+    const warning = selectionError();
+    const text = warning || message;
+    if (status.textContent !== text) status.textContent = text;
+    status.classList.toggle('planner-lodging-status-warning', Boolean(warning || bookingFailure));
+    next.disabled = Boolean(warning || (loading && answers.lodging));
+  }
+
+  async function load() {
+    loading = true;
+    cards.setAttribute('aria-busy', 'true');
+    retry.hidden = true;
+    bookingFailure = false;
+    message = 'Проверяем свободные хаусботы на ваши даты…';
+    updateStatus();
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 5000);
+    let inventory;
+    try {
+      const response = await fetch(url, { cache: 'no-store', credentials: 'omit', signal: controller.signal });
+      const result = await response.json();
+      if (response.status === 400 && result?.error?.field === 'guests') {
+        message = 'В календаре нет вариантов для такого числа гостей. Размещение можно уточнить отдельно.';
+      } else {
+        if (!response.ok || result?.city !== draftCity || !Array.isArray(result.options)
+          || result.checkin !== url.searchParams.get('checkin') || result.checkout !== url.searchParams.get('checkout')
+          || result.guests !== Number(url.searchParams.get('guests'))
+          || (localBookingHost && (result.mode !== 'local-demo' || result.kind !== 'stay'))) {
+          throw new Error('Invalid availability response');
+        }
+        inventory = new Map(result.options.filter(item => item && typeof item.id === 'string'
+          && Number.isInteger(item.capacity) && item.capacity >= 0
+          && Number.isInteger(item.available) && item.available >= 0).map(item => [item.id, item]));
+        if (!inventory.size) throw new Error('Empty availability response');
+      }
+    } catch {
+      bookingFailure = true;
+      message = 'Не удалось проверить доступность. Можно повторить проверку или продолжить планирование.';
+    } finally {
+      clearTimeout(timer);
+    }
+    if (!form.isConnected) return;
+
+    unavailable = new Map();
+    const groups = { free: [], busy: [], unknown: [] };
+    for (const room of rooms) {
+      const booked = isBookedLodging(room.id);
+      const item = inventory?.get(room.id);
+      let state = 'unknown';
+      let detail = 'Доступность уточняется отдельно';
+      if (booked || item?.available > 0) {
+        state = 'free';
+        detail = booked ? 'Из вашего бронирования' : 'Свободен на ваши даты';
+      } else if (item) {
+        state = 'busy';
+        detail = item.capacity === 0 ? 'Сейчас не бронируется'
+          : item.capacity < guestCount() ? 'Не подходит по вместимости' : 'Занят на выбранные даты';
+        unavailable.set(room.id, `${room.label}: ${detail.toLowerCase()}. Выберите другой вариант или «Выбрать позже». Остальные ответы сохранены.`);
+      }
+      groups[state].push(`<label class="planner-choice planner-lodging-card" data-availability="${state}">
+        <input type="radio" name="lodging" value="${esc(room.id)}"${checked(room.id === answers.lodging && state !== 'busy')}${state === 'busy' ? ' disabled' : ''}>
+        <span><strong>${esc(room.label)}</strong><small>До ${room.capacity} гостей · ${detail}</small></span>
+      </label>`);
+    }
+    const labels = { free: 'Доступные варианты', busy: 'Недоступные варианты', unknown: 'Проверяются отдельно' };
+    cards.innerHTML = Object.entries(groups).filter(([, items]) => items.length).map(([state, items]) =>
+      `<fieldset class="planner-lodging-group"><legend>${labels[state]}</legend><div class="planner-choices">${items.join('')}</div></fieldset>`
+    ).join('');
+    if (inventory) message = groups.free.length ? 'Доступность проверена на выбранные даты.'
+      : 'На эти даты в календаре нет свободных хаусботов для вашей компании. Можно изменить даты или выбрать размещение позже.';
+    later.checked = !answers.lodging;
+    loading = false;
+    cards.removeAttribute('aria-busy');
+    retry.hidden = !bookingFailure;
+    updateStatus();
+  }
+
+  retry.addEventListener('click', () => {
+    status.tabIndex = -1;
+    status.focus();
+    void load();
+  });
+  void load();
+  return {
+    updateStatus,
+    error: () => loading && answers.lodging ? 'Дождитесь проверки доступности или выберите размещение позже.' : selectionError(),
+  };
 }
 
 function interestCountLabel() {
@@ -396,7 +521,7 @@ function questionMarkup() {
   return `<p class="planner-help">Соберу дни без пересечений: оставлю время на дорогу, еду, сборы и свободные паузы. Если всё не поместится, покажу, что осталось за рамками программы.</p><dl class="planner-review">${summaryLines().map(([label, text, sub]) => `<div><dt>${esc(label)}</dt><dd>${esc(text)}${sub ? `<small>${esc(sub)}</small>` : ''}</dd></div>`).join('')}</dl>
     <button type="button" class="planner-edit" data-edit-outings>Изменить занятия и поездки</button>
     <button type="button" class="planner-edit" data-edit-services>Изменить услуги</button>
-    ${bookingCompact ? bookingEditButtons() : ''}
+    ${bookingCompact ? bookingEditButtons() : lodgingEditButton()}
     ${answers.children ? '<button type="button" class="planner-edit" data-edit-family>Изменить семейный отдых</button>' : ''}
     ${answers.children ? `<p class="planner-note">${familyModeNote()}</p>` : ''}`;
 }
@@ -485,16 +610,26 @@ function bindBookingEdits(scope, source) {
   }
 }
 
+function clearOutingDatesOutsideStay() {
+  for (const outing of Object.values(answers.outings)) {
+    if (outing.excursionDate < answers.startDate || outing.excursionDate > answers.endDate) outing.excursionDate = '';
+  }
+}
+
 function closeQuickEdit(cancelled) {
   const { source, placeId, returnStep, answers: previous } = quickEdit;
+  const datesChanged = previous.startDate !== answers.startDate || previous.endDate !== answers.endDate;
+  if (!cancelled && current === 'dates' && datesChanged && lodgingAvailabilityUrl && overnight()) {
+    current = 'lodging';
+    renderQuestion();
+    return;
+  }
   quickEdit = undefined;
   if (cancelled) Object.assign(answers, previous);
   else if (current === 'dates' || current === 'lodging') {
-    if (current === 'dates') {
+    if (datesChanged) {
       if (!overnight() || (Number.isFinite(guestCount()) && !lodgingChoice())) answers.lodging = '';
-      for (const outing of Object.values(answers.outings)) {
-        if (outing.excursionDate < answers.startDate || outing.excursionDate > answers.endDate) outing.excursionDate = '';
-      }
+      clearOutingDatesOutsideStay();
     }
     bookingCompact = bookingCompact && Boolean(matchesBooking());
   }
@@ -583,6 +718,7 @@ function renderQuestion(focus = true) {
     </aside>
   </div>`;
   const form = root.querySelector('form');
+  const lodgingAvailability = mountLodgingAvailability(form);
   bindBookingEdits(form, current === 'review' ? 'review' : 'question');
   form.querySelector('[data-edit-outings]')?.addEventListener('click', () => editOutings('review'));
   form.querySelector('[data-edit-services]')?.addEventListener('click', () => openQuickEdit('services', 'review'));
@@ -613,6 +749,7 @@ function renderQuestion(focus = true) {
     }
     renderSummaryValues();
     renderRoutesPreview();
+    lodgingAvailability?.updateStatus();
     persistDraft();
   };
   form.addEventListener('input', event => {
@@ -654,6 +791,8 @@ function renderQuestion(focus = true) {
     if (answers.lodging && !lodgingChoice() && overnight() && (current === 'lodging' || generatingPlan)) {
       allErrors.lodging = 'Выберите размещение, подходящее по вместимости, или вернитесь к выбору позже.';
     }
+    const availabilityError = lodgingAvailability?.error();
+    if (availabilityError) allErrors.lodging = availabilityError;
     const errors = Object.entries(allErrors).filter(([name]) => generatingPlan
       || stepFields[current].includes(name) || (current === 'routes' && name.startsWith('outing-')));
     if (errors.length) {
@@ -667,6 +806,7 @@ function renderQuestion(focus = true) {
       container.hidden = false; container.tabIndex = -1; container.focus();
       return;
     }
+    if (!quickEdit && current === 'dates') clearOutingDatesOutsideStay();
     if (current === 'party' && !lodgingChoice()) answers.lodging = '';
     if (quickEdit) {
       if (current === 'outings' && !stayingAtHotel()) { current = 'routes'; renderQuestion(); }
@@ -901,9 +1041,10 @@ async function mountPlanBooking() {
   const status = root.querySelector('[data-plan-booking-status]');
   const lodging = lodgingChoice();
   bookingConfigRequest ??= fetch('/api/local-booking/config', { cache: 'no-store' })
-    .then(response => response.ok ? response.json() : null).catch(() => null);
+    .then(response => response.ok ? response.json() : null)
+    .catch(() => null)
+    .finally(() => { bookingConfigRequest = undefined; });
   const config = await bookingConfigRequest;
-  if (!config) bookingConfigRequest = undefined;
   if (!button.isConnected) return;
   if (config?.mode !== 'local-demo' || !Array.isArray(config.roomCategories)) {
     status.textContent = 'Локальный календарь бронирования сейчас недоступен.';
@@ -973,7 +1114,7 @@ function renderPlan({ scroll = true, message = '', save = true } = {}) {
         <button class="planner-edit" data-edit-outings>Изменить занятия и поездки</button>
         <button class="planner-edit" data-edit-services>Изменить услуги</button>
         ${answers.children ? '<button class="planner-edit" data-edit-family>Изменить семейный отдых</button>' : ''}
-        ${bookingCompact ? bookingEditButtons() : ''}
+        ${bookingCompact ? bookingEditButtons() : lodgingEditButton()}
         <button class="planner-edit" data-edit>Изменить ответы</button>
       </div>
     </div>
@@ -1065,7 +1206,7 @@ function renderPlan({ scroll = true, message = '', save = true } = {}) {
     pdfButton.disabled = true;
     feedback.textContent = 'Готовим PDF…';
     try {
-      const { prepareHolidayPdfDownload } = await import('./collection-holiday-pdf.js?v=20261108-no-photo-caption-1');
+      const { prepareHolidayPdfDownload } = await import('./collection-holiday-pdf.js?v=20261109-career-type-1');
       const result = await prepareHolidayPdfDownload(schedule, { lodging });
       if (!pdfButton.isConnected) {
         result.release();

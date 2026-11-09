@@ -16,7 +16,7 @@
 .collection-booking-page .collection-booking-heading h1 {
   max-width: none;
   margin: 0 0 20px;
-  font-family: Cormorant, Georgia, serif;
+  font-family: var(--display-font);
   font-size: clamp(72px, 8.1vw, 124px);
   line-height: .95;
   letter-spacing: -.045em;
@@ -25,7 +25,7 @@
 .collection-booking-heading .page-lead {
   max-width: none;
   color: inherit;
-  font: 400 clamp(19px, 1.7vw, 26px)/1.5 Arial, Helvetica, sans-serif;
+  font: 400 clamp(19px, 1.7vw, 26px)/1.5 var(--body-font);
 }
 
 .collection-booking-page .collection-booking-notice {
@@ -34,7 +34,7 @@
   border-top: 1px solid var(--booking-line);
   background: transparent;
   color: var(--booking-muted);
-  font: 400 13px/1.7 Arial, Helvetica, sans-serif;
+  font: 400 13px/1.7 var(--body-font);
 }
 
 .collection-booking-page .collection-booking-layout {
@@ -70,7 +70,7 @@
   width: 100%;
   padding: 0;
   margin-bottom: 24px;
-  font: 400 clamp(34px, 3.6vw, 54px)/1.05 Cormorant, Georgia, serif;
+  font: 400 clamp(34px, 3.6vw, 54px)/1.05 var(--display-font);
   letter-spacing: -.035em;
 }
 
@@ -78,7 +78,7 @@
   display: block;
   margin: 0 0 16px;
   color: var(--booking-muted);
-  font: 400 12px/1.5 Arial, Helvetica, sans-serif;
+  font: 400 12px/1.5 var(--body-font);
   letter-spacing: 0;
 }
 
@@ -94,7 +94,7 @@
 
 .collection-booking-page .form-field label {
   margin-bottom: 8px;
-  font: 400 14px/1.5 Arial, Helvetica, sans-serif;
+  font: 400 14px/1.5 var(--body-font);
 }
 
 .collection-booking-page .form-field input,
@@ -105,7 +105,7 @@
   border-radius: 0;
   background: transparent;
   color: #23261f;
-  font: 400 16px/1.4 Arial, Helvetica, sans-serif;
+  font: 400 16px/1.4 var(--body-font);
   color-scheme: light;
 }
 
@@ -121,7 +121,7 @@
 
 .collection-booking-page .form-hint {
   color: var(--booking-muted);
-  font: 400 13px/1.7 Arial, Helvetica, sans-serif;
+  font: 400 13px/1.7 var(--body-font);
 }
 
 .collection-booking-page fieldset > .form-hint {
@@ -130,7 +130,7 @@
 
 .collection-booking-page .field-error {
   color: #a32f23;
-  font: 400 13px/1.6 Arial, Helvetica, sans-serif;
+  font: 400 13px/1.6 var(--body-font);
 }
 
 .collection-booking-page #booking-form .primary-action,
@@ -146,7 +146,7 @@
   border-radius: 0;
   background: var(--booking-forest);
   color: var(--booking-cream);
-  font: 400 27px/1.2 Cormorant, Georgia, serif;
+  font: 400 27px/1.2 var(--display-font);
   transition: background 500ms ease;
 }
 
@@ -206,19 +206,19 @@
 .collection-booking-page .booking-summary h2 {
   margin: 0 0 22px;
   color: inherit;
-  font: 400 clamp(52px, 5.5vw, 82px)/.95 Cormorant, Georgia, serif;
+  font: 400 clamp(52px, 5.5vw, 82px)/.95 var(--display-font);
   letter-spacing: -.045em;
 }
 
 .collection-booking-page #summary-features {
   color: inherit;
-  font: 400 16px/1.5 Arial, Helvetica, sans-serif;
+  font: 400 16px/1.5 var(--body-font);
 }
 
 .collection-booking-page .booking-summary dl {
   margin: 30px 0 24px;
   border-bottom: 1px solid #f6f3ed44;
-  font: 400 14px/1.65 Arial, Helvetica, sans-serif;
+  font: 400 14px/1.65 var(--body-font);
 }
 
 .collection-booking-page .booking-summary dl > div {
@@ -240,23 +240,23 @@
 
 .collection-booking-page .booking-result > .eyebrow {
   color: var(--booking-muted);
-  font: 400 11px/1.5 Arial, Helvetica, sans-serif;
+  font: 400 11px/1.5 var(--body-font);
 }
 
 .collection-booking-page .booking-result h2 {
   margin: 20px 0;
-  font: 400 clamp(42px, 4vw, 62px)/1 Cormorant, Georgia, serif;
+  font: 400 clamp(42px, 4vw, 62px)/1 var(--display-font);
   letter-spacing: -.045em;
 }
 
 .collection-booking-page .booking-result > p:not(.eyebrow) {
   color: var(--booking-muted);
-  font: 400 16px/1.7 Arial, Helvetica, sans-serif;
+  font: 400 16px/1.7 var(--body-font);
 }
 
 .collection-booking-page .booking-result dl {
   margin: 28px 0 34px;
-  font: 400 14px/1.65 Arial, Helvetica, sans-serif;
+  font: 400 14px/1.65 var(--body-font);
 }
 
 .collection-booking-page .booking-result dl > div {
