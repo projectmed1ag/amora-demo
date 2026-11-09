@@ -1,5 +1,5 @@
 /* The selected light / photographic leisure composition. */
-.cl-overview { --cl-paper: #f3efe5; --cl-ink: #18231b; --cl-dark: #19251c; background: var(--cl-paper); color: var(--cl-ink); font-family: Georgia, 'Times New Roman', serif; }
+.cl-overview { --cl-paper: #f3efe5; --cl-ink: #18231b; --cl-dark: #19251c; background: var(--cl-paper); color: var(--cl-ink); font-family: var(--body-font); }
 .collection-shell .cl-intro { position: relative; isolation: isolate; display: flex; align-items: center; min-height: clamp(176px, 17.2vw, 300px); padding: 12px 4.1vw 10px; overflow: hidden; background: var(--cl-paper); }
 .cl-intro-photo { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; object-position: 50% 55%; }
 .cl-intro::before { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, var(--cl-paper) 0%, var(--cl-paper) 37%, #f3efe5ed 43%, #f3efe500 60%); }
@@ -58,16 +58,16 @@
 .cl-winter-panel .cl-link span { text-decoration: none; }
 .cl-winter-panel .cl-link svg { width: 23px; }
 .cl-winter-panel>img { object-position: center; }
-.collection-shell .cl-image-note { position: absolute; right: 10px; bottom: 3px; color: #f6f3ed; font: 9px/1.2 Arial, sans-serif; text-shadow: 0 1px 5px #000; }
+.collection-shell .cl-image-note { position: absolute; right: 10px; bottom: 3px; color: #f6f3ed; font: 9px/1.2 var(--body-font); text-shadow: 0 1px 5px #000; }
 
 /* Detail pages extend the leisure page's cream, forest and curved photo bands. */
 .cl-detail { --cl-paper: #f3efe5; --cl-ink: #18231b; --cl-dark: #19251c; background: var(--cl-paper); color: var(--cl-ink); }
 .cl-detail-hero { position: relative; isolation: isolate; min-height: clamp(480px, 42vw, 660px); overflow: hidden; }
 .cl-detail-photo { position: absolute; z-index: -2; inset: 0 0 0 38%; margin: 0; }
 .cl-detail-photo img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.cl-detail-photo figcaption { position: absolute; right: 16px; bottom: 11px; color: #fff; font: 10px/1.5 Georgia,serif; text-shadow: 0 1px 6px #000; }
+.cl-detail-photo figcaption { position: absolute; right: 16px; bottom: 11px; color: #fff; font: 10px/1.5 var(--body-font); text-shadow: 0 1px 6px #000; }
 .cl-detail-heading { position: relative; display: flex; flex-direction: column; justify-content: space-between; width: 40%; min-height: inherit; padding: 20px 0 54px var(--mf-gutter); background: var(--cl-paper); }
-.cl-back { display: inline-flex; align-items: center; align-self: start; gap: 12px; min-height: 44px; font: 14px/1.4 Georgia,serif; text-decoration: none; }
+.cl-back { display: inline-flex; align-items: center; align-self: start; gap: 12px; min-height: 44px; font: 14px/1.4 var(--body-font); text-decoration: none; }
 .cl-back span { text-decoration: underline; text-underline-offset: 5px; text-decoration-thickness: 1px; }
 .cl-back svg { width: 24px; height: 16px; transform: rotate(180deg); fill: none; stroke: currentColor; transition: transform 500ms ease; }
 .cl-detail-title-copy { padding-block: 28px 0; }
@@ -81,11 +81,11 @@
 .cl-detail-items>article { min-width: 0; padding: 0 clamp(24px,3.8vw,60px); border-left: 1px solid #f3efe52e; scroll-margin-top: 28px; }
 .cl-detail-items>article:first-child { padding-left: 0; border-left: 0; }
 .cl-detail-items>article:last-child { padding-right: 0; }
-.cl-detail-number { display: block; margin-bottom: 18px; font: 11px/1.3 Georgia,serif; letter-spacing: .1em; color: #d1c5ae; }
+.cl-detail-number { display: block; margin-bottom: 18px; font: 11px/1.3 var(--body-font); letter-spacing: .1em; color: #d1c5ae; }
 .collection-shell .cl-detail-items h2 { font-size: clamp(34px,3.2vw,50px); line-height: .95; letter-spacing: -.035em; }
 .collection-shell .cl-detail-items article>p { margin-top: 18px; font-size: clamp(16px,1.25vw,19px); line-height: 1.65; }
 .collection-shell .cl-detail-single .cl-detail-items article>p { margin: 0; max-width: 920px; font-size: clamp(22px,2.1vw,32px); line-height: 1.45; }
-.collection-shell .cl-season-note { max-width: 920px; margin-top: 26px; font: 14px/1.6 Georgia,serif; color: #d0d2c9; }
+.collection-shell .cl-season-note { max-width: 920px; margin-top: 26px; font: 14px/1.6 var(--body-font); color: #d0d2c9; }
 .cl-detail-actions { display: flex; margin-top: 32px; padding-top: 12px; border-top: 1px solid #f3efe52e; }
 .cl-detail-actions .cl-link { font-size: 17px; }
 @media (hover: hover) {

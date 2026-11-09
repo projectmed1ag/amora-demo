@@ -48,7 +48,6 @@ const details = {
     title: 'Костровая зона.',
     imageURL: './images/hotel/moscow/bungalows/experience/night-firepit.jpg',
     imageAlt: 'Костровая зона с креслами на берегу',
-    imageCaption: false,
     itemIds: ['firepit'],
   },
   winter: {
@@ -118,7 +117,6 @@ export function renderLeisureDetails(activity) {
     <div class="cl-detail-hero">
       <figure class="cl-detail-photo">
         <img src="${escapeHTML(detail.imageURL || `./images/mozhaysk/leisure-${detail.image}.jpg`)}" width="1200" height="800" alt="${escapeHTML(detail.imageAlt)}" fetchpriority="high">
-        ${detail.imageCaption === false ? '' : '<figcaption>Атмосфера отдыха · иллюстрация</figcaption>'}
       </figure>
       <header class="cl-detail-heading">
         <a class="cl-back" href="${overviewURL}">${arrow}<span>Все занятия</span></a>

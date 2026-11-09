@@ -21,13 +21,13 @@ body[data-page]:not([data-page="home"]) #content :is(h1, h2, h3) {
   color: var(--page-ink);
   font-family: var(--display-font, 'AMore Condensed', Arial, sans-serif);
   font-style: normal;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.02;
   letter-spacing: .01em;
   text-transform: uppercase;
   overflow-wrap: anywhere;
 }
-body[data-page]:not([data-page="home"]) #content h1 { font-size: clamp(48px, 6.8vw, 100px); }
+body[data-page]:not([data-page="home"]) #content h1 { font-size: clamp(48px, 6.8vw, 100px); font-weight: 900; }
 body[data-page]:not([data-page="home"]) #content h2 { font-size: clamp(40px, 4.8vw, 72px); }
 body[data-page]:not([data-page="home"]) #content h3 { font-size: clamp(30px, 3vw, 44px); }
 body[data-page]:not([data-page="home"]) #content :is(p, li, dd) { overflow-wrap: break-word; }
@@ -731,7 +731,7 @@ body[data-page] :is(.destination-confirm, .destination-preview-index, .destinati
 
 @media (max-width: 700px) {
   body[data-page]:not([data-page="home"]) #content { --page-gutter: 20px; font-size: 15px; }
-  body[data-page]:not([data-page="home"]) #content h1 { font-size: clamp(48px, 12vw, 72px); line-height: 1.01; }
+  body[data-page]:not([data-page="home"]) #content h1 { font-size: clamp(34px, 10.5vw, 72px); line-height: 1.01; }
   body[data-page]:not([data-page="home"]) #content h2 { font-size: clamp(38px, 10vw, 54px); }
   body[data-page]:not([data-page="home"]) #content h3 { font-size: 34px; }
   body[data-page]:not([data-page="home"]) #content .page-heading { padding: 36px var(--page-gutter) 30px; }

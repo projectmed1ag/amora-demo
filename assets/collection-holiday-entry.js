@@ -4,7 +4,7 @@ export function initHolidayPlannerEntry() {
   if (currentDestinationCity() !== 'mozhaysk' || document.body.dataset.page === 'holiday-planner' || document.querySelector('.holiday-planner-entry')) return;
   const style = document.createElement('link');
   style.rel = 'stylesheet';
-  style.href = new URL('./collection-holiday-entry.css?v=20261108-cta-1', import.meta.url).href;
+  style.href = new URL('./collection-holiday-entry.css?v=20261109-bstudy-fonts-1', import.meta.url).href;
   document.head.append(style);
   const link = document.createElement('a');
   link.className = 'holiday-planner-entry';

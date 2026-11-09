@@ -1,6 +1,6 @@
 import { breakfastNotice, clock, dateLabel, excursionSettings } from './collection-holiday-engine.js?v=20261108-route-pdf-1';
 import { childActivityOptions, outingTransports } from './collection-holiday-data.js?v=20261108-route-pdf-1';
-import { prepareHolidayRouteGuide } from './collection-holiday-route-guide.js?v=20261108-map-labels-1';
+import { prepareHolidayRouteGuide } from './collection-holiday-route-guide.js?v=20261109-career-type-1';
 import { getSeasonForDate } from './collection-seasons.js';
 
 const width = 960;
@@ -17,13 +17,14 @@ const paper = '#f8f6f0';
 const rule = '#ded8cc';
 const notice = 'Предложенное расписание. Размещение, услуги, трансфер и сопровождение детей подтверждаются отдельно.';
 
-const bodyStyle = { font: '12.5px Arial, sans-serif', lineHeight: 16, color: muted };
-const titleStyle = { font: 'bold 14px Arial, sans-serif', lineHeight: 18, color: ink };
+const font = (size, weight = 400) => `${weight} ${size}px "TikTok Sans", Arial, sans-serif`;
+const bodyStyle = { font: font(12.5), lineHeight: 16, color: muted };
+const titleStyle = { font: font(14, 600), lineHeight: 18, color: ink };
 const emphasisStyle = { ...bodyStyle, color: accent };
 const linkStyle = { ...bodyStyle, color: '#355a7a' };
-const smallStyle = { font: 'bold 11px Arial, sans-serif', lineHeight: 15, color: accent };
-const trackStyle = { font: 'bold 12px Arial, sans-serif', lineHeight: 16, color: ink };
-const display = size => `600 ${size}px "AMore Condensed", "Arial Narrow", Arial, sans-serif`;
+const smallStyle = { font: font(11, 500), lineHeight: 15, color: accent };
+const trackStyle = { font: font(12, 600), lineHeight: 16, color: ink };
+const display = size => font(size, 600);
 const headingStyle = { font: display(38), lineHeight: 45, color: ink };
 const galleryPhoto = name => `../images/mobile/mozhaysk/entertainment-gallery-v1/${name}.webp`;
 const seasonalPhoto = (season, name) => `../images/mobile/mozhaysk/entertainment-seasons-v1/${season}-${name}.webp`;
@@ -296,12 +297,14 @@ export async function buildHolidayPdf(plan, { lodging = '' } = {}) {
   if (!plan.days.length) throw new Error('Сначала составьте программу отдыха.');
   const dayPhotos = selectDayPhotos(plan.days);
   const photoPaths = [...new Set([tripPhotos.cover, tripPhotos.overview, ...dayPhotos])];
+  const fontSample = 'A’MORE Программа отдыха 0123456789';
+  const fontLoads = [bodyStyle, smallStyle, titleStyle].map(style =>
+    document.fonts?.load(style.font, fontSample).catch(() => {}));
   const [wordmark, routeGuide, images] = await Promise.all([
     loadImage('./collection-pdf-wordmark.png'),
     prepareHolidayRouteGuide(plan),
     Promise.all(photoPaths.map(async path => [path, await loadImage(path).catch(() => null)])),
-    // The canvas font already includes Cyrillic-capable system fallbacks.
-    document.fonts?.load(display(52), 'ПРОГРАММА ОТДЫХА').catch(() => {}),
+    ...fontLoads,
   ]);
   const photos = Object.fromEntries(images);
   const pages = [];
@@ -325,7 +328,7 @@ export async function buildHolidayPdf(plan, { lodging = '' } = {}) {
     ctx.drawImage(wordmark, margin, (78 - logoHeight) / 2, wordmark.naturalWidth * logoHeight / wordmark.naturalHeight, logoHeight);
     ctx.save();
     ctx.fillStyle = '#f7f2e7';
-    ctx.font = '11px Arial, sans-serif';
+    ctx.font = font(11);
     ctx.textAlign = 'right';
     ctx.fillText('МОЖАЙСКОЕ ВОДОХРАНИЛИЩЕ', width - margin, 25);
     ctx.fillStyle = '#d7c6a6';
@@ -409,8 +412,8 @@ export async function buildHolidayPdf(plan, { lodging = '' } = {}) {
   const white = { ...bodyStyle, color: '#fff' };
   const coverTitle = { font: display(78), lineHeight: 75, color: '#fff' };
   at('МОЖАЙСКОЕ ВОДОХРАНИЛИЩЕ', margin, 134, 550, { ...smallStyle, color: '#e8d8b9' });
-  at('ПРОГРАММА', margin - 2, 154, 570, coverTitle);
-  at('ОТДЫХА', margin - 2, 226, 570, coverTitle);
+  at('Программа', margin - 2, 154, 570, coverTitle);
+  at('отдыха', margin - 2, 226, 570, coverTitle);
   line(margin, 319, 70, gold);
   at(dateRange, margin, 335, 530, { ...titleStyle, color: '#fff' });
   at(guestLine, margin, 360, 520, white);

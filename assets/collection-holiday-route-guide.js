@@ -7,6 +7,7 @@ import { holidayBasemaps } from './collection-holiday-basemaps.js';
 const defaultPoint = demoOrigin.split(',').map(Number);
 const ink = '#303442';
 const blue = '#416d86';
+const mapFont = (size, weight = 400) => `${weight} ${size}px "TikTok Sans", Arial, sans-serif`;
 const hotelMapLabel = 'A  A’MORE · примерное расположение';
 const mapCredit = '© OpenStreetMap contributors · openstreetmap.org/copyright';
 const radians = Math.PI / 180;
@@ -123,7 +124,7 @@ function drawLocalRoute(ctx, box, legs, color, basemap) {
 
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.font = 'bold 9px Arial, sans-serif';
+  ctx.font = mapFont(9, 600);
   for (const [label, point] of [['A', defaultPoint], ['1', legs[1][0]]]) {
     const [px, py] = project(point);
     ctx.beginPath();
@@ -139,9 +140,9 @@ function drawLocalRoute(ctx, box, legs, color, basemap) {
 
   ctx.textAlign = 'left';
   ctx.fillStyle = ink;
-  ctx.font = 'bold 8px Arial, sans-serif';
+  ctx.font = mapFont(8, 600);
   paintMapLabel(ctx, `${hotelMapLabel} (старт и финиш)    1  Разворот`, x + 9, y + 11);
-  ctx.font = '7.5px Arial, sans-serif';
+  ctx.font = mapFont(7.5);
   paintMapLabel(ctx, mapCredit, x + 9, y + height - 8);
 
   const scaleMeters = [500, 250, 100, 50].find(meters => pointsPerMeter * meters <= 85) || 25;
@@ -190,7 +191,7 @@ function drawOverview(ctx, box, places, start, paths, basemap, defaultOrigin) {
     ctx.setLineDash([]);
   }
 
-  ctx.font = 'bold 9px Arial, sans-serif';
+  ctx.font = mapFont(9, 600);
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   const labels = [];
@@ -217,7 +218,7 @@ function drawOverview(ctx, box, places, start, paths, basemap, defaultOrigin) {
     ctx.fillText(label, lx, ly + .5);
   }
 
-  ctx.font = 'bold 9px Arial, sans-serif';
+  ctx.font = mapFont(9, 600);
   ctx.fillStyle = ink;
   ctx.fillText('С', x + width - 18, y + 14);
   ctx.beginPath();
@@ -227,7 +228,7 @@ function drawOverview(ctx, box, places, start, paths, basemap, defaultOrigin) {
   ctx.fill();
   ctx.textAlign = 'left';
   paintMapLabel(ctx, hotelMapLabel, x + 9, y + 14);
-  ctx.font = '8px Arial, sans-serif';
+  ctx.font = mapFont(8);
   paintMapLabel(ctx, mapCredit, x + 9, y + height - 8);
   ctx.restore();
 }
