@@ -4,8 +4,9 @@ import { holidayLodgings } from './collection-holiday-lodging.js';
 import { canEditScheduleItem, scheduleReplacementOptions, applyScheduleEdit, replayScheduleEdits } from './collection-holiday-edits.js?v=20261108-route-pdf-1';
 import { loadHolidayDraft, saveHolidayDraft, clearHolidayDraft } from './collection-holiday-draft.js?v=20261108-route-pdf-1';
 import { mountPlanRequests } from './collection-holiday-requests.js?v=20261108-route-pdf-1';
-import { hotelEventLabels, mountHotelEvents } from './collection-holiday-events.js?v=20261108-route-pdf-1';
+import { hotelEventLabels, loadHotelEvents, mountHotelEvents } from './collection-holiday-events.js?v=20261112-chat-3';
 import { destinationDateParts, destinationLocalDate } from './collection-destinations.js?v=20261024-all-hotels-1';
+import { mountHolidayChat } from './collection-holiday-chat.js?v=20261112-chat-3';
 
 const root = document.getElementById('planner-app');
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
@@ -28,6 +29,7 @@ const questions = {
 };
 const stepFields = { dates: ['startDate', 'endDate', 'arrival', 'departure'], party: ['adults', 'children', 'ages', 'familyMode', 'childActivities'], lodging: ['lodging'], rhythm: ['pace', 'wake'], outings: ['outingMode', 'interests', 'suggestActivities'], routes: ['places'], services: ['services', 'restaurant', 'banya', 'barbecue'], review: [] };
 let current = 'dates', plan, quickEdit;
+let chatState = {};
 let planEdits = [], unappliedEdits = [], undoEdit, itemEditor, pdfInProgress = false, preparedPdf;
 const draftBanner = document.getElementById('planner-draft');
 const draftCity = 'mozhaysk';
@@ -645,6 +647,7 @@ function closeQuickEdit(cancelled) {
 }
 
 function rebuildPlan({ alreadyPlanned = false } = {}) {
+  if (plan && (plan.answers.startDate !== answers.startDate || plan.answers.endDate !== answers.endDate)) chatState = {};
   const base = buildHolidayPlan(structuredClone(answers), alreadyPlanned ? {} : { today: today(), currentMinute: nowMinute() });
   const changedTrips = new Set((plan?.days || []).flatMap(day => day.items).filter(item => {
     if (!item.placeId) return false;
@@ -902,7 +905,7 @@ function focusSchedule(itemId, date) {
   target.scrollIntoView({ block: 'nearest' });
 }
 
-function saveItemEdit(edit, date) {
+function saveItemEdit(edit, date, { focus = true } = {}) {
   const result = applyScheduleEdit(plan, edit);
   if (result.error) return result.error;
   const messages = {
@@ -916,7 +919,28 @@ function saveItemEdit(edit, date) {
   plan = result.plan;
   planEdits.push(edit);
   renderPlan({ scroll: false });
-  focusSchedule(edit.itemId, edit.date || date);
+  if (focus) focusSchedule(edit.itemId, edit.date || date);
+}
+
+function chatClock() {
+  const now = new Date();
+  const { hour, minute } = destinationDateParts(now, draftCity);
+  return { date: destinationLocalDate(now, draftCity), minute: Number(hour) * 60 + Number(minute) };
+}
+
+async function interpretChatMessage(message) {
+  try {
+    const response = await fetch(new URL('chat-interpret', holidayApiBase), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message }),
+    });
+    if (!response.ok) return null;
+    const { command } = await response.json();
+    return typeof command === 'string' && command.length <= 300 ? command : null;
+  } catch {
+    return null;
+  }
 }
 
 function closeItemEditor(restoreFocus = false) {
@@ -1109,6 +1133,7 @@ function renderPlan({ scroll = true, message = '', save = true } = {}) {
       </div>
       <div class="planner-result-actions">
         <button class="planner-button" data-pdf${pdfInProgress ? ' disabled' : ''}>Скачать PDF</button>
+        <button type="button" class="planner-button planner-button-light planner-chat-trigger" data-open-holiday-chat aria-controls="planner-chat">Написать помощнику</button>
         ${holidayApiBase ? '<button type="button" class="planner-button planner-button-light" data-plan-request aria-expanded="false" aria-controls="planner-plan-request">Согласовать с отелем</button>' : ''}
         <button class="planner-button planner-button-light" data-copy>Скопировать текст</button>
         <button class="planner-edit" data-edit-outings>Изменить занятия и поездки</button>
@@ -1120,6 +1145,7 @@ function renderPlan({ scroll = true, message = '', save = true } = {}) {
     </div>
     <p class="planner-feedback" role="status">${esc(message)}</p>
     <p class="planner-feedback" data-pdf-ready hidden><a data-pdf-link>Скачать готовый PDF</a></p>
+    <div id="planner-chat"></div>
     ${holidayApiBase ? '<section id="planner-plan-request" class="planner-item-editor planner-request" data-plan-request-panel aria-labelledby="planner-request-title" hidden></section>' : ''}
     ${lodgingResult()}
     <p class="planner-note"><strong>${esc(breakfastNotice)}</strong> Это предварительная программа. Размещение, время посещения услуг и сопровождение детей подтверждаются отдельно.</p>
@@ -1168,6 +1194,18 @@ function renderPlan({ scroll = true, message = '', save = true } = {}) {
   const pdfButton = root.querySelector('[data-pdf]');
   const pdfReady = root.querySelector('[data-pdf-ready]');
   const pdfLink = root.querySelector('[data-pdf-link]');
+  const chat = mountHolidayChat(root.querySelector('#planner-chat'), {
+    state: chatState,
+    getPlan: () => plan,
+    getClock: chatClock,
+    getEvents: dates => loadHotelEvents(draftCity, dates, holidayApiBase),
+    interpretMessage: localBookingHost ? interpretChatMessage : undefined,
+    applyEdit: edit => {
+      const source = plan.days.find(day => day.items.some(item => item.id === edit.itemId));
+      return saveItemEdit(edit, source?.date || edit.date, { focus: false }) || '';
+    },
+  });
+  root.querySelector('[data-open-holiday-chat]').addEventListener('click', chat.open);
   void mountPlanBooking();
   if (holidayApiBase) {
     mountPlanRequests(root, plan, holidayApiBase);
@@ -1307,6 +1345,7 @@ if (root) {
     bookingCompact = canUseCompactBooking();
     current = steps()[0];
     plan = quickEdit = undoEdit = itemEditor = undefined;
+    chatState = {};
     planEdits = [];
     unappliedEdits = [];
     showDraftStatus(bookingHandoff ? bookingStatus : '', false);
