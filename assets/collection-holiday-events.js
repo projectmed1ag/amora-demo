@@ -9,8 +9,20 @@ export const hotelEventLabels = {
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
-function eventEdit(event) {
+export function hotelEventEdit(event) {
   return { type: 'hotel-event', itemId: `hotel-event:${event.id}`, itemTitle: event.title, date: event.date, time: event.time, event };
+}
+
+export async function loadHotelEvents(city, { dateFrom, dateTo }, apiBase) {
+  if (!apiBase) throw new Error('Events unavailable');
+  const url = new URL('events', apiBase);
+  url.search = new URLSearchParams({ city, dateFrom, dateTo });
+  const response = await fetch(url, { cache: 'no-store', credentials: 'omit', redirect: 'error' });
+  if (!response.ok) throw new Error('Events unavailable');
+  const { events } = await response.json();
+  if (!Array.isArray(events)) throw new Error('Invalid events');
+  return events.filter(event => event && event.date >= dateFrom && event.date <= dateTo
+    && isHotelEventEdit(hotelEventEdit(event)));
 }
 
 export function mountHotelEvents(section, plan, city, onAdd, apiBase) {
@@ -21,8 +33,7 @@ export function mountHotelEvents(section, plan, city, onAdd, apiBase) {
   const selected = new Map(plan.days.flatMap(day => day.items
     .filter(item => item.kind === 'hotel-event')
     .map(item => [item.eventId, { item, date: day.date }])));
-  const url = new URL('events', apiBase);
-  url.search = new URLSearchParams({ city, dateFrom: plan.answers.startDate, dateTo: plan.answers.endDate });
+  const dates = { dateFrom: plan.answers.startDate, dateTo: plan.answers.endDate };
 
   async function load() {
     refresh.disabled = true;
@@ -31,12 +42,8 @@ export function mountHotelEvents(section, plan, city, onAdd, apiBase) {
     list.replaceChildren();
     status.textContent = 'Загружаем афишу…';
     try {
-      const response = await fetch(url, { cache: 'no-store', credentials: 'omit', redirect: 'error' });
-      if (!response.ok) throw new Error('Events unavailable');
-      const { events } = await response.json();
-      if (!Array.isArray(events)) throw new Error('Invalid events');
-      const edits = events.filter(event => event && event.date >= plan.answers.startDate
-        && event.date <= plan.answers.endDate).map(eventEdit).filter(isHotelEventEdit);
+      const events = await loadHotelEvents(city, dates, apiBase);
+      const edits = events.map(hotelEventEdit);
       if (!section.isConnected) return;
       const latest = new Map(edits.map(edit => [edit.event.id, edit.event]));
       const changed = [...selected].filter(([id, { item, date }]) => {
