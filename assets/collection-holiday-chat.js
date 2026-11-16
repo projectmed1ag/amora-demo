@@ -60,7 +60,7 @@ function icon(name, className) {
   return svg;
 }
 
-export function mountHolidayChat(host, { state, getPlan, getClock, getEvents, getGuideDates, applyEdit, openPlanSection, interpretMessage }) {
+export function mountHolidayChat(host, { state, getPlan, getClock, getEvents, getGuideDates, applyEdit, preparePdf, openPlanSection, interpretMessage }) {
   state.messages ??= [];
   state.suggestions ??= [];
   const guide = !getPlan();
@@ -111,7 +111,43 @@ export function mountHolidayChat(host, { state, getPlan, getClock, getEvents, ge
     messages.scrollTop = messages.scrollHeight;
   }
 
-  function messageNode({ role, text, links }) {
+  function appendPdfAction(row) {
+    const label = 'Скачать обновлённый PDF';
+    const className = 'planner-chat-choice planner-chat-pdf';
+    const status = element('span', 'planner-chat-pdf-status');
+    status.setAttribute('role', 'status');
+    const button = action(label, className, async () => {
+      if (button.hasAttribute('aria-disabled')) return;
+      button.setAttribute('aria-disabled', 'true');
+      status.textContent = 'Готовим PDF…';
+      try {
+        const file = await preparePdf();
+        if (!button.isConnected) return;
+        if (!file) {
+          status.textContent = '';
+          return;
+        }
+        const link = element('a', className, label);
+        link.href = file.url;
+        link.download = file.filename;
+        const hadFocus = document.activeElement === button;
+        button.replaceWith(link);
+        status.textContent = 'PDF готов. Если скачивание не началось, нажмите на ссылку ещё раз.';
+        if (hadFocus) {
+          link.focus({ preventScroll: true });
+          scrollMessages();
+        }
+        link.click();
+      } catch {
+        status.textContent = 'PDF не удалось подготовить. Попробуйте ещё раз.';
+      } finally {
+        button.removeAttribute('aria-disabled');
+      }
+    });
+    row.append(button, status);
+  }
+
+  function messageNode({ role, text, links, pdf }) {
     const row = element('li', `planner-chat-message planner-chat-message-${role}`);
     row.append(element('span', 'planner-chat-author', role === 'user' ? 'Вы' : 'Помощник'), element('p', '', text));
     if (links?.length) {
@@ -136,20 +172,26 @@ export function mountHolidayChat(host, { state, getPlan, getClock, getEvents, ge
       }
       if (list.childElementCount) row.append(list);
     }
+    if (pdf && preparePdf) appendPdfAction(row);
     return row;
+  }
+
+  function rememberMessage(message) {
+    state.messages.push(message);
+    if (state.messages.length > 32) state.messages.shift();
+  }
+
+  function showMessage(message) {
+    messages.hidden = false;
+    messages.append(messageNode(message));
+    if (messages.childElementCount > 32) messages.firstElementChild.remove();
+    scrollMessages();
   }
 
   function addMessage(role, text, links) {
     const message = { role, text, links };
-    state.messages.push(message);
-    messages.hidden = false;
-    messages.append(messageNode(message));
-    if (state.messages.length > 32) {
-      state.messages.shift();
-      messages.firstElementChild?.remove();
-    }
-    scrollMessages();
-    return message;
+    rememberMessage(message);
+    showMessage(message);
   }
 
   function cancelProposal() {
@@ -172,16 +214,18 @@ export function mountHolidayChat(host, { state, getPlan, getClock, getEvents, ge
       return;
     }
 
-    // The planner replaces this DOM synchronously on a successful edit.
+    // A successful edit rebuilds the chat from its message history.
     state.pending = null;
     state.suggestions = [];
-    state.focusComposer = true;
-    const success = addMessage('assistant', 'План обновлён. Новый PDF будет содержать эту правку.');
+    state.focusEditResult = true;
+    const success = { role: 'assistant', text: 'План обновлён.', pdf: true };
+    rememberMessage(success);
     const error = applyEdit(selected.edit);
     if (error) {
       success.text = error;
-      if (messages.lastElementChild) messages.lastElementChild.replaceWith(messageNode(success));
-      state.focusComposer = false;
+      success.pdf = false;
+      showMessage(success);
+      state.focusEditResult = false;
       renderOptions();
       input.focus();
     }
@@ -335,9 +379,10 @@ export function mountHolidayChat(host, { state, getPlan, getClock, getEvents, ge
   renderOptions();
   host.replaceChildren(panel);
   scrollMessages();
-  if (state.focusComposer) {
-    state.focusComposer = false;
-    input.focus({ preventScroll: true });
+  if (state.focusEditResult) {
+    state.focusEditResult = false;
+    const download = messages.lastElementChild?.querySelector('.planner-chat-pdf');
+    (download || input).focus();
   }
 
   return {
