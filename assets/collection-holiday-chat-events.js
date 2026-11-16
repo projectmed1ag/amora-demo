@@ -1,5 +1,5 @@
 import { dayReference } from './collection-holiday-chat-intents.js?v=20261112-chat-3';
-import { dateLabel, dateNumber, minutes } from './collection-holiday-engine.js?v=20261108-route-pdf-1';
+import { addDays, dateLabel, dateNumber, minutes } from './collection-holiday-engine.js?v=20261108-route-pdf-1';
 import { hotelEventEdit } from './collection-holiday-events.js?v=20261112-chat-3';
 import { applyScheduleEdit, isHotelEventEdit } from './collection-holiday-edits.js?v=20261108-route-pdf-1';
 
@@ -27,7 +27,7 @@ function eventTitle(input, value, command, reference) {
   return /^(?:событие|мероприятие|тематический вечер)(?: (?:вечером|на вечер))?$/u.test(title) ? '' : title;
 }
 
-const alreadyAdded = (plan, event) => plan.days.some(day => day.items.some(item => item.eventId === event.id));
+const alreadyAdded = (plan, event) => plan?.days.some(day => day.items.some(item => item.eventId === event.id));
 const isPast = (event, now) => event.date < now.date || (event.date === now.date && minutes(event.time) < now.minute);
 const slotLabel = event => `${event.title} · ${dateLabel(event.date)} · ${event.time}–${event.endTime}`;
 
@@ -55,7 +55,7 @@ function addEvent(plan, event, now) {
   });
 }
 
-async function readEvents(plan, { dates, theme, late, time, name, adding }, now, getEvents) {
+async function readEvents(plan, { dates, theme, late, time, name, adding, nearest }, now, getEvents) {
   let events;
   try {
     events = await getEvents({ dateFrom: dates[0], dateTo: dates.at(-1) });
@@ -66,7 +66,8 @@ async function readEvents(plan, { dates, theme, late, time, name, adding }, now,
 
   const published = events.filter(event => event && isHotelEventEdit(hotelEventEdit(event))
     && dates.includes(event.date) && (!theme || event.type === 'theme-night')
-    && (!late || minutes(event.time) >= eveningStart) && (!time || event.time === time));
+    && (!late || minutes(event.time) >= eveningStart) && (!time || event.time === time)
+    && (plan || !isPast(event, now)));
   const ordered = published.sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
   const match = nameKey(name);
   let matches = ordered;
@@ -76,21 +77,23 @@ async function readEvents(plan, { dates, theme, late, time, name, adding }, now,
   }
   if (!matches.length) {
     if (name) return reply(`Событие «${name}» не нашлось в опубликованной афише на эти даты.`);
-    const when = dates.length === 1 ? `На ${dateLabel(dates[0])}` : 'На выбранные даты поездки';
+    const when = dates.length === 1 ? `На ${dateLabel(dates[0])}`
+      : nearest ? 'На ближайшие 30 дней' : plan ? 'На выбранные даты поездки' : 'На эти даты';
     const category = theme ? 'тематические вечера' : late ? 'вечерние мероприятия' : 'мероприятия';
     return reply(`${when} ${category} пока не опубликованы.`);
   }
   if (adding && matches.length === 1) return addEvent(plan, matches[0], now);
 
   const shown = matches.slice(0, 5);
-  const heading = adding ? 'Какое мероприятие добавить?' : 'Афиша отеля';
+  const heading = adding ? 'Какое мероприятие добавить?' : nearest ? 'Афиша на ближайшие 30 дней' : 'Афиша отеля';
   const descriptions = shown.map(event => eventDescription(event, plan, shown.length > 1)).join('\n\n');
-  const links = matches.length > shown.length ? [{ label: 'Полная афиша', href: '#planner-afisha-title' }] : undefined;
-  const suggestions = shown.filter(event => !alreadyAdded(plan, event) && !isPast(event, now)).map(addSuggestion);
-  return reply(`${heading}\n\n${descriptions}`, { suggestions, links });
+  const links = plan && matches.length > shown.length ? [{ label: 'Полная афиша', href: '#planner-afisha-title' }] : undefined;
+  const suggestions = plan ? shown.filter(event => !alreadyAdded(plan, event) && !isPast(event, now)).map(addSuggestion) : [];
+  const more = !plan && matches.length > shown.length ? '\n\nУкажите конкретную дату, чтобы посмотреть другие события.' : '';
+  return reply(`${heading}\n\n${descriptions}${more}`, { suggestions, links });
 }
 
-export function answerHolidayChatEvents(plan, input, now, getEvents) {
+export function answerHolidayChatEvents(plan, input, now, getEvents, guideDates) {
   const raw = String(input ?? '');
   const value = normalize(raw).replace(/[.!?]+$/u, '');
   const query = value.replace(quoted, '').replace(/\s+/gu, ' ').trim();
@@ -106,18 +109,27 @@ export function answerHolidayChatEvents(plan, input, now, getEvents) {
   if (otherEdit.test(query)) return null;
 
   const allDates = plan?.days?.map(day => day.date).sort() ?? [];
-  if (!allDates.length) return reply('Составьте план отдыха, чтобы я мог показать афишу на даты поездки.');
+  if (plan && !allDates.length) return reply('Составьте план отдыха, чтобы я мог показать афишу на даты поездки.');
   const date = Number.isFinite(dateNumber(now?.date)) ? now.date : allDates[0];
+  if (!date) return unavailable();
   const minute = Number.isInteger(now?.minute) ? now.minute : 0;
-  const reference = dayReference(query, plan, date);
-  if (reference && dayReference(query.slice(reference.index + reference.value.length), plan, date)) {
-    return reply('Уточните одну дату или спросите афишу на всю поездку.');
-  }
-  const dates = reference ? allDates.filter(day => reference.dates.includes(day)) : allDates;
-  if (!dates.length) return reply(`Эта дата вне вашей поездки. Отдых запланирован с ${dateLabel(allDates[0])} по ${dateLabel(allDates.at(-1))}.`);
-  if (typeof getEvents !== 'function') return unavailable();
   const command = value.match(addCommand);
+  if (!plan && command) return reply('Чтобы добавить событие в расписание, откройте «План отдыха» и составьте программу.');
+  const upcoming = plan ? [] : Array.from({ length: 30 }, (_, index) => addDays(date, index));
+  const calendar = plan ?? { days: [...new Set([...upcoming, ...(guideDates ?? [])])].map(date => ({ date })) };
+  const reference = dayReference(query, calendar, date);
+  if (reference && dayReference(query.slice(reference.index + reference.value.length), calendar, date)) {
+    return reply(plan ? 'Уточните одну дату или спросите афишу на всю поездку.' : 'Уточните одну дату для поиска в афише.');
+  }
+  const selectedDates = /(?:поездк|мои даты|на эти даты)/u.test(query) && guideDates?.length ? guideDates : null;
+  const nearest = !plan && !reference && !selectedDates;
+  const dates = plan ? (reference ? allDates.filter(day => reference.dates.includes(day)) : allDates)
+    : (reference?.dates ?? selectedDates ?? upcoming);
+  if (!dates.length) return reply(plan
+    ? `Эта дата вне вашей поездки. Отдых запланирован с ${dateLabel(allDates[0])} по ${dateLabel(allDates.at(-1))}.`
+    : 'Укажите дату с годом, например «16 января 2027», или выберите даты в анкете.');
+  if (typeof getEvents !== 'function') return unavailable();
   const name = eventTitle(raw, value, command, reference);
   const time = query.match(clockPattern)?.[1].padStart(5, '0');
-  return readEvents(plan, { dates, theme, late, time, name, adding: Boolean(command) }, { date, minute }, getEvents);
+  return readEvents(plan, { dates, theme, late, time, name, adding: Boolean(command), nearest }, { date, minute }, getEvents);
 }

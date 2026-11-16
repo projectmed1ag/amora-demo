@@ -9,10 +9,10 @@
   <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg?v=20261105-emblem-1">
   <link rel="stylesheet" href="./assets/collection-refinement.css?v=20261109-bstudy-fonts-1">
   <link rel="stylesheet" href="./assets/collection-brand.css?v=original-1">
-  <link rel="stylesheet" href="./assets/collection-holiday-planner.css?v=20261109-lodging-availability-2">
-  <link rel="stylesheet" href="./assets/collection-holiday-chat.css?v=20261112-chat-3">
+  <link rel="stylesheet" href="./assets/collection-holiday-planner.css?v=20261116-assistant-masthead-1">
+  <link rel="stylesheet" href="./assets/collection-holiday-chat.css?v=20261116-assistant-masthead-1">
   <script type="module" src="./assets/collection-runtime.js?v=20261109-bstudy-fonts-1"></script>
-  <script type="module" src="./assets/collection-holiday-planner.js?v=20261112-chat-3"></script>
+  <script type="module" src="./assets/collection-holiday-planner.js?v=20261116-assistant-masthead-1"></script>
 </head>
 <body class="holiday-planner-page collection-site-page" data-page="holiday-planner">
   <a class="planner-skip" href="#content">К помощнику</a>
@@ -36,16 +36,26 @@
     </div>
   </header>
   <main id="content" class="planner-main" tabindex="-1">
-    <div class="planner-intro"><p class="planner-eyebrow">Можайское водохранилище · Личный маршрут отдыха</p><h1>Ваш отдых.<br>В вашем ритме.</h1><p>Выберите даты, хаусбот и любимые занятия. Помощник составит расписание для всей семьи, которое можно скачать в PDF.</p></div>
-    <div class="planner-draft" id="planner-draft" hidden>
-      <p data-draft-status role="status"></p>
-      <button type="button" class="planner-edit" data-reset-draft>Начать заново</button>
-      <div class="planner-draft-actions" data-reset-actions hidden>
-        <button type="button" class="planner-edit" data-confirm-reset>Удалить черновик</button>
-        <button type="button" class="planner-edit" data-cancel-reset>Оставить черновик</button>
+    <div class="planner-masthead" id="planner-masthead">
+      <p class="planner-eyebrow">Можайское водохранилище</p>
+      <h1>Помощник по отдыху</h1>
+      <div class="planner-view-switch" id="planner-assistant" role="group" aria-label="Режим помощника" hidden>
+        <button type="button" data-planner-view="plan" aria-pressed="true" aria-controls="planner-plan-view">План отдыха</button>
+        <button type="button" data-planner-view="chat" aria-pressed="false" aria-controls="planner-chat">Чат с помощником</button>
       </div>
     </div>
-    <div id="planner-app" data-holiday-api-base="https://amora-med1ag-booking.ai-vipsup.chatgpt.site/api/v1/"><p class="planner-loading" role="status">Готовим вопросы для вашей программы…</p></div>
+    <div id="planner-plan-view">
+      <div id="planner-app" data-holiday-api-base="https://amora-med1ag-booking.ai-vipsup.chatgpt.site/api/v1/"><p class="planner-loading" role="status">Готовим вопросы для вашей программы…</p></div>
+      <div class="planner-draft" id="planner-draft" hidden>
+        <p data-draft-status role="status"></p>
+        <button type="button" class="planner-edit" data-reset-draft>Начать заново</button>
+        <div class="planner-draft-actions" data-reset-actions hidden>
+          <button type="button" class="planner-edit" data-confirm-reset>Удалить черновик</button>
+          <button type="button" class="planner-edit" data-cancel-reset>Оставить черновик</button>
+        </div>
+      </div>
+    </div>
+    <div id="planner-chat" hidden></div>
     <noscript><p>Для составления программы включите JavaScript. Вы также можете <a href="./spaces.html?city=mozhaysk">посмотреть развлечения</a> и выбрать время на страницах <a href="./restaurant.html?city=mozhaysk">ресторана</a> и <a href="./banya.html?city=mozhaysk">бани</a>.</p></noscript>
   </main>
   <footer class="home-footer planner-footer">

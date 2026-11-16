@@ -6,9 +6,13 @@ import { loadHolidayDraft, saveHolidayDraft, clearHolidayDraft } from './collect
 import { mountPlanRequests } from './collection-holiday-requests.js?v=20261108-route-pdf-1';
 import { hotelEventLabels, loadHotelEvents, mountHotelEvents } from './collection-holiday-events.js?v=20261112-chat-3';
 import { destinationDateParts, destinationLocalDate } from './collection-destinations.js?v=20261024-all-hotels-1';
-import { mountHolidayChat } from './collection-holiday-chat.js?v=20261112-chat-3';
+import { mountHolidayChat } from './collection-holiday-chat.js?v=20261116-assistant-masthead-1';
 
 const root = document.getElementById('planner-app');
+const masthead = document.getElementById('planner-masthead');
+const viewSwitch = document.getElementById('planner-assistant');
+const planView = document.getElementById('planner-plan-view');
+const chatView = document.getElementById('planner-chat');
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const today = () => destinationLocalDate(new Date(), 'mozhaysk');
 const nowMinute = () => { const { hour, minute } = destinationDateParts(new Date(), 'mozhaysk'); return Number(hour) * 60 + Number(minute); };
@@ -29,7 +33,7 @@ const questions = {
 };
 const stepFields = { dates: ['startDate', 'endDate', 'arrival', 'departure'], party: ['adults', 'children', 'ages', 'familyMode', 'childActivities'], lodging: ['lodging'], rhythm: ['pace', 'wake'], outings: ['outingMode', 'interests', 'suggestActivities'], routes: ['places'], services: ['services', 'restaurant', 'banya', 'barbecue'], review: [] };
 let current = 'dates', plan, quickEdit;
-let chatState = {};
+let chatState = {}, chat;
 let planEdits = [], unappliedEdits = [], undoEdit, itemEditor, pdfInProgress = false, preparedPdf;
 const draftBanner = document.getElementById('planner-draft');
 const draftCity = 'mozhaysk';
@@ -680,8 +684,50 @@ function continueLabel() {
   }[next] || 'Продолжить';
 }
 
+function showPlannerView(view, { focus = false, scroll = false } = {}) {
+  const showChat = view === 'chat';
+  planView.hidden = showChat;
+  chatView.hidden = !showChat;
+  for (const button of viewSwitch.querySelectorAll('[data-planner-view]')) {
+    button.setAttribute('aria-pressed', String(button.dataset.plannerView === view));
+  }
+  if (showChat) chat?.show({ focus });
+  else if (focus) root.querySelector('#planner-question, #planner-result-title')?.focus({ preventScroll: true });
+  if (scroll) masthead.scrollIntoView({ block: 'start', behavior: 'auto' });
+}
+
+function guideDates() {
+  if (!Number.isFinite(dateNumber(answers.startDate)) || !Number.isFinite(dateNumber(answers.endDate))) return [];
+  const start = answers.startDate < today() ? today() : answers.startDate;
+  const dates = [];
+  for (let date = start; date <= answers.endDate && dates.length < 31; date = addDays(date, 1)) dates.push(date);
+  return dates;
+}
+
+function renderAssistant(activePlan, { applyEdit } = {}) {
+  chat = mountHolidayChat(chatView, {
+    state: chatState,
+    getPlan: () => activePlan,
+    getClock: chatClock,
+    getEvents: dates => loadHotelEvents(draftCity, dates, holidayApiBase),
+    getGuideDates: activePlan ? undefined : guideDates,
+    openPlanSection: id => {
+      showPlannerView('plan');
+      const target = document.getElementById(id);
+      if (!target) return;
+      target.tabIndex = -1;
+      target.focus({ preventScroll: true });
+      target.scrollIntoView({ block: 'center' });
+    },
+    interpretMessage: activePlan && localBookingHost ? interpretChatMessage : undefined,
+    applyEdit,
+  });
+}
+
 function renderQuestion(focus = true) {
   releasePreparedPdf();
+  showPlannerView('plan');
+  renderAssistant();
   const sequence = steps(), index = sequence.indexOf(current);
   const history = previousSteps();
   const stickyActions = ['lodging', 'outings', 'routes', 'services', 'review'].includes(current);
@@ -690,18 +736,13 @@ function renderQuestion(focus = true) {
     : questions[current];
   root.innerHTML = `<div class="planner-layout">
     <section class="planner-conversation" aria-labelledby="planner-question">
-      <div class="planner-progress">${quickEdit ? '<span>Настройка плана</span>' : `<span>Вопрос ${index + 1} из <b data-step-count>${sequence.length}</b></span><progress value="${index + 1}" max="${sequence.length}" aria-label="Ход составления программы"></progress>`}</div>
-      <div class="planner-assistant">
+      <div class="planner-step-header">
         <div class="planner-assistant-mark">
           <span class="amore-logo" aria-hidden="true"><span class="brand-name">A’MORE</span><span class="brand-collection">COLLECTION</span></span>
           <span class="planner-assistant-caption">Помощник по отдыху</span>
         </div>
+        <div class="planner-progress">${quickEdit ? '<span>Настройка плана</span>' : `<span>Вопрос ${index + 1} из <b data-step-count>${sequence.length}</b></span><progress value="${index + 1}" max="${sequence.length}" aria-label="Ход составления программы"></progress>`}</div>
       </div>
-      <details class="planner-step-summary${history.length ? ' has-history' : ''}">
-        <summary><span class="planner-summary-desktop">Ваши предыдущие ответы</span><span class="planner-summary-mobile">${history.length ? 'Ваш отдых и ответы' : 'Ваш отдых'}</span></summary>
-        <ol class="planner-summary-desktop">${history.map(step => `<li><span>${questions[step]}</span><p>${esc(answerLabel(step))}</p></li>`).join('')}</ol>
-        <dl class="planner-summary-values planner-summary-mobile" data-trip-summary="history">${summaryValuesMarkup(true)}</dl>
-      </details>
       <h2 id="planner-question" tabindex="-1">${title}</h2>
       <form id="holiday-questions" novalidate>
         <div class="planner-errors" role="alert" hidden></div>
@@ -713,6 +754,11 @@ function renderQuestion(focus = true) {
         </div>
         ${current === 'rhythm' && overnight() ? `<details class="planner-options planner-rhythm-options"><summary>Настроить время начала дня и вечернего отдыха</summary><div class="planner-fields">${field('wake', 'Начало дня', 'time', answers.wake, 'required')}${field('rest', 'Вечерний отдых с', 'time', answers.rest, 'required')}</div></details>` : ''}
       </form>
+      <details class="planner-step-summary${history.length ? ' has-history' : ''}">
+        <summary><span class="planner-summary-desktop">Ваши предыдущие ответы</span><span class="planner-summary-mobile">${history.length ? 'Ваш отдых и ответы' : 'Ваш отдых'}</span></summary>
+        <ol class="planner-summary-desktop">${history.map(step => `<li><span>${questions[step]}</span><p>${esc(answerLabel(step))}</p></li>`).join('')}</ol>
+        <dl class="planner-summary-values planner-summary-mobile" data-trip-summary="history">${summaryValuesMarkup(true)}</dl>
+      </details>
     </section>
     <aside class="planner-sidebar">
       <h2>Ваш отдых</h2>
@@ -1145,7 +1191,6 @@ function renderPlan({ scroll = true, message = '', save = true } = {}) {
     </div>
     <p class="planner-feedback" role="status">${esc(message)}</p>
     <p class="planner-feedback" data-pdf-ready hidden><a data-pdf-link>Скачать готовый PDF</a></p>
-    <div id="planner-chat"></div>
     ${holidayApiBase ? '<section id="planner-plan-request" class="planner-item-editor planner-request" data-plan-request-panel aria-labelledby="planner-request-title" hidden></section>' : ''}
     ${lodgingResult()}
     <p class="planner-note"><strong>${esc(breakfastNotice)}</strong> Это предварительная программа. Размещение, время посещения услуг и сопровождение детей подтверждаются отдельно.</p>
@@ -1194,18 +1239,13 @@ function renderPlan({ scroll = true, message = '', save = true } = {}) {
   const pdfButton = root.querySelector('[data-pdf]');
   const pdfReady = root.querySelector('[data-pdf-ready]');
   const pdfLink = root.querySelector('[data-pdf-link]');
-  const chat = mountHolidayChat(root.querySelector('#planner-chat'), {
-    state: chatState,
-    getPlan: () => plan,
-    getClock: chatClock,
-    getEvents: dates => loadHotelEvents(draftCity, dates, holidayApiBase),
-    interpretMessage: localBookingHost ? interpretChatMessage : undefined,
+  renderAssistant(plan, {
     applyEdit: edit => {
       const source = plan.days.find(day => day.items.some(item => item.id === edit.itemId));
       return saveItemEdit(edit, source?.date || edit.date, { focus: false }) || '';
     },
   });
-  root.querySelector('[data-open-holiday-chat]').addEventListener('click', chat.open);
+  root.querySelector('[data-open-holiday-chat]').addEventListener('click', () => showPlannerView('chat', { focus: true, scroll: true }));
   void mountPlanBooking();
   if (holidayApiBase) {
     mountPlanRequests(root, plan, holidayApiBase);
@@ -1326,6 +1366,11 @@ function restoreDraft() {
 
 if (root) {
   let statusBeforeReset;
+  viewSwitch.hidden = false;
+  viewSwitch.addEventListener('click', event => {
+    const button = event.target.closest('[data-planner-view]');
+    if (button) showPlannerView(button.dataset.plannerView, { focus: true });
+  });
   draftBanner?.querySelector('[data-reset-draft]')?.addEventListener('click', () => {
     statusBeforeReset = draftBanner.querySelector('[data-draft-status]').textContent;
     showDraftStatus('Удалить сохранённый черновик и начать заново?', false);
@@ -1353,4 +1398,7 @@ if (root) {
     root.querySelector('#planner-question').focus();
   });
   restoreDraft();
+  if (new URLSearchParams(location.search).get('assistant') === 'chat') {
+    showPlannerView('chat', { scroll: location.hash === '#planner-assistant' });
+  }
 }
