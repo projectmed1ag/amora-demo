@@ -126,6 +126,17 @@
   margin-top: 8px;
 }
 
+.planner-chat-pdf-status {
+  display: block;
+  color: var(--chat-muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.planner-chat-pdf-status:not(:empty) {
+  margin-top: 4px;
+}
+
 .planner-chat-links {
   display: flex;
   flex-wrap: wrap;
@@ -285,6 +296,17 @@
 .planner-chat-pdf {
   border-color: #9a702f;
   background: #f1e1bd;
+}
+
+.planner-chat-pdf[aria-disabled="true"] {
+  cursor: wait;
+  opacity: .7;
+}
+
+a.planner-chat-pdf {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
 }
 
 .planner-chat-actions:not(:empty) {

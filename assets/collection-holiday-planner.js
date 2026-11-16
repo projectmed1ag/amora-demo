@@ -6,7 +6,7 @@ import { loadHolidayDraft, saveHolidayDraft, clearHolidayDraft } from './collect
 import { mountPlanRequests } from './collection-holiday-requests.js?v=20261108-route-pdf-1';
 import { hotelEventLabels, loadHotelEvents, mountHotelEvents } from './collection-holiday-events.js?v=20261112-chat-3';
 import { destinationDateParts, destinationLocalDate } from './collection-destinations.js?v=20261024-all-hotels-1';
-import { mountHolidayChat } from './collection-holiday-chat.js?v=20261116-assistant-masthead-1';
+import { mountHolidayChat } from './collection-holiday-chat.js?v=20261116-chat-pdf-1';
 
 const root = document.getElementById('planner-app');
 const masthead = document.getElementById('planner-masthead');
@@ -34,7 +34,7 @@ const questions = {
 const stepFields = { dates: ['startDate', 'endDate', 'arrival', 'departure'], party: ['adults', 'children', 'ages', 'familyMode', 'childActivities'], lodging: ['lodging'], rhythm: ['pace', 'wake'], outings: ['outingMode', 'interests', 'suggestActivities'], routes: ['places'], services: ['services', 'restaurant', 'banya', 'barbecue'], review: [] };
 let current = 'dates', plan, quickEdit;
 let chatState = {}, chat;
-let planEdits = [], unappliedEdits = [], undoEdit, itemEditor, pdfInProgress = false, preparedPdf;
+let planEdits = [], unappliedEdits = [], undoEdit, itemEditor, pdfPreparation, preparedPdf;
 const draftBanner = document.getElementById('planner-draft');
 const draftCity = 'mozhaysk';
 const { token: bookingToken, scope: bookingScope, handoff: bookingHandoff } = bookingContext();
@@ -704,13 +704,14 @@ function guideDates() {
   return dates;
 }
 
-function renderAssistant(activePlan, { applyEdit } = {}) {
+function renderAssistant(activePlan, { applyEdit, preparePdf } = {}) {
   chat = mountHolidayChat(chatView, {
     state: chatState,
     getPlan: () => activePlan,
     getClock: chatClock,
     getEvents: dates => loadHotelEvents(draftCity, dates, holidayApiBase),
     getGuideDates: activePlan ? undefined : guideDates,
+    preparePdf,
     openPlanSection: id => {
       showPlannerView('plan');
       const target = document.getElementById(id);
@@ -995,7 +996,7 @@ function closeItemEditor(restoreFocus = false) {
   panel.replaceChildren();
   panel.hidden = true;
   button.setAttribute('aria-expanded', 'false');
-  root.querySelector('[data-pdf]').disabled = pdfInProgress;
+  root.querySelector('[data-pdf]').disabled = Boolean(pdfPreparation);
   if (restoreFocus) button.focus();
   itemEditor = undefined;
 }
@@ -1159,6 +1160,7 @@ async function mountPlanBooking() {
 function releasePreparedPdf() {
   preparedPdf?.release();
   preparedPdf = undefined;
+  pdfPreparation = undefined;
 }
 
 function renderPlan({ scroll = true, message = '', save = true } = {}) {
@@ -1178,7 +1180,7 @@ function renderPlan({ scroll = true, message = '', save = true } = {}) {
         <p>${esc(answers.startDate)} — ${esc(answers.endDate)} · Взрослых: ${answers.adults}${answers.children ? ` · Детей: ${answers.children}` : ''}<br>${format}</p>
       </div>
       <div class="planner-result-actions">
-        <button class="planner-button" data-pdf${pdfInProgress ? ' disabled' : ''}>Скачать PDF</button>
+        <button class="planner-button" data-pdf>Скачать PDF</button>
         <button type="button" class="planner-button planner-button-light planner-chat-trigger" data-open-holiday-chat aria-controls="planner-chat">Написать помощнику</button>
         ${holidayApiBase ? '<button type="button" class="planner-button planner-button-light" data-plan-request aria-expanded="false" aria-controls="planner-plan-request">Согласовать с отелем</button>' : ''}
         <button class="planner-button planner-button-light" data-copy>Скопировать текст</button>
@@ -1239,7 +1241,35 @@ function renderPlan({ scroll = true, message = '', save = true } = {}) {
   const pdfButton = root.querySelector('[data-pdf]');
   const pdfReady = root.querySelector('[data-pdf-ready]');
   const pdfLink = root.querySelector('[data-pdf-link]');
+  async function preparePdf() {
+    if (!pdfButton.isConnected) return null;
+    if (preparedPdf) return preparedPdf;
+    if (pdfPreparation) return pdfPreparation;
+    const schedule = plan;
+    pdfButton.disabled = true;
+    pdfPreparation = (async () => {
+      try {
+        const { prepareHolidayPdfDownload } = await import('./collection-holiday-pdf.js?v=20261109-career-type-1');
+        const result = await prepareHolidayPdfDownload(schedule, { lodging });
+        if (!pdfButton.isConnected) {
+          result.release();
+          return null;
+        }
+        preparedPdf = result;
+        pdfLink.href = result.url;
+        pdfLink.download = result.filename;
+        return result;
+      } finally {
+        if (pdfButton.isConnected) {
+          pdfPreparation = undefined;
+          pdfButton.disabled = Boolean(itemEditor);
+        }
+      }
+    })();
+    return pdfPreparation;
+  }
   renderAssistant(plan, {
+    preparePdf,
     applyEdit: edit => {
       const source = plan.days.find(day => day.items.some(item => item.id === edit.itemId));
       return saveItemEdit(edit, source?.date || edit.date, { focus: false }) || '';
@@ -1274,35 +1304,16 @@ function renderPlan({ scroll = true, message = '', save = true } = {}) {
     focusSchedule(itemId, date);
   });
   pdfButton.addEventListener('click', async () => {
-    if (pdfInProgress) return;
-    if (preparedPdf) {
-      pdfLink.click();
-      return;
-    }
-    const schedule = plan;
-    pdfInProgress = true;
-    pdfButton.disabled = true;
-    feedback.textContent = 'Готовим PDF…';
+    if (!preparedPdf) feedback.textContent = 'Готовим PDF…';
     try {
-      const { prepareHolidayPdfDownload } = await import('./collection-holiday-pdf.js?v=20261109-career-type-1');
-      const result = await prepareHolidayPdfDownload(schedule, { lodging });
-      if (!pdfButton.isConnected) {
-        result.release();
-        return;
-      }
-      preparedPdf = result;
-      pdfLink.href = result.url;
-      pdfLink.download = result.filename;
+      const result = preparedPdf ?? await preparePdf();
+      if (!result || !pdfButton.isConnected) return;
       pdfReady.hidden = false;
       feedback.textContent = 'PDF готов. Если скачивание не началось, воспользуйтесь ссылкой ниже.';
       pdfLink.click();
     } catch (error) {
       console.error('Holiday plan PDF export failed', error);
       feedback.textContent = 'PDF не удалось подготовить. Можно повторить попытку или скачать текстовый файл.';
-    } finally {
-      pdfInProgress = false;
-      const currentButton = root.querySelector('[data-pdf]');
-      if (currentButton) currentButton.disabled = Boolean(itemEditor);
     }
   });
   bindBookingEdits(root, 'result');
