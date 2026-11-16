@@ -1,15 +1,38 @@
 import { answerHolidayChat } from './collection-holiday-chat-intents.js?v=20261112-chat-3';
 import { answerHolidayChatFollowup } from './collection-holiday-chat-followups.js?v=20261112-chat-3';
-import { answerHolidayChatEvents } from './collection-holiday-chat-events.js?v=20261112-chat-3';
+import { answerHolidayChatEvents } from './collection-holiday-chat-events.js?v=20261116-assistant-masthead-1';
 import { answerHolidayChatHotel } from './collection-holiday-chat-hotel.js?v=20261112-chat-3';
 
+const family = { label: 'Для детей', description: 'Игры и прогулки', icon: 'family', query: 'Что есть в отеле для детей?' };
 const examples = [
-  { label: 'Что дальше?', query: 'Что дальше?' },
-  { label: 'Что завтра?', query: 'Что завтра?' },
-  { label: 'Подобрать занятие', query: 'Подбери занятие в свободное время' },
-  { label: 'Афиша отеля', query: 'Какие события в отеле на даты моей поездки?' },
-  { label: 'Возможности отеля', query: 'Какие есть плюшки в отеле?' },
+  { label: 'Подобрать занятие', description: 'Идеи на свободное время', icon: 'trail', query: 'Подбери занятие в свободное время', featured: true },
+  { label: 'Что дальше?', description: 'Ближайшее занятие', icon: 'clock', query: 'Что дальше?' },
+  { label: 'Что завтра?', description: 'План на день', icon: 'calendar', query: 'Что завтра?' },
+  { label: 'Афиша отеля', description: 'События на ваши даты', icon: 'ticket', query: 'Какие события в отеле на даты моей поездки?' },
+  { label: 'Возможности отеля', description: 'От бани до проката', icon: 'house', query: 'Какие есть плюшки в отеле?' },
+  family,
 ];
+const guideExamples = [
+  { label: 'Ближайшие события', description: 'Афиша отеля', icon: 'ticket', query: 'Какие ближайшие события в отеле?', featured: true },
+  family,
+  { label: 'Ресторан и меню', description: 'Завтраки и детское меню', icon: 'restaurant', query: 'Расскажи про ресторан' },
+  { label: 'Баня', description: 'Сеансы и парение', icon: 'steam', query: 'Расскажи про баню' },
+  { label: 'Развлечения', description: 'Чем заняться по сезону', icon: 'trail', query: 'Расскажи про развлечения на территории' },
+  { label: 'Как добраться', description: 'Маршрут и трансфер', icon: 'pin', query: 'Как добраться до отеля?' },
+];
+
+const icons = {
+  chat: 'M5 5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-7l-5 4v-4H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Zm2.5 6h.01m4.5 0h.01m4.5 0h.01',
+  clock: 'M12 7v5l3 2m6-2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z',
+  calendar: 'M7 3v4m10-4v4M4 9h16M6 5h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z',
+  trail: 'm2 17 6-8 4 5 4-7 6 10H2Zm6-3 2 3m5-4 2 4',
+  ticket: 'M3 7h18v3a2 2 0 0 0 0 4v3H3v-3a2 2 0 0 0 0-4V7Zm10 2v1m0 2v1m0 2v1',
+  house: 'm3 11 9-7 9 7m-16-1v10h14V10m-9 10v-6h4v6',
+  family: 'M11 7a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm8 3a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0ZM3 20v-2a5 5 0 0 1 10 0v2m1 0h7v-1a4 4 0 0 0-5-3.9',
+  restaurant: 'M4 3v5a3 3 0 0 0 6 0V3M7 3v18m12 0V3c-3 2-4 5-4 9h4',
+  steam: 'M4 16h16l-1.5 4h-13L4 16Zm3-3c-2-3 2-3 0-6m5 6c-2-3 2-4 0-8m5 8c-2-3 2-3 0-6',
+  pin: 'M19 10c0 5-7 10-7 10S5 15 5 10a7 7 0 0 1 14 0ZM12 7.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Z',
+};
 
 function element(tag, className = '', text = '') {
   const node = document.createElement(tag);
@@ -25,18 +48,31 @@ function action(label, className, onClick) {
   return button;
 }
 
-export function mountHolidayChat(host, { state, getPlan, getClock, getEvents, applyEdit, interpretMessage }) {
+function icon(name, className) {
+  const namespace = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(namespace, 'svg');
+  svg.setAttribute('class', className);
+  svg.setAttribute('aria-hidden', 'true');
+  svg.setAttribute('viewBox', '0 0 24 24');
+  const path = document.createElementNS(namespace, 'path');
+  path.setAttribute('d', icons[name]);
+  svg.append(path);
+  return svg;
+}
+
+export function mountHolidayChat(host, { state, getPlan, getClock, getEvents, getGuideDates, applyEdit, openPlanSection, interpretMessage }) {
   state.messages ??= [];
   state.suggestions ??= [];
+  const guide = !getPlan();
+  const defaults = guide ? guideExamples : examples;
   let waiting = false;
-  const details = element('details', 'planner-chat');
-  details.open = Boolean(state.open);
-  const summary = element('summary', 'planner-chat-summary');
-  const heading = element('span', 'planner-chat-heading');
-  heading.append(element('strong', '', 'Чат с помощником'), element('span', '', 'Расписание, афиша и возможности отеля'));
-  const indicator = element('span', 'planner-chat-indicator');
-  indicator.setAttribute('aria-hidden', 'true');
-  summary.append(heading, indicator);
+  const panel = element('section', 'planner-chat');
+  panel.dataset.mode = guide ? 'guide' : 'plan';
+  const summary = element('div', 'planner-chat-summary');
+  const title = element('h2', '', guide ? 'Чем помочь с поездкой?' : 'Что хотите сделать с планом?');
+  title.id = `${host.id}-title`;
+  panel.setAttribute('aria-labelledby', title.id);
+  summary.append(icon('chat', 'planner-chat-header-icon'), title);
 
   const body = element('div', 'planner-chat-body');
   const messages = element('ol', 'planner-chat-messages');
@@ -53,7 +89,7 @@ export function mountHolidayChat(host, { state, getPlan, getClock, getEvents, ap
   input.id = `${host.id || 'planner-chat'}-input`;
   input.type = 'text';
   input.maxLength = 300;
-  input.placeholder = 'Например, что у нас сегодня?';
+  input.placeholder = guide ? 'Вопрос об отеле' : 'Вопрос о плане';
   input.enterKeyHint = 'send';
   input.autocomplete = 'off';
   input.value = state.input ?? '';
@@ -68,8 +104,8 @@ export function mountHolidayChat(host, { state, getPlan, getClock, getEvents, ap
   processing.hidden = true;
   composer.append(input, send);
   form.append(label, composer, hint, processing);
-  body.append(messages, options, form);
-  details.append(summary, body);
+  body.append(summary, messages, options, form);
+  panel.append(body);
 
   function scrollMessages() {
     messages.scrollTop = messages.scrollHeight;
@@ -85,7 +121,12 @@ export function mountHolidayChat(host, { state, getPlan, getClock, getEvents, ap
         if (url.origin !== location.origin) continue;
         const link = element('a', '', label);
         link.href = url.href;
-        if (!href.startsWith('#')) {
+        if (href.startsWith('#') && openPlanSection) {
+          link.addEventListener('click', event => {
+            event.preventDefault();
+            openPlanSection(href.slice(1));
+          });
+        } else if (!href.startsWith('#')) {
           link.target = '_blank';
           link.rel = 'noopener';
         }
@@ -121,7 +162,7 @@ export function mountHolidayChat(host, { state, getPlan, getClock, getEvents, ap
 
   function confirmProposal() {
     const { selected, plan } = state.pending ?? {};
-    if (!selected) return;
+    if (waiting || !getPlan() || !selected) return;
     if (plan !== getPlan()) {
       state.pending = null;
       state.suggestions = [];
@@ -134,7 +175,6 @@ export function mountHolidayChat(host, { state, getPlan, getClock, getEvents, ap
     // The planner replaces this DOM synchronously on a successful edit.
     state.pending = null;
     state.suggestions = [];
-    state.open = true;
     state.focusComposer = true;
     const success = addMessage('assistant', 'План обновлён. Новый PDF будет содержать эту правку.');
     const error = applyEdit(selected.edit);
@@ -178,18 +218,30 @@ export function mountHolidayChat(host, { state, getPlan, getClock, getEvents, ap
       }
       options.append(actions);
     } else {
-      const choices = pending?.proposals ?? (state.suggestions.length ? state.suggestions : examples);
-      const list = element('ul');
+      const choices = pending?.proposals ?? (state.suggestions.length ? state.suggestions : defaults);
+      const showTopics = choices === defaults && state.messages.length === 0;
+      const list = element('ul', showTopics ? 'planner-chat-suggestions' : '');
       for (const [index, choice] of choices.entries()) {
         const row = element('li');
         const label = pending && choices.length > 1 ? `${index + 1}. ${choice.label}` : choice.label;
-        row.append(action(label, 'planner-chat-choice', () => {
+        const button = action(showTopics ? '' : label, showTopics ? 'planner-chat-topic' : 'planner-chat-choice', () => {
           if (pending) {
             pending.selected = choice;
             renderOptions();
             options.querySelector('.planner-chat-apply')?.focus();
           } else void sendMessage(choice.query);
-        }));
+        });
+        if (showTopics) {
+          const copy = element('span', 'planner-chat-topic-copy');
+          const description = element('small', '', choice.description);
+          description.id = `${host.id}-topic-${index}`;
+          button.setAttribute('aria-label', choice.label);
+          button.setAttribute('aria-describedby', description.id);
+          copy.append(element('strong', '', label), description);
+          button.append(icon(choice.icon, 'planner-chat-topic-icon'), copy);
+          if (choice.featured) button.dataset.featured = 'true';
+        }
+        row.append(button);
         list.append(row);
       }
       if (pending?.recommendation?.hasMore) {
@@ -216,14 +268,17 @@ export function mountHolidayChat(host, { state, getPlan, getClock, getEvents, ap
       state.pending = null;
       state.suggestions = [];
     }
-    const followup = answerHolidayChatFollowup(plan, question, state.pending, clock);
-    const eventAnswer = followup ? null : answerHolidayChatEvents(plan, question, clock, getEvents);
-    const localPlanAnswer = followup || eventAnswer ? null
-      : answerHolidayChat(plan, question, { ...clock, recommendation: state.pending?.recommendation });
-    let answer = followup ?? eventAnswer ?? (localPlanAnswer.local ? localPlanAnswer
-      : answerHolidayChatHotel(plan, question, clock) ?? localPlanAnswer);
+    const followup = plan ? answerHolidayChatFollowup(plan, question, state.pending, clock) : null;
+    const eventAnswer = followup ? null : answerHolidayChatEvents(plan, question, clock, getEvents, getGuideDates?.());
+    const localPlanAnswer = plan && !followup && !eventAnswer
+      ? answerHolidayChat(plan, question, { ...clock, recommendation: state.pending?.recommendation }) : null;
+    let answer = followup ?? eventAnswer ?? (localPlanAnswer?.local ? localPlanAnswer
+      : answerHolidayChatHotel(plan, question, clock) ?? localPlanAnswer) ?? {
+      text: 'Могу рассказать об отеле, занятиях и афише. Чтобы подобрать занятие на свободное время или изменить расписание, откройте «План отдыха» и составьте программу.',
+      local: true,
+    };
     const loadingEvents = typeof answer.then === 'function';
-    if (loadingEvents || (typed && !followup && !answer.local && typeof interpretMessage === 'function')) {
+    if (loadingEvents || (typed && !followup && !answer.local && plan && typeof interpretMessage === 'function')) {
       waiting = send.disabled = true;
       processing.hidden = false;
       state.pending = null;
@@ -234,7 +289,7 @@ export function mountHolidayChat(host, { state, getPlan, getClock, getEvents, ap
         else {
           const result = await interpretMessage(question);
           const interpreted = typeof result === 'string' ? result.trim() : '';
-          if (interpreted && interpreted.length <= input.maxLength && details.isConnected && plan === getPlan()) {
+          if (interpreted && interpreted.length <= input.maxLength && panel.isConnected && plan === getPlan()) {
             answer = answerHolidayChat(plan, interpreted, getClock());
           }
         }
@@ -244,7 +299,7 @@ export function mountHolidayChat(host, { state, getPlan, getClock, getEvents, ap
         waiting = send.disabled = false;
         processing.hidden = true;
       }
-      if (!details.isConnected) return;
+      if (!panel.isConnected) return;
       if (plan !== getPlan()) {
         addMessage('assistant', 'План изменился. Повторите просьбу, чтобы я проверил новое расписание.');
         renderOptions();
@@ -271,20 +326,14 @@ export function mountHolidayChat(host, { state, getPlan, getClock, getEvents, ap
     void sendMessage(input.value, true);
   });
   input.addEventListener('input', () => { state.input = input.value; });
-  details.addEventListener('toggle', () => {
-    if (!details.isConnected) return;
-    state.open = details.open;
-    if (details.open) scrollMessages();
-  });
-
-  if (state.pending && state.pending.plan !== getPlan()) {
+  if (state.pending && (guide || state.pending.plan !== getPlan())) {
     state.pending = null;
     state.suggestions = [];
   }
   messages.hidden = state.messages.length === 0;
   for (const message of state.messages) messages.append(messageNode(message));
   renderOptions();
-  host.replaceChildren(details);
+  host.replaceChildren(panel);
   scrollMessages();
   if (state.focusComposer) {
     state.focusComposer = false;
@@ -292,10 +341,12 @@ export function mountHolidayChat(host, { state, getPlan, getClock, getEvents, ap
   }
 
   return {
-    open() {
-      details.open = state.open = true;
+    show({ focus = false } = {}) {
       scrollMessages();
-      input.focus();
+      if (focus) {
+        title.tabIndex = -1;
+        title.focus({ preventScroll: true });
+      }
     },
   };
 }
