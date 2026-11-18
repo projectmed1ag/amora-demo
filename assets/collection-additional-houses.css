@@ -88,7 +88,7 @@ html[data-city="mozhaysk"] body[data-page="rooms"] main#content > section.additi
 .additional-houses-dialog[open] { display: block; }
 .additional-houses-dialog::backdrop { background: rgb(17 20 28 / 80%); }
 .additional-houses-dialog-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 16px 20px; }
-.additional-houses-dialog-toolbar h2 { margin: 0; color: #303442; font: 600 32px/1.1 var(--display-font, 'AMore Condensed', Arial, sans-serif); letter-spacing: .01em; text-transform: uppercase; }
+.additional-houses-dialog-toolbar h2 { margin: 0; color: #303442; font: 600 16px/1.1 var(--display-font, 'AMore Condensed', Arial, sans-serif); letter-spacing: .01em; text-transform: uppercase; }
 .additional-houses-dialog-stage { background: #f3f0e9; }
 .additional-houses-dialog-stage > img { display: block; width: 100%; height: auto; max-height: 70dvh; object-fit: contain; }
 .additional-houses-dialog .additional-houses-gallery-controls { padding: 8px 20px 16px; }

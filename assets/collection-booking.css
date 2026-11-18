@@ -17,7 +17,7 @@
   max-width: none;
   margin: 0 0 20px;
   font-family: var(--display-font);
-  font-size: clamp(72px, 8.1vw, 124px);
+  font-size: calc(clamp(72px, 8.1vw, 124px) * .5);
   line-height: .95;
   letter-spacing: -.045em;
 }
@@ -206,7 +206,7 @@
 .collection-booking-page .booking-summary h2 {
   margin: 0 0 22px;
   color: inherit;
-  font: 400 clamp(52px, 5.5vw, 82px)/.95 var(--display-font);
+  font: 400 calc(clamp(52px, 5.5vw, 82px) * .5)/.95 var(--display-font);
   letter-spacing: -.045em;
 }
 
@@ -245,7 +245,7 @@
 
 .collection-booking-page .booking-result h2 {
   margin: 20px 0;
-  font: 400 clamp(42px, 4vw, 62px)/1 var(--display-font);
+  font: 400 calc(clamp(42px, 4vw, 62px) * .5)/1 var(--display-font);
   letter-spacing: -.045em;
 }
 
@@ -268,17 +268,17 @@
 
 @media (min-width: 701px) and (max-width: 1000px) {
   .collection-booking-page .collection-booking-layout { gap: 28px; }
-  .collection-booking-page .collection-booking-heading h1 { font-size: 9.2vw; }
+  .collection-booking-page .collection-booking-heading h1 { font-size: 4.6vw; }
   .collection-booking-page #booking-form legend { font-size: 38px; }
   .collection-booking-page .booking-summary-copy { padding: 30px 24px; }
   .collection-booking-page .booking-summary dl > div { grid-template-columns: 1fr; gap: 4px; padding-block: 18px; }
   .collection-booking-page .booking-summary dd { text-align: left; }
-  .collection-booking-page .booking-summary h2 { font-size: 56px; }
+  .collection-booking-page .booking-summary h2 { font-size: 28px; }
 }
 
 @media (max-width: 700px) {
   .collection-booking-page .collection-booking-heading { padding: 30px var(--g) 24px; }
-  .collection-booking-page .collection-booking-heading h1 { font-size: clamp(44px, 11.9vw, 76px); margin-bottom: 20px; }
+  .collection-booking-page .collection-booking-heading h1 { font-size: calc(clamp(44px, 11.9vw, 76px) * .5); margin-bottom: 20px; }
   .collection-booking-heading .page-lead { font-size: 16px; line-height: 1.65; }
   .collection-booking-page .collection-booking-notice { margin-bottom: 28px; padding-top: 18px; font-size: 12px; }
   .collection-booking-page .collection-booking-layout { grid-template-columns: 1fr; gap: 38px; padding-bottom: 36px; }
@@ -294,13 +294,13 @@
   .collection-booking-page .booking-summary { display: flex; order: 0; }
   .collection-booking-page .booking-summary > .media { aspect-ratio: 4 / 3; }
   .collection-booking-page .booking-summary-copy { padding: 30px 26px 34px; }
-  .collection-booking-page .booking-summary h2 { font-size: 60px; }
+  .collection-booking-page .booking-summary h2 { font-size: 30px; }
   .collection-booking-page .booking-summary dl { margin-top: 26px; }
   .collection-booking-page .booking-summary dl > div { padding-block: 18px; }
 }
 
 @media (max-width: 360px) {
-  .collection-booking-page .collection-booking-heading h1 { font-size: 10.9vw; }
+  .collection-booking-page .collection-booking-heading h1 { font-size: 5.45vw; }
   .collection-booking-page #booking-form fieldset:nth-of-type(2) .form-row { grid-template-columns: 1fr; }
   .collection-booking-page .booking-summary-copy { padding-inline: 22px; }
   .collection-booking-page .booking-summary dl > div { grid-template-columns: 1fr; gap: 4px; }

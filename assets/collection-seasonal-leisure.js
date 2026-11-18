@@ -2,15 +2,16 @@ import { getSeasonForDate, getSeasonActivities, seasonLabels } from './collectio
 
 const knownSeason = value => Object.hasOwn(seasonLabels, value || '');
 
-function readSelection() {
+function readSelection(defaultSeason = 'all') {
   const url = new URL(location.href);
   const date = [url.searchParams.get('date'), url.searchParams.get('checkin')].find(value => getSeasonForDate(value)) || '';
-  return { season: getSeasonForDate(date) || (knownSeason(url.searchParams.get('season')) ? url.searchParams.get('season') : 'all'), date };
+  const season = url.searchParams.get('season');
+  return { season: getSeasonForDate(date) || (season === 'all' || knownSeason(season) ? season : defaultSeason), date };
 }
 
 function preserveDetailSeason() {
   const { season, date } = readSelection();
-  if (season === 'all') return;
+  if (season === 'all' && new URL(location.href).searchParams.get('season') !== 'all') return;
   document.querySelectorAll('.cl-back, .cl-detail-actions a').forEach(link => {
     const target = new URL(link.href, location.href);
     if (!target.pathname.endsWith('/spaces.html')) return;
@@ -26,10 +27,29 @@ function initializeSeasonalLeisure() {
   const controls = overview.querySelector('[data-season-controls]');
   const dateInput = overview.querySelector('[data-season-date]');
   const buttons = [...overview.querySelectorAll('[data-season-choice]')];
+  const switcher = controls?.querySelector('[data-season-switch]');
   const status = overview.querySelector('[data-season-status]');
   const stories = [...overview.querySelectorAll('[data-entertainment-story]')];
   const allActivities = new Set(Object.keys(seasonLabels).flatMap(season => getSeasonActivities(season).map(item => item.title)));
   if (!controls || !dateInput || !status) return;
+
+  const useCurrentSeason = overview.dataset.defaultSeason === 'current';
+  const defaultSeason = useCurrentSeason
+    ? getSeasonForDate(new Date().toLocaleDateString('sv-SE', {
+      timeZone: 'Europe/Moscow', year: 'numeric', month: '2-digit', day: '2-digit',
+    })) || 'all'
+    : 'all';
+
+  function positionIndicator(animate = false) {
+    const active = switcher?.querySelector('button[aria-pressed="true"]');
+    if (!active) return;
+    switcher.toggleAttribute('data-moving', animate);
+    switcher.style.setProperty('--season-x', `${active.offsetLeft}px`);
+    switcher.style.setProperty('--season-y', `${active.offsetTop}px`);
+    switcher.style.setProperty('--season-width', `${active.offsetWidth}px`);
+    switcher.style.setProperty('--season-height', `${active.offsetHeight}px`);
+    switcher.dataset.positioned = '';
+  }
 
   function hashStory() {
     let id;
@@ -70,11 +90,13 @@ function initializeSeasonalLeisure() {
       link.href = target.href;
     });
     overview.dataset.seasonReady = '';
+    const animateIndicator = !controls.hidden && updateURL;
     controls.hidden = false;
+    positionIndicator(animateIndicator);
     status.textContent = `${season === 'all' ? 'Все виды отдыха' : seasonLabels[season]}${date ? ' · по выбранной дате' : ''}. Показано занятий: ${count}.`;
     if (updateURL) {
       const url = new URL(location.href);
-      if (season === 'all') url.searchParams.delete('season');
+      if (season === 'all' && !useCurrentSeason) url.searchParams.delete('season');
       else url.searchParams.set('season', season);
       url.searchParams.delete('checkin');
       url.searchParams.delete('checkout');
@@ -92,10 +114,14 @@ function initializeSeasonalLeisure() {
     if (season) render(season, { date: dateInput.value, clearHash: true });
     else if (!dateInput.value) render('all', { clearHash: true });
   });
-  window.addEventListener('popstate', () => { const selection = readSelection(); render(selection.season, { date: selection.date, alignHash: true }); });
-  window.addEventListener('hashchange', () => { const selection = readSelection(); render(selection.season, { date: selection.date, alignHash: true }); });
-  const initial = readSelection();
-  render(initial.season, { date: initial.date, alignHash: true });
+  function renderFromURL() {
+    const { season, date } = readSelection(defaultSeason);
+    render(season, { date, alignHash: true, updateURL: !useCurrentSeason });
+  }
+  window.addEventListener('popstate', renderFromURL);
+  window.addEventListener('hashchange', renderFromURL);
+  renderFromURL();
+  if (switcher && 'ResizeObserver' in window) new ResizeObserver(() => positionIndicator()).observe(switcher);
 }
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initializeSeasonalLeisure, { once: true });

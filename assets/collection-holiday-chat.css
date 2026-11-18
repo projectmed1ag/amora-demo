@@ -55,7 +55,7 @@
 #content .planner-chat-summary > h2 {
   min-width: 0;
   margin: 0;
-  font-size: clamp(20px, 3vw, 28px);
+  font-size: calc(clamp(20px, 3vw, 28px) * .5);
   line-height: 1.2;
   font-weight: 600;
   text-wrap: balance;

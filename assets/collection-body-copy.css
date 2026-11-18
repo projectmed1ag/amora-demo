@@ -1,0 +1,46 @@
+/* Body copy shared by the public pages. Labels, captions and controls retain their own typography. */
+:root { --collection-copy-size: 17px; }
+
+@media (max-width: 700px) {
+  :root { --collection-copy-size: 16px; }
+}
+
+body[data-page="rooms"] #content .room-card-copy > p:not(.stays-number):not(.eyebrow),
+body.collection-about-page[data-page="about"] #content .about-description-copy > .about-description-lead,
+body:is(.collection-site-page, .collection-contacts-page, .holiday-planner-page, [data-page="spaces"]) #content :is(
+  .entertainment-description,
+  .page-lead,
+  .location-hero-lead,
+  .about-description-copy > p,
+  .home-banya-copy > p,
+  .additional-houses-card p:not(.eyebrow, .stays-number),
+  .service-lead,
+  .service-description p,
+  .service-catalog-heading > p,
+  .service-menu-composition,
+  .service-program-description,
+  .service-reservation-intro,
+  .pavilion-description p,
+  .location-description p:not(.eyebrow, .location-note),
+  .cl-detail-title-copy > p,
+  .cl-detail-items article > p,
+  .nearby-heading > p,
+  .nearby-place-detail p:not(.eyebrow),
+  .planner-help,
+  .contacts-details dd,
+  .booking-summary-copy > p:not(.eyebrow, .form-hint)
+),
+body .credits-page :is(.credits-intro, p),
+body.aero-booking-redirect main > p {
+  color: #1b1b1b;
+  font-size: var(--collection-copy-size);
+  line-height: 1.8;
+}
+
+body.collection-entry-page .hotel-collection .hotel-description,
+body[data-page="home"] #content .aero-hero-copy > p,
+body[data-page="home"] #content .home-panel-copy > p:not(.home-room-meta, .eyebrow),
+body[data-page="home"] #content :is(.home-leisure-copy, .home-restaurant > div) > p {
+  font-size: var(--collection-copy-size);
+  line-height: 1.8;
+}

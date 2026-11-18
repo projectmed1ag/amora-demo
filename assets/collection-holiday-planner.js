@@ -1,5 +1,5 @@
 import { onsiteInterests, services, attractions, mapRoute, demoOrigin, demoOriginLabel, outingTransports, childActivityOptions } from './collection-holiday-data.js?v=20261108-route-pdf-1';
-import { breakfastNotice, buildHolidayPlan, planToText, validateAnswers, addDays, dateLabel, dateNumber, clock, excursionSettings, outingDurationMinutes, availableInterestInStay, interestSeasonLabel } from './collection-holiday-engine.js?v=20261108-route-pdf-1';
+import { breakfastNotice, buildHolidayPlan, planToText, validateAnswers, validateTripDates, addDays, dateLabel, dateNumber, clock, excursionSettings, outingDurationMinutes, availableInterestInStay, interestSeasonLabel } from './collection-holiday-engine.js?v=20261118-aero-home-1';
 import { holidayLodgings } from './collection-holiday-lodging.js';
 import { canEditScheduleItem, scheduleReplacementOptions, applyScheduleEdit, replayScheduleEdits } from './collection-holiday-edits.js?v=20261108-route-pdf-1';
 import { loadHolidayDraft, saveHolidayDraft, clearHolidayDraft } from './collection-holiday-draft.js?v=20261108-route-pdf-1';
@@ -1340,9 +1340,28 @@ function renderPlan({ scroll = true, message = '', save = true } = {}) {
 }
 
 function restoreDraft() {
+  const url = new URL(location.href);
+  const fromHome = !bookingScope && !bookingHandoff && url.searchParams.get('city') === draftCity
+    && url.searchParams.get('from') === 'hotel';
+  if (fromHome) {
+    draftScope = `${draftCity}:home`;
+    const fields = stepFields.dates;
+    const dates = Object.fromEntries(fields.map(field => [field, url.searchParams.get(field) || '']));
+    if (!Object.keys(validateTripDates(dates, today(), nowMinute())).length) {
+      Object.assign(answers, dates);
+      current = 'party';
+      if (saveHolidayDraft(draftScope, { answers, step: current, edits: [], completed: false })) {
+        fields.forEach(field => url.searchParams.delete(field));
+        history.replaceState(history.state, '', url);
+      }
+      renderQuestion(false);
+      return;
+    }
+  }
   const bookingDraft = bookingScope ? loadHolidayDraft(bookingScope, defaultAnswers) : null;
   if (bookingHandoff || bookingDraft) draftScope = bookingScope;
-  const draft = draftScope === draftCity ? loadHolidayDraft(draftCity, defaultAnswers) : bookingDraft;
+  const draft = fromHome ? loadHolidayDraft(draftScope, defaultAnswers)
+    : draftScope === draftCity ? loadHolidayDraft(draftCity, defaultAnswers) : bookingDraft;
   const bookingUnavailable = bookingScope && draftScope === draftCity;
   if (!draft) {
     if (bookingHandoff) {

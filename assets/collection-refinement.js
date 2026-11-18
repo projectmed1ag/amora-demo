@@ -9,7 +9,7 @@ const headerSelector = '.home-header, .site-header';
 const cityNames = new Set(Object.keys(collectionDestinations));
 
 function addBookingLink(header) {
-  if (!header || header.querySelector('a[href*="booking.html"], [data-service-booking-link]')) return;
+  if (!header || header.hasAttribute('data-no-booking-link') || header.querySelector('a[href*="booking.html"], [data-service-booking-link]')) return;
   // Legacy destination headers already own their booking control.
   if (!header.classList.contains('home-header')) return;
   const source = header.querySelector('a[href*="rooms.html"], a[href*="hotel.html"]');

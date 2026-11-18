@@ -65,7 +65,7 @@ function loadStyles() {
   const link = document.createElement('link');
   link.id = 'collection-additional-houses-style';
   link.rel = 'stylesheet';
-  link.href = new URL('./collection-additional-houses.css?v=20261106-catalogue-9', import.meta.url).href;
+  link.href = new URL('./collection-additional-houses.css?v=20261118-headings-1', import.meta.url).href;
   const loaded = new Promise(resolve => {
     link.addEventListener('load', resolve, { once: true });
     link.addEventListener('error', resolve, { once: true });

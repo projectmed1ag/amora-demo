@@ -8,7 +8,7 @@ body.collection-about-page[data-page='about'] #content .about-description {
 body.collection-about-page[data-page='about'] #content .about-description h1 {
   max-width: 960px;
   margin: 0 auto;
-  font-size: clamp(52px, 6.2vw, 88px);
+  font-size: calc(clamp(52px, 6.2vw, 88px) * .5);
 }
 body.collection-about-page[data-page='about'] #content .about-description-photo {
   width: 100%;

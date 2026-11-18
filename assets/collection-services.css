@@ -15,7 +15,7 @@ body.collection-service-page[data-page] #content .service-breadcrumbs {
 
 body.collection-service-page[data-page] #content .service-heading h1 {
   margin: 0;
-  font-size: clamp(64px, 7vw, 106px);
+  font-size: calc(clamp(64px, 7vw, 106px) * .5);
   line-height: .94;
   overflow-wrap: normal;
 }
@@ -54,7 +54,7 @@ body.collection-service-page[data-page] #content .service-description {
 body.collection-service-page[data-page] #content .service-description h2,
 body.collection-service-page[data-page] #content .service-reservation h2 {
   max-width: 680px;
-  font-size: clamp(46px, 5.3vw, 78px);
+  font-size: calc(clamp(46px, 5.3vw, 78px) * .5);
   line-height: 1;
 }
 
@@ -103,7 +103,7 @@ body.collection-service-page[data-page] #content .service-reservation {
 body.collection-service-page[data-page] #content .service-reservation h2 { margin-bottom: 22px; }
 body.collection-service-page[data-page] #content .service-reservation p { margin-bottom: 0; }
 
-body.collection-service-page[data-page] #content .service-action {
+body:is(.collection-service-page, .collection-rooms-page)[data-page] #content .service-action {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -125,23 +125,23 @@ body.collection-service-page[data-page] #content .service-action {
   transition: background 260ms ease, border-color 260ms ease;
 }
 
-body.collection-service-page[data-page] #content .service-action:hover {
+body:is(.collection-service-page, .collection-rooms-page)[data-page] #content .service-action:hover {
   border-color: #444958;
   background: #444958;
 }
 
-body.collection-service-page[data-page] #content .service-action:focus-visible {
+body:is(.collection-service-page, .collection-rooms-page)[data-page] #content .service-action:focus-visible {
   outline: 2px solid #303442;
   outline-offset: 4px;
 }
 
-body.collection-service-page[data-page] #content .service-action:disabled {
+body:is(.collection-service-page, .collection-rooms-page)[data-page] #content .service-action:disabled {
   opacity: .5;
   cursor: default;
 }
 
 body.collection-service-page[data-page] #content .service-booking-heading { padding-bottom: 44px; }
-body.collection-service-page[data-page] #content .service-booking-heading h1 { font-size: clamp(60px, 7vw, 106px); }
+body.collection-service-page[data-page] #content .service-booking-heading h1 { font-size: calc(clamp(60px, 7vw, 106px) * .5); }
 
 .service-booking-layout {
   display: grid;
@@ -175,9 +175,9 @@ body.collection-service-page[data-page] #content .service-demo-notice {
 .service-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
 .service-field { display: flex; flex-direction: column; align-items: stretch; gap: 8px; min-width: 0; }
 .service-field-wide { grid-column: 1 / -1; }
-#service-request-form label { color: #303442; font: 400 13px/1.6 var(--body-font); }
+:is(#service-request-form, #stays-booking-form) label { color: #303442; font: 400 13px/1.6 var(--body-font); }
 #service-request-form label span { margin-left: 8px; color: #747782; font-size: 12px; }
-#service-request-form :is(input, select, textarea) {
+:is(#service-request-form, #stays-booking-form) :is(input, select, textarea) {
   display: block;
   width: 100%;
   min-width: 0;
@@ -193,7 +193,7 @@ body.collection-service-page[data-page] #content .service-demo-notice {
   box-shadow: none;
   font: 400 16px/1.5 var(--body-font);
 }
-#service-request-form select { padding-right: 30px; }
+:is(#service-request-form, #stays-booking-form) select { padding-right: 30px; }
 #service-request-form textarea { min-height: 100px; resize: vertical; }
 .service-phone-control { display: flex; align-items: stretch; min-width: 0; border: 1px solid #b9bcc4; background: #fff; }
 .service-phone-prefix { display: grid; place-items: center; flex: none; width: 52px; color: #303442; font: 400 16px/1.5 var(--body-font); user-select: none; }
@@ -220,13 +220,13 @@ body.collection-service-page[data-page] #content .service-field-error {
 body.collection-service-page[data-page] #content .service-submit-row p { max-width: 270px; margin: 0; color: #747782; font-size: 12px; line-height: 1.6; }
 
 .service-booking-aside { align-self: start; padding-top: 28px; border-top: 1px solid #e3e4e8; }
-body.collection-service-page[data-page] #content .service-booking-aside h2 { margin-bottom: 20px; font-size: 40px; }
+body.collection-service-page[data-page] #content .service-booking-aside h2 { margin-bottom: 20px; font-size: 20px; }
 body.collection-service-page[data-page] #content .service-booking-aside p { margin: 0 0 20px; color: #747782; font-size: 14px; line-height: 1.8; }
 .service-related-links { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; margin-top: 28px; }
 .service-related-links a { display: inline-flex; align-items: center; min-height: 44px; font-size: 13px; text-decoration: underline; text-underline-offset: 5px; }
 
 .service-request-result { padding-top: 4px; }
-body.collection-service-page[data-page] #content .service-request-result h2 { max-width: 650px; margin: 0 0 24px; font-size: clamp(44px, 5.3vw, 72px); }
+body.collection-service-page[data-page] #content .service-request-result h2 { max-width: 650px; margin: 0 0 24px; font-size: calc(clamp(44px, 5.3vw, 72px) * .5); }
 #service-result-title:focus { outline: none; }
 body.collection-service-page[data-page] #content .service-result-notice { margin: 0 0 32px; color: #747782; font-size: 14px; line-height: 1.7; }
 .service-result-details { margin: 0; }
@@ -255,7 +255,7 @@ body.collection-service-page[data-page] #content .service-eyebrow {
 }
 body.collection-service-page[data-page] #content .service-reservation-panel h2 {
   margin: 0 0 18px;
-  font-size: clamp(42px, 4vw, 60px);
+  font-size: calc(clamp(42px, 4vw, 60px) * .5);
   line-height: 1;
 }
 body.collection-service-page[data-page] #content .service-reservation-intro {
@@ -277,9 +277,9 @@ body.collection-service-page[data-page] #content .service-reservation-intro {
 .service-steps li[aria-current='step'] { color: #303442; }
 .service-steps span { font-variant-numeric: tabular-nums; }
 .service-steps li[aria-current='step'] span { text-decoration: underline; text-underline-offset: 5px; }
-body.collection-service-page[data-page] #content .service-continue,
+body:is(.collection-service-page, .collection-rooms-page)[data-page] #content .service-continue,
 body.collection-service-page[data-page] #content .service-submit-row .service-action { width: 100%; }
-body.collection-service-page[data-page] #content .service-continue { margin-top: 26px; }
+body:is(.collection-service-page, .collection-rooms-page)[data-page] #content .service-continue { margin-top: 26px; }
 .service-visit-choice { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 22px; }
 body.collection-service-page[data-page] #content #service-visit-summary { margin: 10px 0 0; color: #747782; font: 400 13px/1.7 var(--body-font); }
 .service-edit-link {
@@ -316,7 +316,7 @@ body.collection-service-page[data-page] #content #service-visit-summary { margin
 
 @media (max-width: 700px) {
   .service-experience { grid-template-columns: minmax(0, 1fr); gap: 32px; padding-bottom: 0; }
-  body.collection-service-page[data-page] #content .service-reservation-panel h2 { font-size: clamp(42px, 11vw, 56px); }
+  body.collection-service-page[data-page] #content .service-reservation-panel h2 { font-size: calc(clamp(42px, 11vw, 56px) * .5); }
   .service-visit-choice { flex-wrap: wrap; gap: 0 16px; }
   .service-reservation-panel .service-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 16px; }
 }
@@ -330,12 +330,12 @@ body.collection-service-page[data-page] #content #service-visit-summary { margin
 @media (max-width: 700px) {
   body.collection-service-page[data-page] #content .service-heading { grid-template-columns: minmax(0, 1fr); gap: 22px; padding: 28px var(--g) 34px; }
   body.collection-service-page[data-page] #content .service-breadcrumbs { margin: 0; }
-  body.collection-service-page[data-page] #content .service-heading h1 { font-size: clamp(60px, 14vw, 90px); }
-  body.collection-service-page[data-page] #content .service-booking-heading h1 { font-size: clamp(50px, 11vw, 74px); }
+  body.collection-service-page[data-page] #content .service-heading h1 { font-size: calc(clamp(60px, 14vw, 90px) * .5); }
+  body.collection-service-page[data-page] #content .service-booking-heading h1 { font-size: calc(clamp(50px, 11vw, 74px) * .5); }
   body.collection-service-page[data-page] #content .service-lead { max-width: 100%; font-size: 15px; }
   body.collection-service-page[data-page] #content .service-description { grid-template-columns: minmax(0, 1fr); gap: 26px; padding: 44px var(--g); }
   body.collection-service-page[data-page] #content .service-description h2,
-  body.collection-service-page[data-page] #content .service-reservation h2 { font-size: clamp(42px, 10vw, 62px); }
+  body.collection-service-page[data-page] #content .service-reservation h2 { font-size: calc(clamp(42px, 10vw, 62px) * .5); }
   body.collection-service-page[data-page] #content .service-reservation { flex-direction: column; align-items: flex-start; gap: 28px; padding: 36px 0 48px; }
   body.collection-service-page[data-page] #content .service-reservation p,
   body.collection-service-page[data-page] #content .service-description p { font-size: 15px; }

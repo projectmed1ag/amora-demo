@@ -65,7 +65,7 @@ export function excursionSettings(a, id) {
 
 export const outingDurationMinutes = ({ travelMinutes }) => travelMinutes * 2 + visitReserveMinutes + outingReserveMinutes;
 
-export function validateAnswers(a, today = '', currentMinute = -1) {
+export function validateTripDates(a, today = '', currentMinute = -1) {
   const errors = {};
   const start = dateNumber(a.startDate), end = dateNumber(a.endDate);
   if (!Number.isFinite(start) || (today && a.startDate < today)) errors.startDate = 'Выберите дату начала отдыха не раньше сегодняшнего дня.';
@@ -75,6 +75,11 @@ export function validateAnswers(a, today = '', currentMinute = -1) {
   else if (a.startDate === today && minutes(a.arrival) <= currentMinute) errors.arrival = 'Выберите время приезда позже текущего московского времени.';
   if (!Number.isFinite(minutes(a.departure))) errors.departure = 'Укажите время отъезда.';
   else if (start === end && minutes(a.departure) <= minutes(a.arrival)) errors.departure = 'Для отдыха одним днём отъезд должен быть позже приезда.';
+  return errors;
+}
+
+export function validateAnswers(a, today = '', currentMinute = -1) {
+  const errors = validateTripDates(a, today, currentMinute);
   if (!Number.isInteger(a.adults) || a.adults < 1 || a.adults > 20) errors.adults = 'Укажите от 1 до 20 взрослых.';
   if (!Number.isInteger(a.children) || a.children < 0 || a.children > 10) errors.children = 'Укажите от 0 до 10 детей.';
   else if (a.adults + a.children > 20) errors.children = 'Этот помощник составляет программу для компании до 20 человек.';

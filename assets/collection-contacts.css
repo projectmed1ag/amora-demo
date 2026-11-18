@@ -71,7 +71,7 @@ body.collection-contacts-page {
 .contacts-main dl,
 .contacts-main dd { margin: 0; }
 
-main.contacts-main h1 { font-size: clamp(56px, 6.5vw, 92px); }
+main.contacts-main h1 { font-size: calc(clamp(56px, 6.5vw, 92px) * .5); }
 
 .contacts-return,
 .contacts-hotel-link {
@@ -130,7 +130,7 @@ main.contacts-main h1 { font-size: clamp(56px, 6.5vw, 92px); }
 
 main.contacts-main h2 {
   max-width: 360px;
-  font-size: clamp(38px, 3.2vw, 48px);
+  font-size: calc(clamp(38px, 3.2vw, 48px) * .5);
   line-height: 1.02;
   overflow-wrap: normal;
 }
@@ -174,13 +174,13 @@ main.contacts-main h2 {
   .contacts-footer { gap: 16px; padding-block: 10px; }
   .contacts-main { padding-block: 36px 48px; }
   .contacts-heading { align-items: flex-start; flex-direction: column; gap: 24px; margin-bottom: 40px; }
-  main.contacts-main h1 { font-size: 56px; }
+  main.contacts-main h1 { font-size: 28px; }
   .contacts-return { min-height: 44px; padding: 12px 16px; }
   .contacts-hotels { grid-template-columns: minmax(0, 1fr); gap: 40px; }
   .contacts-hotel { padding-top: 22px; }
   .contacts-hotel-heading { min-height: 0; }
   .contacts-region { margin-bottom: 12px !important; }
-  main.contacts-main h2 { max-width: 320px; font-size: clamp(38px, 10vw, 44px); }
+  main.contacts-main h2 { max-width: 320px; font-size: calc(clamp(38px, 10vw, 44px) * .5); }
   .contacts-details { gap: 20px; padding-block: 24px 20px; }
   .contacts-hotel-link { margin-top: 0; }
 }

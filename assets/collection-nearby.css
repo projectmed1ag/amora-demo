@@ -3,7 +3,7 @@
 .collection-site-leisure .cl-nearby { padding: 70px var(--g) 28px; background: #f6f3ed; color: #23261f; }
 .nearby-heading { display: grid; grid-template-columns: 1.35fr .65fr; gap: 70px; align-items: end; padding-bottom: 42px; }
 .nearby-eyebrow { margin-bottom: 24px; font: 11px/1.5 var(--body-font); letter-spacing: .14em; text-transform: uppercase; color: #666b60; }
-.collection-site-leisure .nearby-heading h2 { font: 400 clamp(55px, 6.1vw, 94px)/.9 var(--display-font); letter-spacing: -.045em; }
+.collection-site-leisure .nearby-heading h2 { font: 400 calc(clamp(55px, 6.1vw, 94px) * .5)/.9 var(--display-font); letter-spacing: -.045em; }
 .nearby-heading > p { max-width: 340px; padding-bottom: 4px; font: 15px/1.7 var(--body-font); color: #61675b; }
 .nearby-layout { display: grid; grid-template-columns: minmax(290px, .72fr) minmax(0, 1.6fr); gap: 44px; border-top: 1px solid #23261f40; padding-top: 26px; }
 .nearby-places { min-width: 0; }
@@ -29,7 +29,7 @@
 .nearby-place-photo figcaption { min-height: 36px; padding-top: 9px; font: 9px/1.6 var(--body-font); color: #6c7165; }
 .nearby-place-photo figcaption a { text-decoration: underline; text-underline-offset: 3px; }
 .nearby-place-category { color: #74705c; font: 10px/1.5 var(--body-font); text-transform: uppercase; letter-spacing: .06em; }
-.collection-site-leisure .nearby-place-detail h3 { margin-top: 10px; font: 400 clamp(32px, 3vw, 47px)/1 var(--display-font); letter-spacing: -.035em; }
+.collection-site-leisure .nearby-place-detail h3 { margin-top: 10px; font: 400 calc(clamp(32px, 3vw, 47px) * .5)/1 var(--display-font); letter-spacing: -.035em; }
 .nearby-place-description { margin-top: 14px; font: 14px/1.7 var(--body-font); color: #62675c; }
 .nearby-place-links { display: flex; align-items: start; flex-direction: column; gap: 2px; margin-top: 14px; }
 .nearby-place-links .home-link { min-height: 44px; font-size: 13px; }
@@ -87,7 +87,7 @@
   .collection-site-leisure .cl-nearby { padding: 42px var(--g) 26px; }
   .nearby-heading { display: block; padding-bottom: 28px; }
   .nearby-eyebrow { margin-bottom: 20px; font-size: 10px; }
-  .collection-site-leisure .nearby-heading h2 { font-size: clamp(48px, 12.8vw, 73px); line-height: .93; }
+  .collection-site-leisure .nearby-heading h2 { font-size: calc(clamp(48px, 12.8vw, 73px) * .5); line-height: .93; }
   .nearby-heading > p { margin-top: 24px; font-size: 14px; line-height: 1.65; }
   .nearby-layout { display: flex; flex-direction: column; gap: 26px; padding-top: 20px; }
   .nearby-map-column { order: -1; }
@@ -100,7 +100,7 @@
   .nearby-place-detail { padding-top: 24px; }
   .nearby-place-photo { margin-bottom: 20px; }
   .nearby-place-photo figcaption { font-size: 10px; }
-  .collection-site-leisure .nearby-place-detail h3 { font-size: 38px; }
+  .collection-site-leisure .nearby-place-detail h3 { font-size: 19px; }
   .nearby-place-description { font-size: 14px; }
   .nearby-place-links { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 0 22px; }
   .nearby-visit-note { margin-top: 28px; }

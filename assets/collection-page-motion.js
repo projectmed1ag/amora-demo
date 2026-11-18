@@ -93,7 +93,7 @@ function initializePageMotion() {
       });
     } else {
       scope.querySelectorAll([
-        '.stays-hero-heading', '.room-houseboat',
+        '.aero-hero-rooms .aero-panorama', '.stays-hero-heading', '.room-houseboat',
         '.cl-intro-copy', '.cl-intro-photo', '.cl-panel', '.cl-story-photo',
         '.cl-story-copy', '.cl-detail-photo', '.cl-detail-heading',
         '.editorial-story > div', '.editorial-story > figure',
