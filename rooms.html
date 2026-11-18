@@ -30,11 +30,11 @@
   <link rel="icon" type="image/svg+xml" sizes="any" href="./assets/favicon.svg?v=20261105-emblem-1">
   <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon-32.png?v=20261105-emblem-1">
   <link rel="apple-touch-icon" sizes="180x180" href="./assets/apple-touch-icon.png?v=20261105-emblem-1">
-    <script type="module" src="./assets/collection-additional-houses.js?v=20261118-headings-1"></script>
-    <link rel="stylesheet" href="./assets/collection-services.css?v=20261118-stays-restaurant-1">
-    <link rel="stylesheet" href="./assets/collection-aero.css?v=20261118-stays-restaurant-1">
+    <script type="module" src="./assets/collection-additional-houses.js?v=20261118-featured-first-1"></script>
+    <link rel="stylesheet" href="./assets/collection-services.css?v=20261118-unified-panels-1">
+    <link rel="stylesheet" href="./assets/collection-aero.css?v=20261119-photo-left-1">
     <link rel="stylesheet" href="./assets/collection-body-copy.css?v=20261118-2">
-    <script type="module" src="./assets/collection-stays-booking.js"></script>
+    <script type="module" src="./assets/collection-stays-booking.js?v=20261119-guests-spinner-1"></script>
 </head>
   <body data-page="rooms" class="collection-home-page collection-site-page collection-rooms-page" data-collection-static="">
     <a class="skip-link" href="#content">К содержанию</a>
@@ -54,22 +54,23 @@
 <div class="home-header-end"><a class="aero-hotels-link" href="./">Отели</a><label class="home-menu" for="home-menu-toggle"><span></span><span></span></label></div>
 </header>
 
-    <main id="content" class="interior-page" tabindex="-1"><section class="aero-hero-rooms" id="top" aria-labelledby="page-title">
-    <div class="aero-stays-photo">
+    <main id="content" class="interior-page" tabindex="-1"><section class="aero-hero-rooms aero-feature-card" id="top" aria-labelledby="page-title">
+    <div class="aero-stays-photo aero-feature-photo">
     <picture class="aero-panorama"><img src="images/rooms/mozhaysk/standard-houseboat/exterior-day.jpg" sizes="100vw" width="1920" height="1080" fetchpriority="high" alt="Панорамный хаусбот с открытой террасой на Можайском водохранилище" decoding="async" style=";background-image:url(&#x27;data:image/webp;base64,UklGRroBAABXRUJQVlA4IK4BAADQCgCdASpAACQAPxF4s1SsJqQjKrQMAYAiCUAX5gVBDBuDbReRr8bk69i6MWeng4TrDnCtJu5AoeEFhe7Kmq8LcU/kJdG2vnVOQGSpXAnvrTTtlC8LOMdzUoZvQAO7gAD+7VfiWR5pAKez4n8HVP10rz5SQYRwi1D5TOl6pnYrunhY3Ba6xW1Fv3SoXjVamRAzZ2Jl9Xg9O3C0oAyJ8YAFqKmLE22AmbuHWqwA84Yj7QFfHBFnkSK93nKhN5Cdb98wue8vbGJ0KUGmA5abfmSGFWIlChMtS000ktX8+Brjeo8FAPMgH7U4mlE9blEzhldZYdK0N1p2PyvdyVJACgkiK+S7QJ57WMlEyKeOOLb3k+mFGrahNmKTUf3io40PClDAVUJCvLECW8Zbu9JIZKSYAbxdHkALz97QSPWw8/RR/cKxCnTLBYhtCHGCnrtjNan52En7tMivgjTKuz4Z+qFZl8OyghQLuDt/5V1K/y2Ozz/xYbz5f2bCbG0uN9c068I44Tm/doNMLDARVih2DJ9ECL0h2m5af8bxPPCinCZxmHqmvfcLDd/oMq0/ingA&#x27;);background-size:cover;background-position:center" data-progressive-photo="" loading="eager"></picture>
     <div class="aero-hero-copy">
       <h1 id="page-title">Хаусботы</h1>
     </div>
     </div>
-    <aside class="aero-stays-booking" aria-labelledby="stays-booking-title">
+    <aside class="aero-stays-booking service-reservation-panel aero-feature-panel" aria-labelledby="stays-booking-title">
+
       <h2 id="stays-booking-title">Забронировать хаусбот</h2>
-      <p>Выберите даты проживания и подходящий хаусбот.</p>
+      <p class="service-reservation-intro">Выберите даты проживания и подходящий хаусбот.</p>
       <form id="stays-booking-form" class="aero-stays-booking-form" action="./booking.html" aria-labelledby="stays-booking-title">
         <input type="hidden" name="city" value="mozhaysk">
         <div class="service-fields">
           <div class="service-field"><label for="stays-booking-checkin">Заезд</label><input id="stays-booking-checkin" name="checkin" type="date" required></div>
           <div class="service-field"><label for="stays-booking-checkout">Выезд</label><input id="stays-booking-checkout" name="checkout" type="date" required></div>
-          <div class="service-field"><label for="stays-booking-guests">Гости</label><select id="stays-booking-guests" name="guests" required><option value="2">2</option></select></div>
+          <div class="service-field"><label for="stays-booking-guests">Гости</label><input id="stays-booking-guests" name="guests" type="number" min="1" max="10" step="1" inputmode="numeric" value="2" required></div>
           <div class="service-field"><label for="stays-booking-room">Хаусбот</label><select id="stays-booking-room" name="room" required><option value="standard">Стандарт</option></select></div>
         </div>
         <button class="service-action service-continue" type="submit" disabled>
@@ -79,8 +80,7 @@
       </form>
       <noscript><a class="primary-action" href="./booking.html?city=mozhaysk">Перейти к бронированию</a></noscript>
     </aside>
-    </section><section class="stays-navigation" aria-labelledby="stays-choice-title"><h2 id="stays-choice-title">Категории</h2>
-    <nav aria-label="Категории хаусботов"><a href="#stay-standard">Стандарт</a><a href="#stay-comfort">Комфорт</a><a href="#stay-junior-suite">Полулюкс</a><a href="#stay-suite">Люкс</a></nav></section>
+    </section>
 
 
     <div class="room-list"><article class="room-card room-houseboat" aria-labelledby="room-standard" id="stay-standard">

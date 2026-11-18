@@ -12,6 +12,7 @@ html.collection-aero {
   --aero-large: 32px;
   --aero-medium: 22px;
   --aero-small: 14px;
+  --aero-feature-height: 304px;
   background: var(--aero-paper);
 }
 .collection-aero body { background: var(--aero-paper); }
@@ -92,7 +93,7 @@ html.collection-aero {
   border-color: var(--aero-line);
 }
 .collection-aero body #content .service-experience > .service-hero { overflow: hidden; }
-.collection-aero body.collection-service-page[data-page] #content .service-reservation-panel {
+.collection-aero body:is(.collection-service-page, .collection-rooms-page)[data-page] #content .service-reservation-panel {
   padding: clamp(16px, 2.4vw, 32px);
   border: 1px solid var(--aero-line);
   scroll-margin-top: calc(var(--header-height) + 12px);
@@ -146,7 +147,7 @@ html.collection-aero {
 
 @supports ((backdrop-filter: blur(16px)) or (-webkit-backdrop-filter: blur(16px))) {
   .collection-aero body #content :is(.planner-conversation, .planner-sidebar),
-  .collection-aero body.collection-service-page[data-page] #content .service-reservation-panel {
+  .collection-aero body:is(.collection-service-page, .collection-rooms-page)[data-page] #content .service-reservation-panel {
     background-color: #fffbf4e6;
     -webkit-backdrop-filter: blur(16px);
     backdrop-filter: blur(16px);
@@ -181,17 +182,16 @@ html.collection-aero {
   background-color: var(--aero-paper);
 }
 @media (max-width: 700px) {
-  .collection-aero body.collection-service-page[data-page] #content .service-reservation-panel h2 {
+  .collection-aero body:is(.collection-service-page, .collection-rooms-page)[data-page] #content .service-reservation-panel h2 {
     font-size: calc(clamp(29px, 8.8vw, 46px) * .5);
     overflow-wrap: break-word;
   }
 }
 
-/* Keep the accommodation catalogue on one continuous warm surface. */
+/* Keep the accommodation catalogue surround on the warm page surface. */
 html.collection-aero body[data-page="rooms"] #content :is(
   .stays-hero, .stays-hero .home-hero-bottom, .stays-navigation,
-  .room-list, .room-grid, .room-card, .room-houseboat, .room-houseboat .room-card-copy,
-  .room-thumbnails, .room-thumbnail, .room-slide img[src*="/concept-covers/"],
+  .room-list, .room-grid, .room-slide img[src*="/concept-covers/"],
   .additional-houses, .additional-houses-open, .additional-houses-thumbnail
 ) {
   background-color: var(--aero-paper);
@@ -269,6 +269,7 @@ html.collection-aero .aero-service-title {
   text-align: center;
   pointer-events: none;
 }
+html.collection-aero body[data-page="rooms"] #content .aero-hero-rooms h1,
 html.collection-aero body.collection-service-page #content .aero-service-title h1 {
   margin: 0;
   color: #fff;
@@ -302,9 +303,28 @@ html.collection-aero body:is([data-page="restaurant"], [data-page="banya"]) #con
   background: radial-gradient(ellipse at center, #12201897, #1220182b 80%);
   pointer-events: none;
 }
-.aero-stays-booking { display: none; }
+.aero-stays-booking { display: block; }
+html.collection-aero body[data-page="rooms"] #content .aero-hero-rooms {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 32px;
+  margin-bottom: 32px;
+}
+@media (max-width: 700px) {
+  html.collection-aero body[data-page="rooms"] #content .aero-hero-rooms { gap: 0; }
+  html.collection-aero body[data-page="rooms"] #content .aero-stays-booking {
+    position: relative;
+    z-index: 1;
+    width: calc(100% - 4px);
+    margin: -36px 2px 0;
+  }
+  html.collection-aero body[data-page="rooms"] #content .aero-stays-booking > :is(.service-eyebrow, h2, .service-reservation-intro) {
+    text-align: center;
+  }
+}
 
 @media (max-width: 700px) {
+  html.collection-aero body[data-page="rooms"] #content .aero-hero-rooms h1,
   html.collection-aero body.collection-service-page #content .aero-service-title h1 {
     font-size: calc(clamp(60px, 14vw, 90px) * .5);
   }
@@ -324,9 +344,6 @@ html.collection-aero body:is([data-page="restaurant"], [data-page="banya"]) #con
     align-items: stretch;
     gap: var(--aero-pair-gap);
   }
-  html.collection-aero body[data-page="rooms"] #content .aero-hero-rooms {
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
-  }
   html.collection-aero body.collection-service-page:is([data-page="restaurant"], [data-page="banya"]) #content .service-experience {
     padding-inline: var(--aero-gutter);
   }
@@ -336,23 +353,13 @@ html.collection-aero body:is([data-page="restaurant"], [data-page="banya"]) #con
   html.collection-aero body.collection-service-page:is([data-page="restaurant"], [data-page="banya"], [data-page="pavilions"]) #content .render-service-gallery-grid {
     column-gap: var(--aero-pair-gap);
   }
+  html.collection-aero body[data-page="rooms"] #content .aero-stays-photo,
   html.collection-aero body.collection-service-page:is([data-page="restaurant"], [data-page="banya"]) #content .service-experience > .service-hero {
     align-self: stretch;
     min-height: 420px;
     height: auto;
     margin-inline: 0;
   }
-  html.collection-aero body[data-page="rooms"] #content .aero-stays-booking {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-    padding: clamp(24px, 4vw, 60px);
-    border: 1px solid var(--aero-line);
-    border-radius: var(--aero-large);
-    background: var(--aero-surface);
-  }
-  .aero-stays-booking p { margin-block: 14px 24px; color: #1b1b1b; font-size: var(--collection-copy-size, 17px); }
   html.collection-aero body.collection-pavilions-page[data-page="pavilions"] #content .pavilion-story {
     display: grid;
   }
@@ -437,4 +444,279 @@ html.collection-aero[data-city="mozhaysk"] body[data-page="rooms"] #content .roo
 html.collection-aero[data-city="mozhaysk"] body[data-page="rooms"] #content .room-card-copy .primary-action {
   background-color: var(--aero-dark);
   border-color: var(--aero-dark);
+}
+
+/* White frosted booking and season panels, with an opaque fallback for older browsers. */
+html.collection-aero body.collection-entertainment-page[data-page="spaces"] #content .entertainment-season-panel,
+html.collection-aero body:is(.collection-service-page, .collection-rooms-page)[data-page] #content .service-reservation-panel {
+  --aero-field: #ffffffdb;
+  background: #fff;
+  border-color: #e1e5eb;
+  box-shadow: inset 0 1px 0 #fffffffa, inset 0 -1px 0 #ffffffb3, 0 16px 40px #3034420e;
+}
+@supports ((backdrop-filter: blur(20px)) or (-webkit-backdrop-filter: blur(20px))) {
+  html.collection-aero body.collection-entertainment-page[data-page="spaces"] #content .entertainment-season-panel,
+  html.collection-aero body:is(.collection-service-page, .collection-rooms-page)[data-page] #content .service-reservation-panel {
+    background: linear-gradient(145deg, #fffffff2, #ffffffc7);
+    -webkit-backdrop-filter: blur(20px) saturate(1.1);
+    backdrop-filter: blur(20px) saturate(1.1);
+  }
+}
+
+/* Framed accommodation cards share the entertainment cards' white surface. */
+html.collection-aero body[data-page="rooms"] #content .room-list,
+html.collection-aero body[data-page="rooms"] #content .additional-houses-list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(24px, 3vw, 44px);
+  padding-inline: var(--aero-gutter);
+  padding-bottom: 32px;
+}
+html.collection-aero[data-city="mozhaysk"] body[data-page="rooms"] main#content > section.additional-houses {
+  padding: 0;
+  font: inherit;
+}
+@media (min-width: 1001px) {
+  html.collection-aero body[data-page="rooms"] #content .room-list,
+  html.collection-aero body[data-page="rooms"] #content .additional-houses-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+html.collection-aero body[data-page="rooms"] #content .room-list .room-houseboat,
+html.collection-aero body[data-page="rooms"] #content .additional-houses-card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--aero-line);
+  border-radius: var(--aero-large);
+  overflow: hidden;
+  background: #fff;
+}
+html.collection-aero body[data-page="rooms"] #content :is(.room-houseboat, .additional-houses-card) :is(.room-gallery, .room-thumbnails, .room-thumbnail, .room-card-copy, .additional-houses-gallery, .additional-houses-thumbnails, .additional-houses-open) {
+  background-color: #fff;
+}
+html.collection-aero body[data-page="rooms"] #content :is(.room-houseboat, .additional-houses-card) .room-card-copy {
+  flex: 1;
+  justify-content: flex-start;
+  padding: clamp(20px, 3vw, 44px);
+  border-radius: var(--aero-large);
+}
+
+/* One outer clip prevents the nested photo and gallery radii leaving white wedges. */
+html.collection-aero body[data-page="rooms"] #content :is(.room-houseboat, .additional-houses-card) :is(
+  .room-gallery, .room-slideshow, .room-slide, .room-slide img, .room-card-copy,
+  .additional-houses-gallery, .additional-houses-photo, .additional-houses-open, .additional-houses-open img
+) {
+  border-radius: 0;
+}
+
+html.collection-aero body[data-page="rooms"] #content .additional-houses-thumbnail img { object-fit: cover; }
+html.collection-aero body[data-page="rooms"] #content :is(.additional-houses-thumbnail, .additional-houses-open):focus-visible {
+  outline-offset: -4px;
+}
+
+/* Action links and destination choices use the site's common control radius. */
+html.collection-aero body[data-page] #content :is(
+  .primary-action, .home-link, .service-action, .cl-detail-actions a,
+  .nearby-place-list button, .nearby-map-toolbar button
+) {
+  border-radius: var(--aero-small);
+}
+
+/* Keep the five destination hero pairs at one resting height. Forms may grow
+   naturally for validation messages and the contact step. */
+@media (min-width: 1001px) {
+  html.collection-aero[data-city="mozhaysk"] body:is([data-page="rooms"], [data-page="restaurant"], [data-page="banya"], [data-page="pavilions"], [data-page="spaces"]) #content :is(
+    .aero-stays-photo, .service-experience > .service-hero, .pavilion-photo
+  ) {
+    min-height: var(--aero-feature-height);
+    height: auto;
+    aspect-ratio: auto;
+  }
+  html.collection-aero[data-city="mozhaysk"] body:is([data-page="rooms"], [data-page="restaurant"], [data-page="banya"], [data-page="pavilions"], [data-page="spaces"]) #content :is(
+    .service-reservation-panel, .entertainment-season-panel
+  ) {
+    min-height: var(--aero-feature-height);
+  }
+}
+@media (max-width: 1000px) {
+  html.collection-aero[data-city="mozhaysk"] body:is([data-page="rooms"], [data-page="restaurant"], [data-page="banya"], [data-page="pavilions"], [data-page="spaces"]) #content :is(
+    .aero-stays-photo, .service-experience > .service-hero, .pavilion-photo
+  ) {
+    height: clamp(320px, 43vw, 420px);
+    min-height: 0;
+    aspect-ratio: auto;
+  }
+}
+
+/* One continuous desktop card surrounds the photo and its connected panel. */
+@media (min-width: 1001px) {
+  html.collection-aero[data-city="mozhaysk"] body[data-page] #content .aero-feature-card {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas: "photo panel";
+    align-items: stretch;
+    gap: 0;
+    margin: 12px var(--aero-gutter) 32px;
+    padding: 0;
+    border: 1px solid var(--aero-line);
+    border-radius: var(--aero-large);
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 16px 40px #3034420e;
+  }
+  html.collection-aero[data-city="mozhaysk"] body[data-page] #content .pavilion-layout > .aero-feature-card {
+    grid-column: 1 / -1;
+    margin: 0;
+  }
+  html.collection-aero[data-city="mozhaysk"] body[data-page] #content .aero-feature-card > .aero-feature-photo {
+    grid-area: photo;
+    min-height: calc(var(--aero-feature-height) - 2px);
+    height: auto;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    align-self: stretch;
+  }
+  html.collection-aero[data-city="mozhaysk"] body[data-page] #content .aero-feature-card > .aero-feature-panel {
+    grid-area: panel;
+    min-height: calc(var(--aero-feature-height) - 2px);
+    width: 100%;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  html.collection-aero[data-city="mozhaysk"] body[data-page] #content .aero-feature-card .aero-panorama {
+    border-radius: 0;
+  }
+  html.collection-aero[data-city="mozhaysk"] body[data-page] #content .aero-feature-card .pavilion-photo {
+    min-height: 0;
+    height: 100%;
+    aspect-ratio: auto;
+    border-radius: 0;
+  }
+}
+@media (max-width: 1000px) {
+  /* Keep the pavilion photo and form in their original mobile grid. */
+  html.collection-aero[data-city="mozhaysk"] body[data-page="pavilions"] #content .pavilion-layout > .aero-feature-card {
+    display: contents;
+  }
+}
+@media (max-width: 700px) {
+  html.collection-aero[data-city="mozhaysk"] body[data-page="pavilions"] #content .pavilion-reservation {
+    width: calc(100% - 4px);
+    margin: -36px 2px 28px;
+  }
+  html.collection-aero[data-city="mozhaysk"] body[data-page="spaces"] #content .entertainment-hero {
+    gap: 0;
+  }
+  html.collection-aero[data-city="mozhaysk"] body[data-page="spaces"] #content .entertainment-season-panel {
+    position: relative;
+    z-index: 1;
+    width: calc(100% - 4px);
+    margin: -36px 2px 0;
+  }
+}
+
+/* Compact controls share one baseline height; errors and contacts remain natural. */
+html.collection-aero[data-city="mozhaysk"] body[data-page] #content .aero-feature-panel {
+  padding: 16px;
+}
+html.collection-aero[data-city="mozhaysk"] body[data-page] #content .aero-feature-panel > h2 {
+  margin-bottom: 6px;
+}
+html.collection-aero[data-city="mozhaysk"] body[data-page] #content .aero-feature-panel .service-reservation-intro {
+  margin: 0 0 10px;
+  font-size: 14px;
+  line-height: 1.45;
+}
+html.collection-aero[data-city="mozhaysk"] body[data-page] #content .aero-feature-panel .service-steps {
+  gap: 20px;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  line-height: 1.4;
+}
+html.collection-aero[data-city="mozhaysk"] body[data-page] #content .aero-feature-panel .service-fields {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 12px;
+}
+html.collection-aero[data-city="mozhaysk"] body[data-page] #content .aero-feature-panel .service-field {
+  gap: 4px;
+}
+html.collection-aero[data-city="mozhaysk"] body[data-page] #content .aero-feature-panel :is(label, .service-field-help) {
+  line-height: 1.4;
+}
+html.collection-aero[data-city="mozhaysk"] body[data-page] #content .aero-feature-panel :is(#service-request-form, #stays-booking-form) :is(input:not([type="hidden"]), select) {
+  min-height: 44px;
+  padding: 8px 10px;
+}
+html.collection-aero[data-city="mozhaysk"] body[data-page] #content .aero-feature-panel :is(#service-request-form, #stays-booking-form) select[name] {
+  padding-right: 26px;
+}
+html.collection-aero[data-city="mozhaysk"] body[data-page] #content .aero-feature-panel #service-visit-step {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 10px 12px;
+}
+html.collection-aero[data-city="mozhaysk"] body[data-page] #content .aero-feature-panel #service-visit-step > .service-fields {
+  display: contents;
+}
+html.collection-aero[data-city="mozhaysk"] body[data-page] #content .aero-feature-panel #service-visit-step .service-field-wide {
+  grid-column: auto;
+}
+html.collection-aero[data-city="mozhaysk"] body[data-page] #content .aero-feature-panel .service-action {
+  min-height: 44px;
+  padding: 10px 12px;
+  gap: 6px;
+}
+html.collection-aero[data-city="mozhaysk"] body[data-page] #content .aero-feature-panel .service-action svg {
+  width: 20px;
+  height: 16px;
+}
+html.collection-aero[data-city="mozhaysk"] body[data-page] #content .aero-feature-panel .service-continue {
+  margin-top: 12px;
+}
+html.collection-aero[data-city="mozhaysk"] body[data-page] #content .aero-feature-panel #service-visit-next {
+  margin-top: 0;
+  align-self: end;
+}
+@media (max-width: 1000px) {
+  html.collection-aero[data-city="mozhaysk"] body[data-page] #content .aero-feature-panel {
+    min-height: var(--aero-feature-height);
+  }
+}
+@media (max-width: 700px) {
+  html.collection-aero[data-city="mozhaysk"] body[data-page] #content .aero-feature-panel {
+    min-height: var(--aero-feature-height);
+    padding: 12px;
+  }
+  html.collection-aero[data-city="mozhaysk"] body[data-page] #content .aero-feature-panel :is(#service-request-form, #stays-booking-form) :is(input:not([type="hidden"]), select) {
+    padding-inline: 6px;
+  }
+  html.collection-aero[data-city="mozhaysk"] body[data-page] #content .aero-feature-panel :is(#service-request-form, #stays-booking-form) select[name] {
+    padding-right: 24px;
+  }
+}
+
+@media (max-width: 380px) {
+  html.collection-aero[data-city="mozhaysk"] { --aero-feature-height: 316px; }
+}
+
+/* Give the longer houseboat names more room without adding another row. */
+html.collection-aero[data-city="mozhaysk"] body[data-page="rooms"] #content .aero-feature-panel #stays-booking-form .service-fields {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+html.collection-aero[data-city="mozhaysk"] body[data-page="rooms"] #content .aero-feature-panel #stays-booking-form .service-field {
+  grid-column: span 3;
+}
+html.collection-aero[data-city="mozhaysk"] body[data-page="rooms"] #content .aero-feature-panel #stays-booking-form .service-field:has([name="guests"]) {
+  grid-column: span 2;
+}
+html.collection-aero[data-city="mozhaysk"] body[data-page="rooms"] #content .aero-feature-panel #stays-booking-form .service-field:has([name="room"]) {
+  grid-column: span 4;
 }

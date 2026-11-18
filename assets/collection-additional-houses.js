@@ -163,15 +163,19 @@ function initializeAdditionalHouses() {
   const home = page === 'home';
   const after = main?.querySelector(home ? ':scope > .home-stays' : ':scope > .room-list');
   if (!after) return;
-  const existingRoomCount = home ? 0 : after.querySelectorAll(':scope > .room-houseboat').length;
+  const displayHouses = home ? houses : [...houses].reverse();
   const stylesReady = loadStyles();
   const section = document.createElement('section');
   section.id = 'additional-houses';
   section.className = `additional-houses additional-houses--${home ? 'home' : 'rooms'}`;
   section.setAttribute('aria-label', 'Хаусботы Панорама и Резиденция');
-  section.innerHTML = `<div class="additional-houses-list">${houses.map((house, index) => houseMarkup(house, home, existingRoomCount + index + 1)).join('')}</div>`;
-  after.after(section);
+  section.innerHTML = `<div class="additional-houses-list">${displayHouses.map((house, index) => houseMarkup(house, home, index + 1)).join('')}</div>`;
+  if (home) after.after(section);
+  else after.before(section);
   if (!home) {
+    after.querySelectorAll(':scope > .room-houseboat .stays-number').forEach((number, index) => {
+      number.textContent = String(houses.length + index + 1).padStart(2, '0');
+    });
     const viewer = createViewer();
     houses.forEach(house => bindGallery(section.querySelector(`[data-additional-gallery="${house.id}"]`), house, viewer));
   }

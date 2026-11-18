@@ -6,12 +6,10 @@ const form = document.querySelector('.aero-stays-booking-form');
 const { city, checkin, checkout, guests, room } = form.elements;
 const maxGuests = Math.max(...holidayLodgings.map(lodging => lodging.capacity));
 
-guests.replaceChildren(...Array.from({ length: maxGuests }, (_, index) => {
-  const count = String(index + 1);
-  return new Option(count, count, count === '2', count === '2');
-}));
+guests.max = String(maxGuests);
 
 function updateRooms() {
+  if (!guests.validity.valid) return;
   const selected = room.value;
   const options = holidayLodgings.filter(lodging => lodging.capacity >= Number(guests.value));
   room.replaceChildren(new Option('Выберите хаусбот', ''), ...options.map(lodging => new Option(lodging.name, lodging.id)));
@@ -23,7 +21,7 @@ function updateDateLimits() {
   checkout.min = addDays(checkin.value >= checkin.min ? checkin.value : checkin.min, 1);
 }
 
-guests.addEventListener('change', updateRooms);
+guests.addEventListener('input', updateRooms);
 checkin.addEventListener('input', updateDateLimits);
 form.addEventListener('submit', event => {
   event.preventDefault();

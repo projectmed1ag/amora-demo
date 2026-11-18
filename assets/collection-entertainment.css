@@ -102,6 +102,7 @@ body.collection-entertainment-page[data-page='spaces'] #content .entertainment-s
   border-radius: 20px;
   background: linear-gradient(150deg, #fcf8f2e6, #e9e0d4bb);
 }
+.entertainment-season-options:not(:has([data-season-choice='all'])) { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .entertainment-overview[data-season='winter'] .entertainment-season-options { --season-accent: #fff; --season-ink: #263342; }
 .entertainment-overview[data-season='spring'] .entertainment-season-options { --season-accent: #f6c9d7; --season-ink: #472b39; }
 .entertainment-overview[data-season='summer'] .entertainment-season-options { --season-accent: #c2d9a9; --season-ink: #213618; }
@@ -224,7 +225,7 @@ body.collection-entertainment-page[data-page='spaces'] #content .entertainment-h
   border: 1px solid var(--aero-line);
   border-top: 0;
   border-radius: 0 0 var(--aero-large) var(--aero-large);
-  background: transparent;
+  background: #fff;
   text-align: center;
 }
 body.collection-entertainment-page[data-page='spaces'] #content .entertainment-hero + .entertainment-stories .entertainment-story-copy h2 {

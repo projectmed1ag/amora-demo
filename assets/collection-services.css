@@ -246,19 +246,19 @@ body.collection-service-page[data-page] #content .service-result-notice { margin
 .service-experience > .service-hero { align-self: start; }
 .service-reservation-panel { min-width: 0; scroll-margin-top: 0; }
 .service-reservation-panel:focus { outline: none; }
-body.collection-service-page[data-page] #content .service-eyebrow {
+body:is(.collection-service-page, .collection-rooms-page)[data-page] #content .service-eyebrow {
   margin: 0 0 14px;
   color: #747782;
   font: 400 11px/1.5 var(--body-font);
   letter-spacing: .08em;
   text-transform: uppercase;
 }
-body.collection-service-page[data-page] #content .service-reservation-panel h2 {
+body:is(.collection-service-page, .collection-rooms-page)[data-page] #content .service-reservation-panel h2 {
   margin: 0 0 18px;
   font-size: calc(clamp(42px, 4vw, 60px) * .5);
   line-height: 1;
 }
-body.collection-service-page[data-page] #content .service-reservation-intro {
+body:is(.collection-service-page, .collection-rooms-page)[data-page] #content .service-reservation-intro {
   margin: 0 0 24px;
   color: #747782;
   font: 400 14px/1.7 var(--body-font);
@@ -316,7 +316,7 @@ body.collection-service-page[data-page] #content #service-visit-summary { margin
 
 @media (max-width: 700px) {
   .service-experience { grid-template-columns: minmax(0, 1fr); gap: 32px; padding-bottom: 0; }
-  body.collection-service-page[data-page] #content .service-reservation-panel h2 { font-size: calc(clamp(42px, 11vw, 56px) * .5); }
+  body:is(.collection-service-page, .collection-rooms-page)[data-page] #content .service-reservation-panel h2 { font-size: calc(clamp(42px, 11vw, 56px) * .5); }
   .service-visit-choice { flex-wrap: wrap; gap: 0 16px; }
   .service-reservation-panel .service-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 16px; }
 }

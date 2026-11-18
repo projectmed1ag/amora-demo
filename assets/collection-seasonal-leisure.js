@@ -34,10 +34,11 @@ function initializeSeasonalLeisure() {
   if (!controls || !dateInput || !status) return;
 
   const useCurrentSeason = overview.dataset.defaultSeason === 'current';
-  const defaultSeason = useCurrentSeason
+  const hasAllSeasons = buttons.some(button => button.dataset.seasonChoice === 'all');
+  const defaultSeason = useCurrentSeason || !hasAllSeasons
     ? getSeasonForDate(new Date().toLocaleDateString('sv-SE', {
       timeZone: 'Europe/Moscow', year: 'numeric', month: '2-digit', day: '2-digit',
-    })) || 'all'
+    })) || 'winter'
     : 'all';
 
   function positionIndicator(animate = false) {
@@ -59,12 +60,14 @@ function initializeSeasonalLeisure() {
 
   function render(season, { date = '', updateURL = true, alignHash = false, clearHash = false } = {}) {
     if (season !== 'all' && !knownSeason(season)) return;
+    if (season === 'all' && !hasAllSeasons) season = defaultSeason;
     let visible = season === 'all' ? allActivities : new Set(getSeasonActivities(season).map(item => item.title));
     const target = alignHash ? hashStory() : null;
     if (target && ![...target.querySelectorAll('[data-entertainment-activity]')].some(item => visible.has(item.dataset.entertainmentActivity))) {
-      season = 'all';
+      season = hasAllSeasons ? 'all' : target.dataset.seasons.split(/\s+/).find(knownSeason) || defaultSeason;
       date = '';
-      visible = allActivities;
+      visible = season === 'all' ? allActivities : new Set(getSeasonActivities(season).map(item => item.title));
+      if (!hasAllSeasons) updateURL = true;
     }
     let count = 0;
     stories.forEach(story => {
@@ -116,7 +119,7 @@ function initializeSeasonalLeisure() {
   });
   function renderFromURL() {
     const { season, date } = readSelection(defaultSeason);
-    render(season, { date, alignHash: true, updateURL: !useCurrentSeason });
+    render(season, { date, alignHash: true, updateURL: !useCurrentSeason || season === 'all' && !hasAllSeasons });
   }
   window.addEventListener('popstate', renderFromURL);
   window.addEventListener('hashchange', renderFromURL);
