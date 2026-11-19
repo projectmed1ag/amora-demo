@@ -1,4 +1,5 @@
 import { currentDestinationCity, destinationDateParts, destinationLocalDate, destinationURL, getDestination } from './collection-destinations.js?v=20261024-all-hotels-1';
+import { isQuarterHour, minutes, TIME_STEP_MINUTES, timeStepMessage, useQuarterHourSelect } from './collection-time-slots.js?v=20261119-quarter-hour-1';
 
 // Service requests are local previews. No endpoint, storage or transmission of
 // contact details is involved in this workflow.
@@ -42,7 +43,7 @@ export function serviceLocalDate(now = new Date(), city) {
 
 // Suggest the next quarter-hour in the destination clock, not live availability.
 export function nearestServiceVisit(now = new Date(), city = currentDestinationCity()) {
-  const interval = 15 * 60_000;
+  const interval = TIME_STEP_MINUTES * 60_000;
   const nextSlot = new Date(Math.floor(now.getTime() / interval) * interval + interval);
   const { year, month, day, hour, minute } = destinationDateParts(nextSlot, city);
   return { date: `${year}-${month}-${day}`, time: `${hour}:${minute}` };
@@ -60,13 +61,13 @@ function validateVisit(values, now, city = currentDestinationCity()) {
   const today = serviceLocalDate(now, city);
   if (!validDate(values.date)) errors.date = 'Укажите корректную дату посещения.';
   else if (values.date < today) errors.date = 'Дата посещения не может быть в прошлом.';
-  const timeValid = /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(values.time || '');
-  if (!timeValid) errors.time = 'Укажите желаемое время посещения.';
+  const visitMinute = minutes(values.time);
+  if (!Number.isFinite(visitMinute)) errors.time = 'Укажите желаемое время посещения.';
+  else if (!isQuarterHour(values.time)) errors.time = timeStepMessage;
   else if (validDate(values.date) && values.date === today) {
     const { hour, minute } = destinationDateParts(now, city);
     const currentMinutes = Number(hour) * 60 + Number(minute);
-    const [hours, minutes] = values.time.split(':').map(Number);
-    if (hours * 60 + minutes <= currentMinutes) errors.time = `Выберите время позже текущего времени ${getDestination(city).timeLabel}.`;
+    if (visitMinute <= currentMinutes) errors.time = `Выберите время позже текущего времени ${getDestination(city).timeLabel}.`;
   }
   const guests = Number(values.guests);
   if (values.service === 'pavilion') {
@@ -245,6 +246,7 @@ export function initServiceBooking() {
   const visitSummary = document.getElementById('service-visit-summary');
   const controls = Object.fromEntries(fieldNames.map(name => [name, form.elements.namedItem(name)]));
   if (!result || !details || !resultTitle || !edit || !errorSummary || !submit || !next || !visitStep || !contactStep || !editVisit || !visitSummary || Object.values(controls).some(control => !control)) return;
+  if (controls.time.type === 'time') controls.time = useQuarterHourSelect(controls.time);
   // Suggestions refresh only while untouched; user choices and planner dates win.
   let suggestedDate = !controls.date.value;
   let suggestedTime = !controls.time.value;
@@ -430,7 +432,7 @@ export function initServiceBooking() {
     showStep('visit');
   });
   form.addEventListener('keydown', event => {
-    if (step === 'visit' && event.key === 'Enter' && !event.isComposing && !['BUTTON', 'TEXTAREA'].includes(event.target.tagName)) {
+    if (step === 'visit' && event.key === 'Enter' && !event.isComposing && !['BUTTON', 'SELECT', 'TEXTAREA'].includes(event.target.tagName)) {
       event.preventDefault();
       advanceToContacts();
     }
@@ -480,14 +482,16 @@ export function initServiceBooking() {
       suggestedDate = false;
       controls.date.value = proposed.date;
     }
-    if (/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(proposed.time || '')) {
+    const needsNewTime = Number.isFinite(minutes(proposed.time)) && !isQuarterHour(proposed.time);
+    if (isQuarterHour(proposed.time) || needsNewTime) {
       suggestedTime = false;
-      controls.time.value = proposed.time;
+      controls.time.value = needsNewTime ? '' : proposed.time;
     }
     if (/^(?:[1-9]|1\d|20)$/.test(proposed.guests || '')) controls.guests.value = proposed.guests;
     const notice = document.createElement('p');
     notice.className = 'service-field-help';
-    notice.textContent = 'Дата и время предложены помощником. Проверьте их и подтвердите посещение отдельно.';
+    notice.textContent = needsNewTime ? `В плане указано время ${proposed.time}. ${timeStepMessage}`
+      : 'Дата и время предложены помощником. Проверьте их и подтвердите посещение отдельно.';
     form.prepend(notice);
     refreshDateLimit();
   }

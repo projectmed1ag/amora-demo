@@ -1,5 +1,8 @@
 import { onsiteInterests, services, attractions, childActivityOptions, outingTransports, routeIdeas, mapRoute, demoOrigin, demoOriginLabel, estimateOutingTravel, demoLocalRoute, localRouteDescriptions } from './collection-holiday-data.js?v=20261108-route-pdf-1';
 import { getSeasonForDate, seasonLabels } from './collection-seasons.js';
+import { clock, minutes } from './collection-time-slots.js?v=20261119-quarter-hour-1';
+
+export { clock, minutes };
 
 const DAY = 86400000;
 const breakfastStart = 7 * 60;
@@ -10,8 +13,6 @@ const maxStayDays = 31;
 const interestCatalog = new Map(onsiteInterests.map(item => [item.id, item]));
 export const familyAdultInterests = ['walk', 'beach', 'bike', 'garden', 'fishing', 'table-tennis']
   .map(id => interestCatalog.get(id));
-export const minutes = value => /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(value || '') ? Number(value.slice(0, 2)) * 60 + Number(value.slice(3)) : NaN;
-export const clock = value => `${String(Math.floor(value / 60)).padStart(2, '0')}:${String(value % 60).padStart(2, '0')}`;
 export const breakfastNotice = `Завтрак подают ежедневно с ${clock(breakfastStart)} до ${clock(breakfastEnd)}.`;
 export const isBreakfastTime = (start, end) => start >= breakfastStart && end <= breakfastEnd;
 export function dateNumber(value) {

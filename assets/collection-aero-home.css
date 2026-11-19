@@ -2,8 +2,7 @@ html:has(> body.collection-aero-home),
 body.collection-aero-home { background: var(--aero-paper); }
 
 @media (max-width: 1099px) {
-  body.collection-aero-home .home-nav a,
-  body.collection-aero-home .home-header-end > .aero-hotels-link {
+  body.collection-aero-home .home-nav a {
     font: 400 clamp(14px, 1.18vw, 18px)/1.25 var(--body-font);
     letter-spacing: 0;
     text-transform: none;

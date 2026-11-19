@@ -1,14 +1,15 @@
 import { onsiteInterests, services, attractions, mapRoute, demoOrigin, demoOriginLabel, outingTransports, childActivityOptions } from './collection-holiday-data.js?v=20261108-route-pdf-1';
-import { breakfastNotice, buildHolidayPlan, planToText, validateAnswers, validateTripDates, addDays, dateLabel, dateNumber, clock, excursionSettings, outingDurationMinutes, availableInterestInStay, interestSeasonLabel, familyAdultInterests } from './collection-holiday-engine.js?v=20261119-family-1';
+import { breakfastNotice, buildHolidayPlan, planToText, validateAnswers, validateTripDates, addDays, dateLabel, dateNumber, clock, excursionSettings, outingDurationMinutes, availableInterestInStay, interestSeasonLabel, familyAdultInterests } from './collection-holiday-engine.js?v=20261119-quarter-hour-1';
 import { holidayLodgings } from './collection-holiday-lodging.js';
-import { canEditScheduleItem, canMoveScheduleItem, scheduleReplacementOptions, applyScheduleEdit, replayScheduleEdits } from './collection-holiday-edits.js?v=20261108-route-pdf-1';
+import { canEditScheduleItem, canMoveScheduleItem, scheduleReplacementOptions, applyScheduleEdit, replayScheduleEdits } from './collection-holiday-edits.js?v=20261119-quarter-hour-1';
 import { loadHolidayDraft, saveHolidayDraft, clearHolidayDraft } from './collection-holiday-draft.js?v=20261119-family-1';
 import { mountPlanRequests } from './collection-holiday-requests.js?v=20261108-route-pdf-1';
 import { hotelEventLabels, loadHotelEvents, mountHotelEvents } from './collection-holiday-events.js?v=20261112-chat-3';
 import { destinationDateParts, destinationLocalDate } from './collection-destinations.js?v=20261024-all-hotels-1';
-import { mountHolidayChat } from './collection-holiday-chat.js?v=20261116-chat-pdf-1';
+import { mountHolidayChat } from './collection-holiday-chat.js?v=20261119-quarter-hour-1';
 import { activityTiles, alternativesMarkup, badgesMarkup, boardIcon, boardMark, boardPalette, boardPhoto, buildBoardAlternatives, isBoardActivity } from './collection-holiday-board.js?v=20261119-row-actions-1';
 import { hasBoardLocation, mountBoardMap } from './collection-holiday-board-map.js?v=20261119-row-actions-1';
+import { ceilQuarterHour, quarterHourOptions } from './collection-time-slots.js?v=20261119-quarter-hour-1';
 
 const root = document.getElementById('planner-app');
 const masthead = document.getElementById('planner-masthead');
@@ -76,7 +77,13 @@ const lodgingChoice = () => overnight() ? lodgingOptions().find(item => item.id 
 const lodgingLabel = () => overnight() ? lodgingChoice()?.label || 'Пока не выбрано' : 'Без ночёвки';
 const checked = value => value ? ' checked' : '';
 const outingField = (id, name) => `outing-${id}-${name}`;
-const field = (name, label, type, value, extra = '') => `<div class="planner-field"><label for="plan-${name}">${label}</label><input id="plan-${name}" name="${name}" type="${type}" value="${esc(value)}" ${extra}></div>`;
+function field(name, label, type, value, extra = '', slotOptions = { keepSaved: true }) {
+  const attributes = `id="plan-${name}" name="${name}" ${extra}`;
+  const control = type === 'time'
+    ? `<select ${attributes}>${quarterHourOptions(value, slotOptions)}</select>`
+    : `<input ${attributes} type="${type}" value="${esc(value)}">`;
+  return `<div class="planner-field"><label for="plan-${name}">${label}</label>${control}</div>`;
+}
 const choice = (name, value, title, detail, active, type = 'radio', disabled = false) => `<label class="planner-choice"><input type="${type}" name="${name}" value="${value}"${checked(active)}${disabled ? ' disabled' : ''}><span><strong>${title}</strong>${detail ? `<small>${detail}</small>` : ''}</span></label>`;
 
 function coordinationApiBase() {
@@ -141,8 +148,8 @@ function bookingContext() {
 function bookingDefaults() {
   if (!bookingHandoff || bookingHandoff.startDate !== today()) return bookingHandoff;
   const minute = nowMinute();
-  const nextQuarter = Math.min(1439, Math.ceil((minute + 1) / 15) * 15);
-  return clock(minute) >= defaultAnswers.arrival && minute < 1439
+  const nextQuarter = ceilQuarterHour(minute + 1);
+  return clock(minute) >= defaultAnswers.arrival && nextQuarter < 1440
     ? { ...bookingHandoff, arrival: clock(nextQuarter) } : bookingHandoff;
 }
 
@@ -1046,6 +1053,8 @@ function openItemEditor(button, item, day) {
   const title = adding ? 'Добавить занятие' : `${itemActions[type]} «${item.title}»`;
   const duration = item.end - item.start;
   const gap = adding ? { windowStart: item.start, windowEnd: item.end } : undefined;
+  const firstSlot = ceilQuarterHour(item.start);
+  const availableDuration = adding ? item.end - firstSlot : duration;
   panel.innerHTML = `<form aria-label="${esc(title)}" novalidate>
     <h5>${esc(title)}</h5>
     <div class="planner-errors" role="alert" tabindex="-1" hidden></div>
@@ -1055,12 +1064,12 @@ function openItemEditor(button, item, day) {
       ${adding ? '' : `<div class="planner-field"><label for="plan-item-date">День</label>
         <select id="plan-item-date" name="date">${plan.days.map(candidate => `<option value="${esc(candidate.date)}"${candidate.date === day.date ? ' selected' : ''}>${esc(dateLabel(candidate.date))}</option>`).join('')}</select>
       </div>`}
-      ${field('item-time', 'Начало', 'time', clock(item.start), 'required')}
+      ${field('item-time', 'Начало', 'time', clock(firstSlot), 'required', adding ? { min: item.start, max: item.end - 1 } : {})}
     </div>
     ${choosing ? `<div class="planner-field"><label for="plan-item-replacement">Новое занятие</label><select id="plan-item-replacement" name="replacement" required></select></div>
       <div class="planner-fields" data-custom-activity hidden>
         ${field('item-title', 'Название', 'text', '', 'maxlength="100" required')}
-        ${field('item-duration', 'Длительность, мин', 'number', adding ? Math.min(30, duration) : duration, `min="1" step="1" required${adding ? ` max="${duration}"` : ''}`)}
+        ${field('item-duration', 'Длительность, мин', 'number', adding ? Math.min(30, availableDuration) : duration, `min="1" step="1" required${adding ? ` max="${availableDuration}"` : ''}`)}
       </div>` : ''}
     <div class="planner-item-editor-actions">
       <button type="submit" class="planner-button">Сохранить</button>
@@ -1267,7 +1276,7 @@ function bindBoard(date) {
   const gapFor = (day, row) => day.items.find(item => item.kind === 'free' && item.start === Number(row.dataset.freeStart));
 
   function editFor(selection, day, gap) {
-    const time = clock(gap.start);
+    const time = clock(ceilQuarterHour(gap.start));
     return selection.id
       ? { type: 'add', itemId: 'added:preview', replacementId: selection.id, itemTitle: selection.title, date: day.date, time, ...windowOf(gap) }
       : { type: 'move', itemId: selection.itemId, itemTitle: selection.title, date: day.date, time };

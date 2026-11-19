@@ -1,5 +1,5 @@
-import { answerHolidayChat } from './collection-holiday-chat-intents.js?v=20261112-chat-3';
-import { answerHolidayChatFollowup } from './collection-holiday-chat-followups.js?v=20261112-chat-3';
+import { answerHolidayChat } from './collection-holiday-chat-intents.js?v=20261119-quarter-hour-1';
+import { answerHolidayChatFollowup } from './collection-holiday-chat-followups.js?v=20261119-quarter-hour-1';
 import { answerHolidayChatEvents } from './collection-holiday-chat-events.js?v=20261116-assistant-masthead-1';
 import { answerHolidayChatHotel } from './collection-holiday-chat-hotel.js?v=20261112-chat-3';
 

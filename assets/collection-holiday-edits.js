@@ -1,5 +1,6 @@
 import { onsiteInterests, services } from './collection-holiday-data.js?v=20261108-route-pdf-1';
 import { availableInterestOnDate, breakfastNotice, clock, createInterestItem, createServiceItem, dateNumber, familyActivity, isBreakfastTime, minutes, notesForSchedule, unavailableInterestReason, withScheduleGaps } from './collection-holiday-engine.js?v=20261108-route-pdf-1';
+import { ceilQuarterHour, isQuarterHour, timeStepMessage } from './collection-time-slots.js?v=20261119-quarter-hour-1';
 
 const fixedKinds = new Set(['arrival', 'departure', 'visit', 'free']);
 const hotelEventTypes = new Set(['event', 'activity', 'theme-night']);
@@ -66,7 +67,8 @@ export function scheduleReplacementOptions(plan, date, { windowStart, windowEnd 
   if (!day) return [];
   const inWindow = windowStart !== undefined || windowEnd !== undefined;
   if (inWindow && (!validWindow(windowStart, windowEnd) || !fitsFreeWindow(day, windowStart, windowEnd))) return [];
-  const limit = inWindow ? windowEnd - windowStart : Infinity;
+  const limit = inWindow ? windowEnd - ceilQuarterHour(windowStart) : Infinity;
+  if (limit <= 0) return [];
   return [
     ...replacementTemplates(plan.answers, date)
       .filter(option => option.duration <= limit && (inWindow || option.id !== 'family:short'))
@@ -75,7 +77,7 @@ export function scheduleReplacementOptions(plan, date, { windowStart, windowEnd 
   ];
 }
 
-export function applyScheduleEdit(plan, edit) {
+export function applyScheduleEdit(plan, edit, { restoring = false } = {}) {
   const reject = error => ({ plan, error });
   if (!['move', 'replace', 'remove', 'add', 'hotel-event'].includes(edit?.type)) return reject('Выберите действие с занятием.');
   const hotelEvent = edit.type === 'hotel-event';
@@ -95,8 +97,10 @@ export function applyScheduleEdit(plan, edit) {
   if (edit.type !== 'remove') {
     targetDay = plan.days.find(day => day.date === (edit.date ?? sourceDay?.date));
     if (!targetDay) return reject(hotelEvent ? 'Дата события выходит за даты отдыха.' : 'Выберите день в пределах поездки.');
-    const start = minutes(edit.time ?? (original && clock(original.start)));
+    const time = edit.time ?? (original && clock(original.start));
+    const start = minutes(time);
     if (!Number.isFinite(start)) return reject('Укажите время начала.');
+    if (!hotelEvent && !restoring && !isQuarterHour(time)) return reject(timeStepMessage);
 
     let template = original;
     if (hotelEvent) template = hotelEventTemplate(edit.event);
@@ -161,7 +165,7 @@ export function replayScheduleEdits(plan, edits = []) {
   const errors = [];
   let current = plan;
   for (const edit of edits) {
-    const result = applyScheduleEdit(current, edit);
+    const result = applyScheduleEdit(current, edit, { restoring: true });
     if (result.error) errors.push({ edit, error: result.error });
     else current = result.plan;
   }

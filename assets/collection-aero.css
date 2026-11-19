@@ -48,6 +48,20 @@ html.collection-aero {
 }
 .collection-aero body .aero-hotels-link:hover { background: #ffffff18; }
 .collection-aero body .home-header .refine-booking { display: none; }
+@media (max-width: 1099px) {
+  .collection-aero body .home-header-end > .aero-hotels-link {
+    width: 64px;
+    min-height: 44px;
+    padding: 0;
+    font: 400 14px/1.25 var(--body-font);
+    white-space: nowrap;
+  }
+}
+@media (max-width: 359px) {
+  .collection-aero body .home-header:has(.aero-hotels-link) {
+    grid-template-columns: minmax(0, 1fr) max-content 44px;
+  }
+}
 @media (min-width: 1100px) {
   .collection-aero body :is(.home-header, .site-header) > :is(.home-nav, .site-nav) {
     background: transparent;

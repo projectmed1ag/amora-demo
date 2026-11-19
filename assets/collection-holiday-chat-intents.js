@@ -1,6 +1,7 @@
 import { addDays, clock, dateLabel, dateNumber, minutes } from './collection-holiday-engine.js?v=20261108-route-pdf-1';
 import { onsiteInterests } from './collection-holiday-data.js?v=20261108-route-pdf-1';
-import { applyScheduleEdit, canEditScheduleItem, scheduleReplacementOptions } from './collection-holiday-edits.js?v=20261108-route-pdf-1';
+import { applyScheduleEdit, canEditScheduleItem, scheduleReplacementOptions } from './collection-holiday-edits.js?v=20261119-quarter-hour-1';
+import { ceilQuarterHour, TIME_STEP_MINUTES, timeStepMessage } from './collection-time-slots.js?v=20261119-quarter-hour-1';
 
 const months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
 const weekdays = ['воскресень[ея]', 'понедельник[а]?', 'вторник[а]?', 'сред[ыу]', 'четверг[а]?', 'пятниц[ыу]', 'суббот[ыу]'];
@@ -177,11 +178,11 @@ function proposalFor(plan, edit, label) {
 
 function timeOptions(day, duration, minimum, preferred, maximum = day.end) {
   return day.items.filter(item => item.kind === 'free').map(window => {
-    const first = Math.max(window.start, minimum);
-    const last = Math.min(window.end, maximum) - duration;
+    const first = ceilQuarterHour(Math.max(window.start, minimum));
+    const last = Math.floor((Math.min(window.end, maximum) - duration) / TIME_STEP_MINUTES) * TIME_STEP_MINUTES;
     if (first > last) return null;
-    const rounded = Math.ceil(first / 15) * 15;
-    const time = Number.isFinite(preferred) ? Math.max(first, Math.min(last, preferred)) : Math.min(rounded, last);
+    const time = Number.isFinite(preferred)
+      ? Math.max(first, Math.min(last, Math.round(preferred / TIME_STEP_MINUTES) * TIME_STEP_MINUTES)) : first;
     return { time, window };
   }).filter(Boolean).sort((a, b) => Number.isFinite(preferred)
     ? Math.abs(a.time - preferred) - Math.abs(b.time - preferred) : a.time - b.time);
@@ -348,6 +349,7 @@ function recommendActivity(plan, input, today, minute, previous) {
   if (!days.length) return response('Укажите предстоящий день в пределах поездки.');
   const timing = recommendationTime(input, reference);
   if (timing.limits.some(limit => !Number.isFinite(limit.minute))) return response('Укажите время от 00:00 до 23:59.');
+  if (timing.limits.some(limit => ['в', 'на'].includes(limit.relation) && limit.minute % TIME_STEP_MINUTES !== 0)) return response(timeStepMessage);
   if (timing.duration !== undefined && !(timing.duration > 0)) return response('Сколько минут оставить на занятие?');
   const results = [];
   const seenGroups = new Set(previous?.seenGroups ?? []);

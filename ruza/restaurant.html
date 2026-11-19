@@ -20,7 +20,7 @@
     <script type="module" src="../assets/collection-runtime.js?v=20261109-bstudy-fonts-1"></script>
     <script type="module" src="../assets/collection-refinement.js?v=20261027-mobile-carousel-1"></script>
     <script type="module" src="../assets/collection-page-motion.js?v=20261027-heading-reveal-1"></script>
-    <script type="module" src="../assets/collection-services.js?v=20261105-service-audit-1"></script>
+    <script type="module" src="../assets/collection-services.js?v=20261119-quarter-hour-1"></script>
     <meta name="description" content="Ресторан A’MORE Collection в Рузе: завтраки, горячие блюда, детское меню, десерты и напитки. Меню с ценами и бронирование столика.">
     <title>Ресторан в Рузе — A’MORE Collection</title>
       <link rel="stylesheet" href="../assets/collection-trip-planner.css?v=20261118-headings-1">
@@ -29,7 +29,7 @@
     <link rel="icon" type="image/svg+xml" sizes="any" href="../assets/favicon.svg?v=20261105-emblem-1">
   <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32.png?v=20261105-emblem-1">
   <link rel="apple-touch-icon" sizes="180x180" href="../assets/apple-touch-icon.png?v=20261105-emblem-1">
-    <link rel="stylesheet" href="../assets/collection-aero.css?v=20261119-site-depth-4">
+    <link rel="stylesheet" href="../assets/collection-aero.css?v=20261119-mobile-hotels-1">
     <link rel="stylesheet" href="../assets/collection-body-copy.css?v=20261118-2">
 </head>
   <body data-page="restaurant" class="collection-home-page collection-site-page collection-service-page" data-collection-static="">
@@ -63,7 +63,7 @@
               <div class="service-fields">
                 <input id="service-kind" name="service" type="hidden" value="restaurant"><p class="service-field-error" id="service-error-service" hidden></p>
                 <div class="service-field"><label for="service-date">Дата</label><input id="service-date" name="date" type="date" required aria-describedby="service-error-date"><p class="service-field-error" id="service-error-date" hidden></p></div>
-                <div class="service-field"><label for="service-time">Время</label><input id="service-time" name="time" type="time" step="60" required aria-describedby="service-time-help service-error-time"><p class="service-field-help" id="service-time-help"><span data-service-time-zone>По московскому времени</span></p><p class="service-field-error" id="service-error-time" hidden></p></div>
+                <div class="service-field"><label for="service-time">Время</label><input id="service-time" name="time" type="time" step="900" required aria-describedby="service-time-help service-error-time"><p class="service-field-help" id="service-time-help"><span data-service-time-zone>По московскому времени</span></p><p class="service-field-error" id="service-error-time" hidden></p></div>
                 <div class="service-field service-field-wide"><label for="service-guests">Количество гостей</label><input id="service-guests" name="guests" type="number" min="1" max="20" step="1" inputmode="numeric" value="2" required aria-describedby="service-error-guests"><p class="service-field-error" id="service-error-guests" hidden></p></div>
               </div>
               <button id="service-visit-next" class="service-action service-continue" type="button" disabled><span>Продолжить</span><svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10h22m-6-6 6 6-6 6"></path></svg></button>

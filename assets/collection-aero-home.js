@@ -1,7 +1,9 @@
 import { destinationDateParts, destinationLocalDate } from './collection-destinations.js?v=20261024-all-hotels-1';
-import { addDays, validateTripDates } from './collection-holiday-engine.js?v=20261118-aero-home-1';
+import { addDays, validateTripDates } from './collection-holiday-engine.js?v=20261119-quarter-hour-1';
+import { isQuarterHour, timeStepMessage, useQuarterHourSelect } from './collection-time-slots.js?v=20261119-quarter-hour-1';
 
 const form = document.querySelector('.aero-planner');
+for (const input of form.querySelectorAll('input[type="time"]')) useQuarterHourSelect(input);
 const { startDate, endDate } = form.elements;
 const error = document.getElementById('aero-planner-error');
 const city = form.elements.city.value;
@@ -34,6 +36,9 @@ form.addEventListener('submit', event => {
   const { hour, minute } = destinationDateParts(new Date(), city);
   const values = Object.fromEntries(new FormData(form));
   const errors = validateTripDates(values, today(), Number(hour) * 60 + Number(minute));
+  for (const field of ['arrival', 'departure']) {
+    if (values[field] && !isQuarterHour(values[field])) errors[field] = timeStepMessage;
+  }
   const firstError = Object.entries(errors)[0];
   if (!firstError) return;
 

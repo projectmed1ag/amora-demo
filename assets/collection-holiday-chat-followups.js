@@ -1,5 +1,5 @@
 import { clock, dateLabel, minutes } from './collection-holiday-engine.js?v=20261108-route-pdf-1';
-import { applyScheduleEdit } from './collection-holiday-edits.js?v=20261108-route-pdf-1';
+import { applyScheduleEdit } from './collection-holiday-edits.js?v=20261119-quarter-hour-1';
 
 const ordinals = [
   /^(?:перв(?:ый|ую|ое)|1(?:-й|-ую)?)$/u,

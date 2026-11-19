@@ -29,12 +29,12 @@
   <link rel="icon" type="image/svg+xml" sizes="any" href="./assets/favicon.svg?v=20261105-emblem-1">
   <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon-32.png?v=20261105-emblem-1">
   <link rel="apple-touch-icon" sizes="180x180" href="./assets/apple-touch-icon.png?v=20261105-emblem-1">
-    <link rel="stylesheet" href="./assets/collection-aero.css?v=20261119-site-depth-4">
-    <link rel="stylesheet" href="./assets/collection-aero-home.css?v=20261118-headings-1">
-    <script type="module" src="./assets/collection-aero-home.js?v=20261118-2"></script>
+    <link rel="stylesheet" href="./assets/collection-aero.css?v=20261119-mobile-hotels-1">
+    <link rel="stylesheet" href="./assets/collection-aero-home.css?v=20261119-mobile-hotels-1">
+    <script type="module" src="./assets/collection-aero-home.js?v=20261119-quarter-hour-1"></script>
     <link rel="stylesheet" href="./assets/collection-body-copy.css?v=20261118-2">
-<link rel="stylesheet" href="./assets/collection-planner-showcase.css?v=20261119-tour-3">
-<script type="module" src="./assets/collection-planner-showcase.js?v=20261119-tour-2"></script>
+<link rel="stylesheet" href="./assets/collection-planner-showcase.css?v=20261119-inline-video-2">
+<script type="module" src="./assets/collection-planner-showcase.js?v=20261119-inline-video-2"></script>
 </head>
   <body data-page="home" class="collection-home-page collection-site-page collection-aero-home" data-collection-static="">
     <a class="skip-link" href="#content">К содержанию</a>
@@ -71,8 +71,8 @@
     <div class="aero-planner-fields">
       <label for="aero-start"><span>Дата приезда</span><input id="aero-start" name="startDate" type="date" required></label>
       <label for="aero-end"><span>Дата отъезда</span><input id="aero-end" name="endDate" type="date" required></label>
-      <label for="aero-arrival"><span>Время приезда</span><input id="aero-arrival" name="arrival" type="time" value="10:00" required></label>
-      <label for="aero-departure"><span>Время отъезда</span><input id="aero-departure" name="departure" type="time" value="20:00" required></label>
+      <label for="aero-arrival"><span>Время приезда</span><input id="aero-arrival" name="arrival" type="time" step="900" value="10:00" required></label>
+      <label for="aero-departure"><span>Время отъезда</span><input id="aero-departure" name="departure" type="time" step="900" value="20:00" required></label>
       <button type="submit">Спланировать отдых</button>
     </div>
     <p class="aero-planner-error" id="aero-planner-error" role="alert" hidden></p>
@@ -86,12 +86,13 @@
       <a class="planner-showcase-primary" href="./holiday-planner.html?city=mozhaysk&amp;from=hotel">Открыть план отдыха</a>
     </div>
     <figure class="planner-showcase-film">
-      <video class="planner-showcase-video" width="1000" height="800" controls muted loop playsinline
+      <video id="planner-showcase-video" class="planner-showcase-video" width="1000" height="800" muted loop playsinline
         preload="none" poster="./images/holiday-board/planner-tour-poster.webp"
         aria-label="Как работает планировщик отдыха" aria-describedby="planner-showcase-transcript">
         <source src="./images/holiday-board/planner-tour.mp4" type="video/mp4">
         <a href="./images/holiday-board/planner-tour.mp4">Открыть ролик о планировщике</a>
       </video>
+      <button type="button" class="planner-showcase-playback" aria-controls="planner-showcase-video" hidden><span>Смотреть ролик</span></button>
       <p id="planner-showcase-transcript" hidden>В ролике прогулку, велосипед, отдых у воды и баню расставляют между приёмами пищи. Карта показывает пример пути из хаусбота к прокату и бане. За первое выполненное занятие дают «Первое впечатление», за велопрогулку — «На двух колёсах», за пешую прогулку — «По берегу», за три занятия — «День удался».</p>
     </figure>
     <div class="planner-showcase-more">
