@@ -903,3 +903,27 @@ html.collection-aero body[data-page="home"] #content .aero-planner {
     box-shadow: inset 0 1px 0 #ffffff, var(--aero-card-shadow);
   }
 }
+
+/* Let each desktop photograph dissolve into its adjacent white booking panel. */
+@media (min-width: 1001px) {
+  html.collection-aero[data-city="mozhaysk"] body[data-page] #content :is(
+    .aero-feature-card > .aero-stays-photo,
+    .aero-feature-card > .service-hero,
+    .aero-feature-card > .pavilion-story > .pavilion-photo
+  )::before {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    inset: 0 0 0 auto;
+    width: clamp(48px, 6vw, 96px);
+    background: linear-gradient(90deg, #ffffff00 0%, #ffffff18 30%, #ffffffad 76%, #fff 100%);
+    pointer-events: none;
+  }
+  html.collection-aero[data-city="mozhaysk"] body[data-page] #content .aero-feature-card .aero-service-title {
+    z-index: 2;
+  }
+  html.collection-aero[data-city="mozhaysk"] body[data-page] #content .aero-feature-card > .aero-stays-photo > h1 {
+    position: relative;
+    z-index: 2;
+  }
+}
