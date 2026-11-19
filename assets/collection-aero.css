@@ -13,6 +13,8 @@ html.collection-aero {
   --aero-medium: 22px;
   --aero-small: 14px;
   --aero-feature-height: 304px;
+  --aero-card-shadow: 0 2px 4px #40382c0a, 0 16px 28px -16px #40382c52;
+  --aero-photo-shadow: 0 3px 8px #40382c14, 0 14px 24px -14px #40382c66;
   background: var(--aero-paper);
 }
 .collection-aero body { background: var(--aero-paper); }
@@ -494,14 +496,16 @@ html.collection-aero body[data-page="rooms"] #content .additional-houses-card {
   border-radius: var(--aero-large);
   overflow: hidden;
   background: #fff;
+  box-shadow: var(--aero-card-shadow);
 }
 html.collection-aero body[data-page="rooms"] #content :is(.room-houseboat, .additional-houses-card) :is(.room-gallery, .room-thumbnails, .room-thumbnail, .room-card-copy, .additional-houses-gallery, .additional-houses-thumbnails, .additional-houses-open) {
   background-color: #fff;
 }
 html.collection-aero body[data-page="rooms"] #content :is(.room-houseboat, .additional-houses-card) .room-card-copy {
   flex: 1;
+  align-items: stretch;
   justify-content: flex-start;
-  padding: clamp(20px, 3vw, 44px);
+  padding: clamp(20px, 2.1vw, 32px);
   border-radius: var(--aero-large);
 }
 
@@ -511,6 +515,88 @@ html.collection-aero body[data-page="rooms"] #content :is(.room-houseboat, .addi
   .additional-houses-gallery, .additional-houses-photo, .additional-houses-open, .additional-houses-open img
 ) {
   border-radius: 0;
+}
+
+/* Selected concept: the gallery sits above the white information surface.
+   A single outer clip keeps the card corners clean; the inset thumbnail tray
+   overlaps the photograph and casts its shadow onto the text panel. */
+html.collection-aero body[data-page="rooms"] #content :is(.room-houseboat, .additional-houses-card) :is(.room-gallery, .additional-houses-gallery) {
+  position: relative;
+  z-index: 1;
+  display: block;
+  flex: none;
+}
+html.collection-aero body[data-page="rooms"] #content :is(.room-gallery > .room-slideshow, .additional-houses-open > img) {
+  height: auto;
+  aspect-ratio: 16 / 9;
+}
+html.collection-aero body[data-page="rooms"] #content :is(.room-houseboat, .additional-houses-card) :is(.room-thumbnails, .additional-houses-thumbnails) {
+  position: relative;
+  z-index: 2;
+  height: clamp(60px, 7vw, 90px);
+  margin: -10px 0 0;
+  padding: 7px;
+  gap: 8px;
+  border-radius: var(--aero-medium);
+  overflow: visible;
+  background: #fff;
+  box-shadow: 0 14px 20px -8px #302c286b, 0 2px 4px #302c2814;
+}
+html.collection-aero body[data-page="rooms"] #content :is(.room-houseboat, .additional-houses-card) :is(.room-thumbnail, .additional-houses-thumbnail) {
+  position: relative;
+  transform-origin: center;
+  transition: transform 180ms ease, box-shadow 180ms ease, opacity 180ms ease;
+}
+html.collection-aero body[data-page="rooms"] #content :is(.room-houseboat, .additional-houses-card) :is(.room-thumbnail, .additional-houses-thumbnail)[aria-pressed="true"] {
+  outline: none;
+}
+html.collection-aero body[data-page="rooms"] #content :is(.room-thumbnails, .additional-houses-thumbnails) > :first-child {
+  transform-origin: left center;
+}
+html.collection-aero body[data-page="rooms"] #content :is(.room-thumbnails, .additional-houses-thumbnails) > :last-child {
+  transform-origin: right center;
+}
+@media (hover: hover) and (pointer: fine) {
+  html.collection-aero body[data-page="rooms"] #content :is(.room-houseboat, .additional-houses-card) :is(.room-thumbnail, .additional-houses-thumbnail):hover {
+    z-index: 3;
+    transform: translateY(-6px) scale(1.45);
+    box-shadow: 0 10px 20px #252a3540;
+    opacity: 1;
+  }
+}
+html.collection-aero body[data-page="rooms"] #content :is(.room-houseboat, .additional-houses-card) :is(.room-thumbnail, .additional-houses-thumbnail):focus-visible {
+  z-index: 3;
+  transform: translateY(-6px) scale(1.45);
+  box-shadow: 0 10px 20px #252a3540;
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  html.collection-aero body[data-page="rooms"] #content :is(.room-houseboat, .additional-houses-card) :is(.room-thumbnail, .additional-houses-thumbnail) {
+    transition: none;
+  }
+}
+html.collection-aero body[data-page="rooms"] #content :is(.room-houseboat, .additional-houses-card) .room-card-copy > .stays-number {
+  height: auto;
+  min-height: 0;
+  margin-bottom: 8px;
+}
+html.collection-aero body[data-page="rooms"] #content :is(.room-houseboat, .additional-houses-card) .room-card-copy > h2 {
+  margin-bottom: 16px;
+}
+html.collection-aero body[data-page="rooms"] #content :is(.room-houseboat, .additional-houses-card) .room-specifications {
+  margin-bottom: 16px;
+}
+html.collection-aero body[data-page="rooms"] #content :is(.room-houseboat, .additional-houses-card) .room-card-copy > p:not(.stays-number) {
+  max-width: none;
+}
+html.collection-aero body[data-page="rooms"] #content :is(.room-houseboat, .additional-houses-card) .room-features {
+  margin: 16px 0 20px;
+  padding-top: 12px;
+}
+html.collection-aero body[data-page="rooms"] #content :is(.room-houseboat, .additional-houses-card) .room-card-copy > .primary-action {
+  width: 100%;
+  margin-top: auto;
+  justify-content: center;
 }
 
 html.collection-aero body[data-page="rooms"] #content .additional-houses-thumbnail img { object-fit: cover; }
@@ -781,4 +867,39 @@ html.collection-aero[data-city="mozhaysk"] body[data-page] #content .aero-featur
   background-position: right 8px center;
   background-size: 12px 8px;
   background-repeat: no-repeat;
+}
+
+/* The same elevation follows real content cards throughout the hotel.
+   Standalone photographs receive only a shadow: their shape and captions stay
+   with their existing page styles. */
+html.collection-aero body[data-page] #content :is(
+  .home-photo-panel, .cl-panel, .service-booking-primary, .service-booking-aside,
+  .booking-result, .planner-conversation, .planner-sidebar, .planner-draft,
+  .contacts-hotel, .about-description-copy
+) {
+  box-shadow: var(--aero-card-shadow);
+}
+html.collection-aero body[data-page="spaces"] #content .entertainment-story {
+  border-radius: var(--aero-large);
+  box-shadow: var(--aero-card-shadow);
+}
+html.collection-aero body[data-page] #content :is(
+  .render-service-gallery-photo, .gallery-photo > .media, .cl-detail-photo,
+  .nearby-photo-frame, .nearby-place-photo, .home-feature-photo,
+  .home-leisure-media, .about-description-visual, .aero-highlights img
+) {
+  box-shadow: var(--aero-photo-shadow);
+}
+html.collection-aero body[data-page="home"] #content .aero-planner {
+  box-shadow: inset 0 1px 0 #ffffff6b, var(--aero-card-shadow);
+}
+@media (min-width: 1001px) {
+  html.collection-aero[data-city="mozhaysk"] body[data-page] #content .aero-feature-card {
+    box-shadow: var(--aero-card-shadow);
+  }
+}
+@media (max-width: 1000px) {
+  html.collection-aero[data-city="mozhaysk"] body[data-page] #content .aero-feature-panel {
+    box-shadow: inset 0 1px 0 #ffffff, var(--aero-card-shadow);
+  }
 }
