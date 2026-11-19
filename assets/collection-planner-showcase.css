@@ -78,6 +78,7 @@ html body.collection-aero-home[data-page="home"] #content .planner-showcase-copy
 .planner-showcase-more p { margin: 8px 0 0; max-width: 38ch; color: #675949; font-size: .85rem; line-height: 1.4; }
 .planner-showcase-film {
   --showcase-film-padding: 7px;
+  position: relative;
   grid-column: 2;
   grid-row: 1 / span 3;
   min-width: 0;
@@ -98,39 +99,29 @@ html body.collection-aero-home[data-page="home"] #content .planner-showcase-copy
   pointer-events: none;
 }
 .planner-showcase-playback:not([hidden]) {
-  display: block;
-  min-height: 44px;
-  margin: 3px 4px 0 auto;
-  padding: 4px 9px;
+  position: absolute;
+  inset: var(--showcase-film-padding);
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  margin: 0;
+  padding: 6px;
   border: 0;
   border-radius: 9px;
   background: transparent;
   color: #5e5141;
   font: 550 .82rem/1.2 var(--body-font);
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
-.planner-showcase-playback:hover { background: #f2e8d7; }
+.planner-showcase-playback span {
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: #fffbf3;
+  opacity: 0;
+}
 .planner-showcase-playback:focus-visible { outline: 2px solid #665333; outline-offset: -2px; }
-@media (hover: hover) and (pointer: fine) {
-  .planner-showcase-film { position: relative; }
-  .planner-showcase-playback:not([hidden]) {
-    position: absolute;
-    inset: var(--showcase-film-padding);
-    display: flex;
-    justify-content: flex-end;
-    align-items: flex-end;
-    margin: 0;
-    padding: 6px;
-    background: transparent;
-  }
-  .planner-showcase-playback span {
-    padding: 7px 10px;
-    border-radius: 8px;
-    background: #fffbf3;
-    opacity: 0;
-  }
-  .planner-showcase-playback:focus-visible span { opacity: 1; }
-}
+.planner-showcase-playback:focus-visible span { opacity: 1; }
 @media (max-width: 790px) {
   .planner-showcase-layout { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; gap: 14px; }
   .planner-showcase-copy, .planner-showcase-film, .planner-showcase-more { grid-column: auto; grid-row: auto; }
