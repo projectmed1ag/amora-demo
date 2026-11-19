@@ -195,16 +195,16 @@ body.collection-entertainment-page[data-page='spaces'] #content .entertainment-s
   body.collection-entertainment-page[data-page='spaces'] #content .entertainment-gallery-controls { top: auto; right: 12px; bottom: 48px; left: auto; transform: none; }
   body.collection-entertainment-page[data-page='spaces'] #content .entertainment-weather { padding-block: 30px; font-size: 11px; }
 
-  body.collection-entertainment-page[data-page='spaces'] #content .entertainment-hero + .entertainment-stories .entertainment-photo {
+  body.collection-entertainment-page[data-page='spaces'] #content .entertainment-hero ~ .entertainment-stories .entertainment-photo {
     height: var(--entertainment-cover-height);
     aspect-ratio: auto;
   }
 }
 
-body.collection-entertainment-page[data-page='spaces'] #content .entertainment-hero + .entertainment-stories {
+body.collection-entertainment-page[data-page='spaces'] #content .entertainment-hero ~ .entertainment-stories {
   padding-inline: var(--aero-gutter);
 }
-body.collection-entertainment-page[data-page='spaces'] #content .entertainment-hero + .entertainment-stories .entertainment-story {
+body.collection-entertainment-page[data-page='spaces'] #content .entertainment-hero ~ .entertainment-stories .entertainment-story {
   grid-template-columns: minmax(0, 1fr);
   grid-template-areas: 'photo' 'copy';
   grid-template-rows: auto 1fr;
@@ -212,11 +212,11 @@ body.collection-entertainment-page[data-page='spaces'] #content .entertainment-h
   gap: 0;
   isolation: isolate;
 }
-body.collection-entertainment-page[data-page='spaces'] #content .entertainment-hero + .entertainment-stories .entertainment-photo {
+body.collection-entertainment-page[data-page='spaces'] #content .entertainment-hero ~ .entertainment-stories .entertainment-photo {
   z-index: 2;
   border-radius: var(--aero-large);
 }
-body.collection-entertainment-page[data-page='spaces'] #content .entertainment-hero + .entertainment-stories .entertainment-story-copy {
+body.collection-entertainment-page[data-page='spaces'] #content .entertainment-hero ~ .entertainment-stories .entertainment-story-copy {
   width: 100%;
   max-width: none;
   /* Join the side borders to the photo at the start of its lower corners. */
@@ -228,10 +228,10 @@ body.collection-entertainment-page[data-page='spaces'] #content .entertainment-h
   background: #fff;
   text-align: center;
 }
-body.collection-entertainment-page[data-page='spaces'] #content .entertainment-hero + .entertainment-stories .entertainment-story-copy h2 {
+body.collection-entertainment-page[data-page='spaces'] #content .entertainment-hero ~ .entertainment-stories .entertainment-story-copy h2 {
   text-align: center;
 }
-body.collection-entertainment-page[data-page='spaces'] #content .entertainment-hero + .entertainment-stories .entertainment-gallery-controls {
+body.collection-entertainment-page[data-page='spaces'] #content .entertainment-hero ~ .entertainment-stories .entertainment-gallery-controls {
   right: 12px;
   bottom: 12px;
   left: auto;
@@ -239,16 +239,16 @@ body.collection-entertainment-page[data-page='spaces'] #content .entertainment-h
   border-radius: var(--aero-small);
 }
 @media (min-width: 801px) {
-  body.collection-entertainment-page[data-page='spaces'] #content .entertainment-hero + .entertainment-stories {
+  body.collection-entertainment-page[data-page='spaces'] #content .entertainment-hero ~ .entertainment-stories {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: clamp(24px, 3vw, 46px);
   }
-  body.collection-entertainment-page[data-page='spaces'] #content .entertainment-hero + .entertainment-stories .entertainment-photo {
+  body.collection-entertainment-page[data-page='spaces'] #content .entertainment-hero ~ .entertainment-stories .entertainment-photo {
     aspect-ratio: 16 / 9;
   }
 }
 @media (min-width: 1001px) {
-  body.collection-entertainment-page[data-page='spaces'] #content .entertainment-hero + .entertainment-stories {
+  body.collection-entertainment-page[data-page='spaces'] #content .entertainment-hero ~ .entertainment-stories {
     max-width: none;
     column-gap: var(--aero-pair-gap);
   }

@@ -40,6 +40,14 @@ export function serviceLocalDate(now = new Date(), city) {
   return destinationLocalDate(now, city);
 }
 
+// Suggest the next quarter-hour in the destination clock, not live availability.
+export function nearestServiceVisit(now = new Date(), city = currentDestinationCity()) {
+  const interval = 15 * 60_000;
+  const nextSlot = new Date(Math.floor(now.getTime() / interval) * interval + interval);
+  const { year, month, day, hour, minute } = destinationDateParts(nextSlot, city);
+  return { date: `${year}-${month}-${day}`, time: `${hour}:${minute}` };
+}
+
 function validDate(value) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value || '')) return false;
   const date = new Date(`${value}T00:00:00Z`);
@@ -237,6 +245,9 @@ export function initServiceBooking() {
   const visitSummary = document.getElementById('service-visit-summary');
   const controls = Object.fromEntries(fieldNames.map(name => [name, form.elements.namedItem(name)]));
   if (!result || !details || !resultTitle || !edit || !errorSummary || !submit || !next || !visitStep || !contactStep || !editVisit || !visitSummary || Object.values(controls).some(control => !control)) return;
+  // Suggestions refresh only while untouched; user choices and planner dates win.
+  let suggestedDate = !controls.date.value;
+  let suggestedTime = !controls.time.value;
   const previewNotice = result.querySelector('.service-result-notice') || document.createElement('p');
   previewNotice.className = 'service-result-notice';
   previewNotice.textContent = 'Это предварительный просмотр. Заявка не отправлена. Контакты не сохраняются.';
@@ -286,7 +297,11 @@ export function initServiceBooking() {
   }
 
   function refreshDateLimit() {
-    controls.date.min = serviceLocalDate();
+    const now = new Date();
+    controls.date.min = serviceLocalDate(now);
+    const nearest = nearestServiceVisit(now);
+    if (suggestedDate) controls.date.value = nearest.date;
+    if (suggestedTime) controls.time.value = nearest.time;
   }
 
   function updateService() {
@@ -387,6 +402,9 @@ export function initServiceBooking() {
       return;
     }
     clearErrors();
+    // Once the visit is reviewed, keep its summary and actual values in sync.
+    suggestedDate = false;
+    suggestedTime = false;
     const guests = Number(values.guests);
     const guestWord = guests % 10 === 1 && guests % 100 !== 11 ? 'гость' : guests % 10 >= 2 && guests % 10 <= 4 && (guests % 100 < 12 || guests % 100 > 14) ? 'гостя' : 'гостей';
     visitSummary.textContent = `${readableDate(values.date)} · ${values.time} ${destination.timeLabel} · ${guests} ${guestWord}`;
@@ -394,10 +412,14 @@ export function initServiceBooking() {
   }
 
   form.addEventListener('input', event => {
+    if (event.target.name === 'date') suggestedDate = false;
+    if (event.target.name === 'time') suggestedTime = false;
     if (fieldNames.includes(event.target.name)) clearError(event.target.name);
     errorSummary.hidden = true;
   });
   form.addEventListener('change', event => {
+    if (event.target.name === 'date') suggestedDate = false;
+    if (event.target.name === 'time') suggestedTime = false;
     if (fieldNames.includes(event.target.name)) clearError(event.target.name);
     if (event.target.name === 'service') updateService();
     refreshDateLimit();
@@ -454,8 +476,14 @@ export function initServiceBooking() {
   const planQuery = new URLSearchParams(location.search);
   if (planQuery.get('from') === 'holiday-plan') {
     const proposed = { date: planQuery.get('date'), time: planQuery.get('time'), guests: planQuery.get('guests') };
-    if (validDate(proposed.date) && proposed.date >= serviceLocalDate()) controls.date.value = proposed.date;
-    if (/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(proposed.time || '')) controls.time.value = proposed.time;
+    if (validDate(proposed.date) && proposed.date >= serviceLocalDate()) {
+      suggestedDate = false;
+      controls.date.value = proposed.date;
+    }
+    if (/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(proposed.time || '')) {
+      suggestedTime = false;
+      controls.time.value = proposed.time;
+    }
     if (/^(?:[1-9]|1\d|20)$/.test(proposed.guests || '')) controls.guests.value = proposed.guests;
     const notice = document.createElement('p');
     notice.className = 'service-field-help';

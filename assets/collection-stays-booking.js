@@ -41,6 +41,8 @@ form.addEventListener('submit', event => {
   window.location.assign(target);
 });
 
+if (!checkin.value) checkin.value = destinationLocalDate(new Date(), city.value);
+if (!checkout.value) checkout.value = addDays(checkin.value, 1);
 updateDateLimits();
 updateRooms();
 form.querySelector('button[type="submit"]').disabled = false;

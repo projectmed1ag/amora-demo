@@ -1,20 +1,46 @@
-/* One editorial column keeps the photograph and description together. */
+/* Keep the photograph and its framed description in one editorial card. */
 body.collection-about-page[data-page='about'] #content .about-description {
   width: 100%;
   max-width: 1440px;
   margin: 0 auto;
-  padding: clamp(40px, 5vw, 72px) var(--page-gutter) clamp(56px, 6vw, 88px);
+  padding: 12px var(--aero-gutter) 48px;
+}
+body.collection-about-page[data-page='about'] #content .about-description-visual {
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+  border-radius: var(--aero-large);
 }
 body.collection-about-page[data-page='about'] #content .about-description h1 {
-  max-width: 960px;
-  margin: 0 auto;
-  font-size: calc(clamp(52px, 6.2vw, 88px) * .5);
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  max-width: none;
+  margin: 0;
+  padding: 24px;
+  color: #fff;
+  font-size: calc(clamp(64px, 7vw, 106px) * .5);
+  text-align: center;
+  text-shadow: 0 2px 14px #111b13b0;
+  pointer-events: none;
 }
 body.collection-about-page[data-page='about'] #content .about-description-photo {
+  position: relative;
   width: 100%;
-  margin: 32px 0 0;
+  margin: 0;
   aspect-ratio: 16 / 9;
   overflow: hidden;
+  border-radius: inherit;
+  background: #39483b;
+}
+body.collection-about-page[data-page='about'] #content .about-description-photo::after {
+  position: absolute;
+  inset: 0;
+  content: '';
+  background: radial-gradient(ellipse at center, #12201897, #1220182b 80%);
+  pointer-events: none;
 }
 body.collection-about-page[data-page='about'] #content :is(.about-description-photo > img, .about-description-photo > .collection-picture > img) {
   display: block;
@@ -25,11 +51,20 @@ body.collection-about-page[data-page='about'] #content :is(.about-description-ph
   transform: none;
 }
 body.collection-about-page[data-page='about'] #content .about-description-copy {
-  max-width: 960px;
-  margin: 40px auto 0;
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: none;
+  margin: calc(-1 * var(--aero-large)) 0 0;
+  padding: calc(var(--aero-large) + 24px) clamp(20px, 3vw, 40px) 32px;
+  border: 1px solid var(--aero-line);
+  border-top: 0;
+  border-radius: 0 0 var(--aero-large) var(--aero-large);
+  background: #fff;
 }
 body.collection-about-page[data-page='about'] #content .about-description-copy > p {
-  margin: 0;
+  max-width: 960px;
+  margin: 0 auto;
   color: var(--page-ink);
   font: 400 16px/1.8 var(--body-font);
 }
@@ -43,22 +78,13 @@ body.collection-about-page[data-page='about'] #content .about-description-copy >
 }
 @media (max-width: 700px) {
   body.collection-about-page[data-page='about'] #content .about-description {
-    padding: 36px 0 48px;
+    padding-bottom: 36px;
   }
   body.collection-about-page[data-page='about'] #content .about-description h1 {
-    margin-inline: 20px;
-    text-align: center;
-  }
-  body.collection-about-page[data-page='about'] #content .about-description-photo {
-    margin-top: 24px;
+    font-size: calc(clamp(60px, 14vw, 90px) * .5);
   }
   body.collection-about-page[data-page='about'] #content .about-description-copy {
-    position: relative;
-    z-index: 1;
-    width: calc(100% - 32px);
-    margin: -36px 16px 0;
-    padding: 28px 20px;
-    background: #fff;
+    padding: calc(var(--aero-large) + 20px) 20px 24px;
     text-align: center;
   }
   body.collection-about-page[data-page='about'] #content .about-description-copy > p {

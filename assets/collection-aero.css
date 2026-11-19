@@ -720,3 +720,65 @@ html.collection-aero[data-city="mozhaysk"] body[data-page="rooms"] #content .aer
 html.collection-aero[data-city="mozhaysk"] body[data-page="rooms"] #content .aero-feature-panel #stays-booking-form .service-field:has([name="room"]) {
   grid-column: span 4;
 }
+
+/* Catalogue headings use the same divider and rhythm as the service galleries. */
+html.collection-aero body:is([data-page="rooms"], [data-page="spaces"]) #content .aero-catalog-heading {
+  margin: 32px var(--aero-gutter) 0;
+  padding: 48px 0 32px;
+  border-top: 1px solid #e3e4e8;
+}
+html.collection-aero body:is([data-page="rooms"], [data-page="spaces"]) #content .aero-catalog-heading > h2 {
+  margin: 0;
+  font-size: calc(clamp(44px, 4.8vw, 72px) * .5);
+  line-height: 1.05;
+}
+@media (max-width: 700px) {
+  html.collection-aero body:is([data-page="rooms"], [data-page="spaces"]) #content .aero-catalog-heading {
+    margin-top: 36px;
+    padding-top: 32px;
+    padding-bottom: 24px;
+  }
+  html.collection-aero body:is([data-page="rooms"], [data-page="spaces"]) #content .aero-catalog-heading > h2 {
+    font-size: calc(clamp(38px, 10vw, 56px) * .5);
+  }
+}
+
+/* iOS applies a native content-box minimum to date/time controls unless their
+   appearance is reset. Keep the real picker, but size its box within the grid. */
+html.collection-aero body #content :is(.service-field, .form-field, .planner-field, .entertainment-date) input:is([type="date"], [type="time"]) {
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  min-inline-size: 0;
+  text-align: left;
+}
+html.collection-aero body #content :is(.service-field, .form-field, .planner-field, .entertainment-date) input::-webkit-date-and-time-value {
+  min-width: 0;
+  height: 1.5em;
+  white-space: nowrap;
+  text-align: left;
+}
+@supports (-webkit-touch-callout: none) {
+  @media (max-width: 359px) {
+    /* Fit the localized month and year in two columns on the narrowest iPhones.
+       The input itself stays 16px, avoiding Safari's focus zoom. */
+    html.collection-aero body #content .service-field input[type="date"]::-webkit-date-and-time-value {
+      font-size: 14px;
+    }
+  }
+}
+
+/* Match the select box to adjacent 44px inputs on iOS, keeping its native picker. */
+html.collection-aero body #content .service-field select,
+html.collection-aero[data-city="mozhaysk"] body[data-page] #content .aero-feature-panel :is(#service-request-form, #stays-booking-form) select[name] {
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='m1 1 5 5 5-5' fill='none' stroke='%23303442' stroke-width='1.4'/%3E%3C/svg%3E");
+  background-position: right 8px center;
+  background-size: 12px 8px;
+  background-repeat: no-repeat;
+}
