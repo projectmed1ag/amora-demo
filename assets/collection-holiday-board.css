@@ -1,0 +1,599 @@
+.holiday-planner-page {
+  --board-paper: #faf4e9;
+  --board-surface: #fffdf8;
+  --board-line: #e1d2bb;
+  --board-tan: #bb8e53;
+  --board-ink: #303442;
+  --board-green: #38574c;
+  --board-shadow: 0 16px 34px #5a40271c, 0 4px 8px #5a402717;
+  background: var(--board-paper);
+}
+.holiday-planner-page .planner-main { width: min(calc(100% - 2 * var(--planner-gutter)), 1280px); }
+.holiday-planner-page .planner-masthead {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin-bottom: 18px;
+  padding: 4px 0 17px;
+  border: 0;
+  border-bottom: 1px solid var(--board-line);
+  border-radius: 0;
+  background: none;
+  color: var(--board-ink);
+}
+.holiday-planner-page .planner-masthead .planner-eyebrow {
+  flex-basis: 100%;
+  color: #68583f;
+  margin: 0;
+}
+#content .planner-masthead h1 { margin: 0 auto 0 0; font-size: clamp(32px, 5vw, 58px); font-weight: 680; text-transform: uppercase; }
+.holiday-planner-page .planner-view-switch { display: inline-grid; background: #f1e6d6; border-color: var(--board-line); }
+.holiday-planner-page .planner-view-switch button { color: var(--board-ink); }
+.holiday-planner-page .planner-view-switch button[aria-pressed="true"] { background: #fffdf8; border-color: var(--board-line); }
+.holiday-planner-page .planner-view-switch button:focus-visible { outline-color: var(--board-ink); }
+.holiday-board-surface {
+  min-width: 0;
+  background: var(--board-surface);
+  border: 1px solid var(--board-line);
+  border-radius: 18px;
+  box-shadow: var(--board-shadow);
+}
+.holiday-planner-page .planner-result { padding: 0; border: 0; background: transparent; }
+.holiday-planner-page .planner-result-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  padding: 0;
+  margin: 0 0 16px;
+  border: 0;
+  background: transparent;
+}
+#content .planner-result-heading h2 { margin: 0 0 5px; font-size: clamp(23px, 3vw, 34px); }
+.holiday-planner-page .planner-result-heading p { margin: 0; }
+.holiday-planner-page .planner-result-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+.holiday-planner-page .planner-result-actions .planner-edit { width: auto; }
+.holiday-planner-page .holiday-primary, .holiday-coordination .planner-button {
+  background: var(--board-ink);
+  color: #fffaf1;
+  border-color: var(--board-ink);
+}
+.holiday-planner-page .holiday-primary:hover, .holiday-coordination .planner-button:hover { background: #454b60; color: #fffaf1; }
+.holiday-trip-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; }
+.holiday-trip-controls .planner-edit { min-height: 44px; padding-inline: 4px; }
+.holiday-planner-page .planner-result > .planner-feedback:empty { display: none; }
+.holiday-planner-page .planner-result > .planner-feedback { margin-bottom: 12px; }
+.holiday-board-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 14px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.holiday-board-tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.holiday-board-tabs button, .holiday-map-schedule button {
+  min-height: 44px;
+  border: 1px solid var(--board-line);
+  border-radius: 11px;
+  padding: 7px 12px;
+  color: var(--board-ink);
+  background: var(--board-surface);
+  font: inherit;
+  cursor: pointer;
+}
+.holiday-board-tabs button { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; }
+.holiday-board-tabs button[aria-pressed="true"], .holiday-map-schedule button[aria-pressed="true"] {
+  border-color: #8e6740;
+  background: #f3e4cf;
+}
+.holiday-day-tabs {
+  position: relative;
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 3px 4px 0;
+  margin-bottom: 14px;
+  border-bottom: 1px solid #c8ad86;
+  scrollbar-color: #c8ad86 #f4eadb;
+}
+.holiday-day-tabs button {
+  flex: 0 0 auto;
+  display: grid;
+  justify-items: start;
+  gap: 2px;
+  min-width: 104px;
+  min-height: 50px;
+  padding: 6px 12px;
+  border: 1px solid #ddc9ad;
+  border-radius: 13px 13px 0 0;
+  background: #f3e7d6;
+  box-shadow: inset 0 1px #fff9ed, 0 2px 5px #5a402719;
+  color: var(--board-ink);
+  font: 500 .8rem/1.25 var(--body-font);
+  cursor: pointer;
+}
+.holiday-day-tabs button span { color: #605345; font-size: .75rem; white-space: nowrap; }
+.holiday-day-tabs button[aria-selected="true"] {
+  border-color: #a48662;
+  border-bottom-color: var(--board-surface);
+  background: var(--board-surface);
+  box-shadow: inset 0 3px var(--board-tan), 0 2px 7px #5a40272a;
+}
+.holiday-day-tabs button:hover { background: #fff7e9; }
+.holiday-day-tabs button:focus-visible { outline: 2px solid var(--board-ink); outline-offset: -3px; }
+.holiday-board-layout { display: grid; grid-template-columns: minmax(184px, .85fr) minmax(0, 1.83fr) minmax(190px, .82fr); gap: 14px; align-items: start; }
+.holiday-board-layout > * { min-width: 0; }
+.holiday-palette, .holiday-timeline, .holiday-coordination, .holiday-map, .holiday-badge-panel { padding: clamp(12px, 1.7vw, 23px); }
+#content :is(.holiday-palette, .holiday-coordination, .holiday-map, .holiday-badge-panel) h3 { margin: 0 0 12px; font-size: clamp(18px, 2vw, 25px); }
+.holiday-palette-grid, .holiday-pick-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; }
+.holiday-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 79px;
+  padding: 9px 6px;
+  border: 1px solid #c8a372;
+  border-radius: 14px;
+  background: #fcf2df;
+  box-shadow: inset 0 0 0 3px #ead8ba, 0 3px 0 #b78b59, 0 5px 8px #62472125;
+  color: var(--board-ink);
+  cursor: pointer;
+  text-align: center;
+  font: inherit;
+  overflow-wrap: anywhere;
+}
+.holiday-tile strong { font-size: .88rem; line-height: 1.18; }
+.holiday-tile small { color: #5d5041; font-size: .8rem; line-height: 1.28; }
+.holiday-tile > input { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: inherit; }
+.holiday-tile:hover:not(:has(:disabled)), .holiday-tile:focus-within, .holiday-tile:focus-visible { border-color: #6b5137; }
+.holiday-tile:focus-within, .holiday-tile:focus-visible { outline: 2px solid var(--board-ink); outline-offset: 2px; }
+.holiday-tile:has(:checked) { background: #e9efdf; border-color: #4d6b55; box-shadow: inset 0 0 0 3px #ceddc2, 0 3px 0 #7e977a; }
+.holiday-tile:has(:disabled), .holiday-tile:disabled { opacity: .65; cursor: not-allowed; }
+.holiday-pick-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 138px), 1fr)); gap: 10px; }
+.holiday-pick-grid .holiday-tile { min-height: 74px; padding: 8px; }
+.holiday-pick-grid .holiday-tile .holiday-icon { width: 23px; height: 23px; }
+#content .holiday-pick-group h3 { margin: 13px 0 7px; font-size: 1rem; }
+.holiday-icon { width: 27px; height: 27px; flex: 0 0 auto; display: inline-block; vertical-align: middle; opacity: .86; }
+.holiday-board-tabs .holiday-icon, .holiday-event-confirm .holiday-icon { width: 18px; height: 18px; }
+.holiday-palette-hint, .holiday-board-note { color: #685b48; font-size: .84rem; line-height: 1.4; }
+.holiday-palette-hint { margin: 13px 0 8px; }
+.holiday-board-tools summary, .holiday-variant summary { padding: 8px 0; cursor: pointer; font-weight: 600; }
+.holiday-timeline .planner-days { margin: 0; display: block; }
+.holiday-timeline .planner-day { padding: 0; margin: 0; border: 0; background: transparent; box-shadow: none; }
+.holiday-timeline .planner-day-heading { margin: 0 0 14px; padding: 0; border: 0; gap: 7px; flex-wrap: wrap; }
+.holiday-timeline .planner-day-heading h3 { margin: 0; font-size: 1.18rem; }
+.holiday-timeline .planner-day > ol { display: grid; gap: 8px; padding: 0; margin: 0; }
+.holiday-timeline .planner-event {
+  display: grid;
+  grid-template-columns: 55px minmax(0,1fr);
+  gap: 10px;
+  align-items: start;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: none;
+}
+.holiday-timeline .planner-event time { display: grid; gap: 2px; justify-items: end; font-variant-numeric: tabular-nums; padding: 9px 0; font-size: .86rem; white-space: nowrap; }
+.holiday-timeline .planner-event time span { font-size: .75rem; font-weight: 500; color: #625e58; }
+.holiday-timeline .planner-event[data-transition] { color: #5d564b; }
+.holiday-timeline .planner-event[data-transition] > div { background: transparent; border-color: transparent; box-shadow: none; }
+.holiday-timeline .planner-event > div {
+  padding: 9px 11px;
+  border: 1px solid var(--board-line);
+  border-radius: 12px;
+  background: #fffefa;
+  box-shadow: 0 6px 12px #5a40271d, 0 1px 3px #5a402715, inset 0 1px #fff;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.holiday-timeline .planner-event[data-free-start] > div { background: #fbf2e4; border-style: dashed; }
+.holiday-timeline .planner-event[data-done] > div { border-color: #a8bfaa; background: #f2f7ef; }
+.holiday-timeline .planner-event h4 { display: flex; align-items: center; gap: 8px; margin: 0; font-size: .98rem; }
+.holiday-timeline .planner-event h4 .holiday-icon { width: 22px; height: 22px; }
+.holiday-timeline .planner-event-actions, .holiday-event-action-row { display: flex; gap: 7px; flex-wrap: wrap; }
+.holiday-timeline .planner-event-actions .planner-button,
+.holiday-board-top-actions .holiday-trip-controls .planner-button {
+  min-height: 44px;
+  padding: 7px 12px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  box-shadow: 0 3px 7px #5a402725, inset 0 1px #ffffff35;
+}
+.holiday-timeline .planner-event-actions .planner-button-light,
+.holiday-board-top-actions .holiday-trip-controls .planner-button-light {
+  border-color: #d5c6b1;
+  background: #fffdf8;
+}
+.holiday-timeline .planner-event-actions .planner-button-light:is(:hover, [aria-expanded="true"]),
+.holiday-board-top-actions .holiday-trip-controls .planner-button-light:hover {
+  border-color: #a48662;
+  background: #f8ecda;
+}
+.holiday-timeline .planner-event-actions, .holiday-timeline .planner-event-links { margin: 0; }
+.holiday-timeline .planner-event-edit { min-height: 34px; text-align: left; }
+.holiday-timeline .planner-event-links:empty { display: none; }
+.holiday-timeline .planner-event-links a { overflow-wrap: anywhere; }
+.holiday-event-detail { font-size: .84rem; }
+.holiday-event-confirm { color: #674d28; font-weight: 580; font-size: .79rem; }
+.holiday-mark[aria-pressed="true"] { color: var(--board-green); }
+.holiday-timeline .planner-item-editor { padding: 10px; margin-top: 6px; }
+.holiday-timeline .planner-item-editor .planner-fields { grid-template-columns: repeat(auto-fit, minmax(min(100%, 132px), 1fr)); }
+.holiday-board-note { margin: 14px 0 0; }
+.holiday-board-sidebar { display: grid; gap: 12px; }
+.holiday-board-photo { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; border: 1px solid var(--board-line); border-radius: 16px; box-shadow: var(--board-shadow); }
+.holiday-coordination ul { padding: 0; list-style: none; margin: 0 0 10px; display: grid; gap: 8px; }
+.holiday-coordination li { padding: 8px; border-radius: 8px; background: #f6ecde; display: grid; gap: 4px; }
+.holiday-coordination li small { color: #614b31; }
+.holiday-coordination p { font-size: .87rem; line-height: 1.45; margin: 0 0 12px; }
+.holiday-board-tools { margin-top: 16px; padding: 5px 14px; border: 1px solid var(--board-line); border-radius: 12px; }
+.holiday-board-tools[open] { padding-bottom: 12px; }
+.holiday-planner-page .planner-afisha { margin-top: 18px; }
+[data-board-screen="pick"] .planner-layout { align-items: start; gap: 16px; }
+[data-board-screen="pick"] .planner-conversation { border-top: 1px solid var(--board-line); padding: clamp(14px, 3vw, 35px); }
+[data-board-screen="pick"] .planner-step-header { gap: 8px 16px; justify-content: space-between; }
+[data-board-screen="pick"] .planner-options .holiday-pick-grid { padding: 8px 0 6px; }
+[data-board-screen="pick"] .planner-sidebar { background: var(--board-surface); border-color: var(--board-line); box-shadow: var(--board-shadow); }
+[data-board-screen="pick"] .planner-sidebar > img { max-height: 175px; object-fit: cover; }
+.holiday-alternatives { margin-top: 6px; }
+#content .holiday-alternatives h2 { margin: 7px 0 8px; font-size: clamp(24px, 4vw, 40px); }
+.holiday-alternatives > p { max-width: 65ch; margin: 0 0 16px; }
+.holiday-variant-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); align-items: start; gap: 14px; }
+.holiday-variant { display: grid; gap: 8px; padding: clamp(13px, 2vw, 23px); }
+.holiday-variant > .holiday-icon { box-sizing: content-box; width: 29px; height: 29px; padding: 8px; border-radius: 13px; background: #f5e7ce; }
+#content .holiday-variant h3 { margin: 0; font-size: clamp(19px, 2.4vw, 29px); }
+.holiday-variant p { margin: 0; }
+.holiday-variant-highlights, .holiday-variant-day ul { margin: 0; padding-left: 19px; }
+.holiday-variant .holiday-match { color: var(--board-green); font-size: .84rem; font-weight: 650; }
+.holiday-variant details { border-top: 1px solid var(--board-line); }
+.holiday-variant-day { margin-bottom: 10px; font-size: .86rem; }
+.holiday-variant-day span { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.holiday-map-head { display: flex; align-items: start; justify-content: space-between; flex-wrap: wrap; gap: 8px 14px; margin-bottom: 13px; }
+.holiday-map-head p, .holiday-badge-panel > p { margin: 0; color: #625847; }
+.holiday-map-layout { display: grid; grid-template-columns: minmax(0, 2.6fr) minmax(180px, 1fr); gap: 13px; }
+.holiday-map-art { position: relative; align-self: start; overflow: hidden; border-radius: 15px; }
+.holiday-map-art > img { display: block; width: 100%; height: auto; }
+.holiday-map-art > canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.holiday-map-pin {
+  position: absolute;
+  inset: var(--pin-y) auto auto var(--pin-x);
+  transform: translate(-50%, -70%);
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  min-height: 44px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.holiday-map-pin .holiday-map-pin-icon {
+  display: grid;
+  place-items: center;
+  width: 27px;
+  height: 27px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  background: #32443d;
+  color: #fff;
+  font: 650 13px var(--body-font);
+  box-shadow: 0 1px 6px #30251480;
+}
+.holiday-map-pin:focus-visible { outline: 2px solid #fff; outline-offset: -4px; border-radius: 50%; }
+.holiday-map-guide { display: grid; gap: 10px; align-content: start; min-width: 0; }
+.holiday-map-info { display: grid; gap: 4px; min-width: 0; padding: 11px; border: 1px solid var(--board-line); border-radius: 11px; background: #f8f0e3; overflow-wrap: anywhere; }
+.holiday-map-info p { margin: 0; font-size: .87rem; }
+.holiday-map-schedule { margin-top: 11px; display: flex; flex-wrap: wrap; gap: 6px; }
+.holiday-badge-count { margin: 13px 0 9px; }
+.holiday-badges { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
+.holiday-badges li { display: flex; gap: 9px; align-items: center; padding: 10px; border: 1px solid var(--board-line); border-radius: 12px; }
+.holiday-badges li[data-earned="true"] { border-color: #a8bfaa; background: #edf4e9; }
+.holiday-badges li div { min-width: 0; display: grid; gap: 3px; }
+.holiday-badges li span { color: #5e5548; font-size: .84rem; }
+.holiday-badge-status { margin-left: auto; font-weight: 650; }
+@media (max-width: 960px) {
+  .holiday-board-layout { grid-template-columns: minmax(165px, 1fr) minmax(0, 2fr); }
+  .holiday-board-sidebar { grid-column: 1 / -1; grid-template-columns: minmax(145px, 1fr) minmax(0, 2fr); align-items: start; }
+  .holiday-board-photo { aspect-ratio: 16 / 9; }
+}
+@media (max-width: 670px) {
+  .holiday-planner-page .planner-masthead { gap: 8px; }
+  .holiday-planner-page .planner-masthead .planner-view-switch { flex-basis: 100%; }
+  .holiday-board-layout, .holiday-map-layout, .holiday-variant-grid { grid-template-columns: minmax(0,1fr); }
+  .holiday-board-sidebar { grid-template-columns: minmax(0,1fr); }
+  .holiday-board-sidebar > img { display: none; }
+
+  .holiday-pick-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .holiday-planner-page .holiday-primary { width: 100%; }
+  .holiday-planner-page .planner-result-actions { width: 100%; }
+  .holiday-planner-page .planner-result-actions .holiday-primary { flex-basis: 100%; }
+  .holiday-planner-page .planner-result-heading { align-items: flex-start; gap: 10px; }
+  [data-board-screen="pick"] .planner-question-actions:not(:has([data-back])) { grid-template-columns: minmax(0,1fr); }
+  .holiday-timeline .planner-event { grid-template-columns: 56px minmax(0,1fr); gap: 10px; }
+  .holiday-timeline .planner-event-edit { min-height: 44px; }
+  .holiday-board-tabs button { padding-inline: 7px; font-size: .85rem; }
+  .holiday-board-tabs button .holiday-icon { display: none; }
+  .holiday-badges { grid-template-columns: minmax(0,1fr); }
+}
+
+/* Artwork and raised pieces from the selected board and map composition. */
+.collection-aero body.holiday-planner-page,
+.collection-aero body.holiday-planner-page main#content { background: var(--board-paper); }
+.holiday-board-intro { flex-basis: 100%; margin: 0; color: #4d483e; }
+.holiday-board-toolbar { margin-bottom: 12px; }
+.holiday-board-layout { grid-template-columns: minmax(178px, .95fr) minmax(0, 1.78fr) minmax(190px, .95fr); gap: 12px; }
+.holiday-board-surface { background: #fffaf2; box-shadow: var(--board-shadow), inset 0 0 0 1px #fff9ee; }
+.holiday-palette { background: #fbf1e3; overflow: hidden; }
+#content .holiday-palette h3 { text-transform: uppercase; }
+.holiday-palette .holiday-tile {
+  min-height: 62px;
+  min-width: 0;
+  gap: 3px;
+  border-radius: 13px;
+  padding: 6px 4px;
+  background: linear-gradient(#fff8e9, #f3dfbd);
+  box-shadow: inset 0 0 0 2px #f7ead5, 0 3px 0 #9e733f, 0 6px 8px #69422337;
+}
+.holiday-palette .holiday-tile strong { font-size: .75rem; }
+.holiday-palette .holiday-tile small { font-size: .65rem; }
+.holiday-palette .holiday-tile .holiday-icon { width: 23px; height: 23px; }
+.holiday-palette .holiday-tile[aria-pressed="true"] { background: #e7edd9; border-color: #536b48; }
+.holiday-palette .holiday-tile:disabled {
+  opacity: 1;
+  background: #eee7dc;
+  color: #62584b;
+  border-color: #d9ccba;
+  box-shadow: inset 0 1px #fff8ed, 0 2px 5px #6942231a;
+}
+#content .holiday-palette-group-title { margin: 16px 0 7px; font-size: .9rem; }
+.holiday-timeline .holiday-day-heading { display: block; text-align: center; }
+#content .holiday-day-heading h3 { margin: 0; font-size: clamp(21px, 2.45vw, 34px); }
+.holiday-timeline .holiday-day-heading div span { font-size: .89rem; font-weight: 550; color: #5c5448; text-transform: none; letter-spacing: normal; }
+.holiday-row-actions { display: flex; flex: none; margin-left: auto; }
+.holiday-row-actions > button {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  width: 44px;
+  height: 44px;
+  color: var(--board-ink);
+  cursor: pointer;
+}
+.holiday-row-toggle .holiday-icon { width: 23px; height: 23px; }
+.holiday-row-remove .holiday-icon { width: 21px; height: 21px; }
+.holiday-timeline .planner-day > ol { padding-left: 14px; position: relative; }
+.holiday-timeline .planner-day > ol::before { content: ""; position: absolute; left: 4px; top: 23px; bottom: 23px; border-left: 1px solid #be9157; }
+.holiday-timeline .planner-event time { position: relative; padding: 8px 0; }
+.holiday-timeline .planner-event:not([data-free-start], [data-transition]) time::before {
+  content: "";
+  position: absolute;
+  left: -14px;
+  top: 15px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #b58343;
+  box-shadow: inset 0 0 0 1px #9b6f3d;
+}
+.holiday-timeline .planner-event > div { padding: 4px; }
+.holiday-event-header { display: flex; align-items: center; gap: 10px; min-height: 50px; }
+.holiday-event-photo { width: clamp(67px, 8.7vw, 126px); height: 52px; flex: 0 0 auto; object-fit: cover; border-radius: 9px; }
+.holiday-event-symbol { flex: 0 0 auto; width: 42px; height: 42px; display: grid; place-items: center; background: #f6ead7; border-radius: 9px; }
+.holiday-event-label { display: grid; gap: 3px; align-content: center; min-width: 0; padding-block: 4px; }
+#content .holiday-timeline .planner-event h4 { font-size: clamp(.82rem, 1.3vw, 1.08rem); overflow-wrap: anywhere; }
+.holiday-event-confirm, .holiday-event-done { font-size: .72rem; line-height: 1.22; }
+.holiday-event-done { color: var(--board-green); }
+.holiday-row-toggle:hover, .holiday-row-toggle[aria-expanded="true"] { background: #f1e2cd; }
+.holiday-row-remove:hover { background: #f4e3da; }
+.holiday-row-actions > button:focus-visible { outline: 2px solid var(--board-ink); outline-offset: -2px; }
+.holiday-event-detail { padding: 6px 8px 8px; border-top: 1px solid var(--board-line); }
+.holiday-event-detail > p { margin: 6px 0; }
+.holiday-event-detail .planner-event-actions { margin-top: 4px; }
+.holiday-board-layout [data-free-start] > div { border-style: dashed; padding: 0; box-shadow: none; }
+.holiday-slot-add {
+  width: 100%;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--board-ink);
+  font: 600 .86rem var(--body-font);
+  cursor: pointer;
+}
+.holiday-slot-add .holiday-icon { width: 17px; height: 17px; }
+.holiday-slot-add:disabled { cursor: default; opacity: .5; }
+.holiday-timeline [data-drop-allowed] > div { background: #e9f0dd; border-color: #54764d; box-shadow: inset 0 0 0 1px #54764d; }
+.holiday-timeline [data-drop-allowed]:hover > div { background: #dce9ce; }
+.holiday-timeline [data-transition] { align-items: center; opacity: .82; }
+.holiday-timeline [data-transition] time { padding-block: 0; }
+.holiday-transition-label { display: block; padding: 3px 6px; font-size: .76rem; }
+.holiday-placement-status { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; }
+.holiday-placement-status .planner-feedback { margin: 0; }
+.holiday-placement-status:has(.planner-feedback:not(:empty)) { margin-bottom: 10px; }
+.holiday-placement-status .planner-edit { min-height: 44px; }
+.holiday-board-photo { aspect-ratio: 1.12; }
+.holiday-coordination li { grid-template-columns: 26px minmax(0,1fr); align-items: center; background: #fdf4e6; box-shadow: 0 2px 6px #5a402712; }
+.holiday-coordination li div { display: grid; align-content: center; gap: 4px; min-width: 0; overflow-wrap: anywhere; }
+.holiday-coordination li div strong { font-size: .93rem; }
+.holiday-coordination li a { width: fit-content; }
+.holiday-coordination .planner-button { width: 100%; }
+.holiday-coordination {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.holiday-coordination > :is(h3, .planner-button) { flex: 0 0 auto; }
+.holiday-coordination-list {
+  min-height: 0;
+  max-height: clamp(120px, 45svh, 440px);
+  overflow-y: auto;
+  padding: 2px 3px 4px;
+  margin: 0 -3px;
+  scrollbar-width: thin;
+  scrollbar-color: #b59b76 transparent;
+}
+.holiday-coordination-list:focus-visible { outline: 2px solid var(--board-ink); border-radius: 6px; }
+.holiday-coordination-list ul { margin-bottom: 4px; }
+@media (min-width: 961px) {
+  .holiday-board-sidebar {
+    display: flex;
+    flex-direction: column;
+    max-height: var(--holiday-day-height, 75svh);
+  }
+  .holiday-board-sidebar > .holiday-board-photo {
+    flex: 0 1 auto;
+    min-height: 0;
+    max-height: max(0px, calc(var(--holiday-day-height, 75svh) - 225px));
+  }
+  .holiday-coordination { flex: 0 1 auto; padding: clamp(12px, 1.2vw, 18px); }
+}
+.holiday-map { background: transparent; border: 0; padding: 0; box-shadow: none; }
+#content .holiday-map-head h3 { font-size: clamp(24px, 3.2vw, 41px); margin-bottom: 5px; }
+.holiday-map-art { aspect-ratio: 2 / 1; }
+.holiday-map-art > :is(img, canvas) { position: absolute; inset: -21.3333% auto auto 0; width: 100%; height: auto; }
+.holiday-map-pin { inset: calc((var(--pin-y) - 16%) * 4 / 3) auto auto var(--pin-x); }
+.holiday-map-pin .holiday-map-pin-icon {
+  width: clamp(31px, 4.8vw, 53px);
+  height: clamp(31px, 4.8vw, 53px);
+  border: 3px solid #fffaf2;
+  background: #32463b;
+}
+.holiday-map-pin .holiday-map-pin-icon .holiday-icon { width: 57%; height: 57%; filter: invert(1); opacity: 1; }
+.holiday-map-pin .holiday-map-pin-label {
+  position: absolute;
+  top: 50%;
+  left: calc(100% - 7px);
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  width: max-content;
+  max-width: 125px;
+  height: auto;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 7px;
+  color: #19251e;
+  background: #fffaf0;
+  font-size: clamp(.66rem, 1.15vw, 1rem);
+  line-height: 1.14;
+  text-align: left;
+  box-shadow: 0 2px 5px #1c271b50;
+}
+.holiday-map-pin[data-map-point="banya"] .holiday-map-pin-label { left: auto; right: calc(100% - 7px); }
+.holiday-map-pin[aria-pressed="true"] .holiday-map-pin-icon { background: #886132; }
+.holiday-map-pin[data-map-origin] .holiday-map-pin-icon { outline: 2px solid #293e32; outline-offset: 1px; }
+.holiday-map-pin[aria-pressed="true"] .holiday-map-pin-label,
+.holiday-map-pin[data-map-origin] .holiday-map-pin-label { background: #f0dfb7; outline: 1px solid #77562d; }
+.holiday-map-layout { margin-top: 12px; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); align-items: start; }
+.holiday-map-guide, .holiday-map-agenda { padding: clamp(12px, 2vw, 21px); }
+.holiday-map-info { display: flex; padding: 0; border: 0; background: none; gap: 13px; align-items: stretch; }
+.holiday-map-activity-photo { width: min(34%, 230px); min-height: 130px; object-fit: cover; flex: 0 0 auto; border-radius: 10px; }
+.holiday-map-activity { display: grid; align-content: start; gap: 6px; align-items: start; min-width: 0; }
+#content .holiday-map-activity h4 { display: flex; align-items: center; gap: 7px; margin: 0; font-size: clamp(18px, 2.3vw, 30px); }
+.holiday-map-activity .planner-button { justify-self: start; }
+.holiday-map-lodging { margin: 0; font-size: .84rem; color: #5c5448; }
+.holiday-map-agenda h4 { margin: 0 0 8px; font-size: clamp(19px, 2vw, 26px); }
+.holiday-map-schedule { display: grid; gap: 0; margin: 0 0 9px; padding: 0 0 0 23px; }
+.holiday-map-schedule li { padding: 3px 0; border-bottom: 1px solid var(--board-line); }
+.holiday-map-schedule li > span { display: block; padding: 8px 5px; }
+.holiday-map-schedule button { width: 100%; border: 0; text-align: left; background: transparent; padding-inline: 5px; }
+@media (max-width: 960px) {
+  .holiday-board-layout { grid-template-columns: minmax(165px, .95fr) minmax(0,1.78fr); }
+  .holiday-board-photo { aspect-ratio: 16/9; }
+}
+@media (max-width: 670px) {
+  .holiday-board-intro { font-size: .9rem; }
+  .holiday-board-layout, .holiday-map-layout { grid-template-columns: minmax(0,1fr); }
+  .holiday-palette-grid { grid-template-columns: repeat(4, minmax(0,1fr)); gap: 7px; }
+  .holiday-palette .holiday-tile { min-height: 54px; }
+  .holiday-palette .holiday-tile strong { font-size: .71rem; }
+  .holiday-palette .holiday-tile .holiday-icon { width: 20px; height: 20px; }
+  .holiday-timeline .planner-day > ol { padding-left: 11px; }
+  .holiday-timeline .planner-event:not([data-free-start], [data-transition]) time::before { left: -11px; width: 7px; height: 7px; }
+  .holiday-event-header { gap: 5px; }
+  .holiday-event-photo { width: clamp(49px, 17vw, 84px); height: 43px; }
+  .holiday-event-symbol { width: 31px; height: 34px; }
+  .holiday-event-symbol .holiday-icon { width: 23px; height: 23px; }
+  .holiday-event-confirm, .holiday-event-done { font-size: .66rem; }
+  .holiday-map-art { aspect-ratio: 4 / 3; }
+  .holiday-map-art > :is(img, canvas) { inset: 0 auto auto -6.25%; width: 112.5%; max-width: none; }
+  .holiday-map-pin { inset: var(--pin-y) auto auto calc((var(--pin-x) - 5.5556%) * 1.125); }
+  .holiday-map-pin .holiday-map-pin-label { padding-inline: 5px; }
+  .holiday-map-pin[data-map-point="banya"] .holiday-map-pin-label { top: 0; right: 0; transform: translateY(-70%); }
+  .holiday-map-activity-photo { width: 30%; min-height: 100px; }
+}
+@media (max-width: 420px) {
+  .holiday-row-actions { flex-direction: column; }
+}
+.holiday-palette .holiday-tile, .holiday-timeline [data-board-movable] .holiday-event-header {
+  cursor: grab;
+  user-select: none;
+}
+.holiday-palette .holiday-tile { touch-action: pan-y; }
+.holiday-timeline [data-board-movable] .holiday-row-toggle { touch-action: none; }
+.holiday-timeline [data-drag-over] > div { background: #dce9ce; }
+.holiday-board-layout [data-being-dragged] { opacity: .58; }
+.holiday-drag-ghost {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1200;
+  pointer-events: none;
+  max-width: min(235px, 65vw);
+  padding: 12px 16px;
+  border: 1px solid #af8252;
+  border-radius: 12px;
+  color: #303442;
+  background: #fff7e9;
+  box-shadow: 0 7px 18px #4935223b;
+  font-weight: 650;
+}
+.holiday-board-top-actions { display: flex; flex-wrap: wrap; gap: 4px 16px; align-items: center; margin-inline-start: auto; }
+.holiday-planner-page[data-holiday-view="map"] :is(.holiday-board-top-actions,.holiday-board-intro),
+.holiday-planner-page[data-holiday-view="badges"] :is(.holiday-board-top-actions,.holiday-board-intro),
+.holiday-planner-page:is([data-holiday-view="pick"], [data-holiday-view="family"]) .holiday-board-intro { display: none; }
+.holiday-family { display: grid; gap: 18px; }
+.holiday-family-intro { margin: 0; max-width: 62ch; }
+.holiday-family-party, .holiday-family-programme { margin: 0; padding: clamp(14px, 2.2vw, 26px); }
+#content .holiday-family-party h2 { margin: 0 0 14px; font-size: clamp(19px, 2.5vw, 26px); }
+.holiday-family-party .planner-fields { max-width: 480px; }
+.holiday-family-mode { margin: 16px 0 0; padding: 0; border: 0; }
+.holiday-family-mode .planner-choices { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.holiday-family-programmes { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; align-items: start; }
+.holiday-family-programme { min-inline-size: 0; }
+.holiday-family-programme legend { padding-inline: 7px; font-weight: 650; font-size: 1.1rem; }
+.holiday-family-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 110px), 1fr)); gap: 10px; }
+.holiday-family-options .holiday-tile { min-height: 66px; }
+.holiday-family-options .holiday-icon { width: 23px; height: 23px; }
+.holiday-family-programme .planner-help { margin: 12px 0 0; }
+.holiday-family > .planner-note { margin: 0; }
+.holiday-family-actions { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; }
+.holiday-parallel-summary { display: grid; gap: 3px; color: #554b3d; font-size: .76rem; line-height: 1.3; }
+@media (max-width: 670px) {
+  .holiday-planner-page:not(.holiday-chat-open) .planner-masthead .planner-view-switch { display: none; }
+  .holiday-board-top-actions { order: -1; width: 100%; margin-inline-start: 0; gap: 10px; }
+  .holiday-board-top-actions .holiday-primary { flex-basis: 100%; }
+  .holiday-palette { padding-block: 9px; }
+  #content .holiday-palette h3 { margin-bottom: 8px; }
+  .holiday-palette-hint { margin: 8px 0 3px; }
+  .holiday-map-head { margin-bottom: 9px; }
+  .holiday-timeline .planner-event time span { margin-left: 0; }
+  .holiday-family-programmes { grid-template-columns: minmax(0,1fr); }
+  .holiday-family-actions > button { flex: 1 1 138px; }
+}
+@media (max-width: 359px) {
+  .holiday-palette-grid { grid-template-columns: repeat(3, minmax(0,1fr)); }
+}

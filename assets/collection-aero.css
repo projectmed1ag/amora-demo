@@ -875,7 +875,8 @@ html.collection-aero[data-city="mozhaysk"] body[data-page] #content .aero-featur
 html.collection-aero body[data-page] #content :is(
   .home-photo-panel, .cl-panel, .service-booking-primary, .service-booking-aside,
   .booking-result, .planner-conversation, .planner-sidebar, .planner-draft,
-  .contacts-hotel, .about-description-copy
+  .about-description-copy, .nearby-map-stage, .location-hero, .stays-hero,
+  .service-reservation-panel:not(.aero-feature-panel)
 ) {
   box-shadow: var(--aero-card-shadow);
 }
@@ -886,7 +887,9 @@ html.collection-aero body[data-page="spaces"] #content .entertainment-story {
 html.collection-aero body[data-page] #content :is(
   .render-service-gallery-photo, .gallery-photo > .media, .cl-detail-photo,
   .nearby-photo-frame, .nearby-place-photo, .home-feature-photo,
-  .home-leisure-media, .about-description-visual, .aero-highlights img
+  .home-leisure-media, .about-description-visual, .aero-highlights img, .aero-hero > .aero-panorama,
+  .home-service-photo:not(:has(.home-feature-photo)), .booking-summary > .media,
+  .service-hero:not(.aero-feature-card .service-hero, :has(.home-feature-photo))
 ) {
   box-shadow: var(--aero-photo-shadow);
 }
@@ -902,7 +905,14 @@ html.collection-aero body[data-page="home"] #content .aero-planner {
   html.collection-aero[data-city="mozhaysk"] body[data-page] #content .aero-feature-panel {
     box-shadow: inset 0 1px 0 #ffffff, var(--aero-card-shadow);
   }
+  html.collection-aero[data-city="mozhaysk"] body[data-page] #content :is(.aero-stays-photo, .service-hero, .pavilion-photo).aero-feature-photo,
+  html.collection-aero[data-city="mozhaysk"] body[data-page] #content .pavilion-story.aero-feature-photo > .pavilion-photo {
+    box-shadow: var(--aero-photo-shadow);
+  }
 }
+html.collection-aero .aero-booking-redirect main,
+html.collection-aero .credits-card,
+html.collection-aero #content .contacts-hotel { box-shadow: var(--aero-card-shadow); }
 
 /* Let each desktop photograph dissolve into its adjacent white booking panel. */
 @media (min-width: 1001px) {

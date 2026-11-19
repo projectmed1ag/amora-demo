@@ -8,6 +8,8 @@ const outingReserveMinutes = 30;
 const visitReserveMinutes = 75;
 const maxStayDays = 31;
 const interestCatalog = new Map(onsiteInterests.map(item => [item.id, item]));
+export const familyAdultInterests = ['walk', 'beach', 'bike', 'garden', 'fishing', 'table-tennis']
+  .map(id => interestCatalog.get(id));
 export const minutes = value => /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(value || '') ? Number(value.slice(0, 2)) * 60 + Number(value.slice(3)) : NaN;
 export const clock = value => `${String(Math.floor(value / 60)).padStart(2, '0')}:${String(value % 60).padStart(2, '0')}`;
 export const breakfastNotice = `Завтрак подают ежедневно с ${clock(breakfastStart)} до ${clock(breakfastEnd)}.`;
@@ -91,6 +93,7 @@ export function validateAnswers(a, today = '', currentMinute = -1) {
   }
   if (!['calm', 'balanced', 'active'].includes(a.pace)) errors.pace = 'Выберите желаемый темп.';
   if (!['together', 'separate'].includes(a.familyMode)) errors.familyMode = 'Выберите формат семейного отдыха.';
+  if (a.adultActivity && !familyAdultInterests.some(item => item.id === a.adultActivity)) errors.adultActivity = 'Выберите занятие для взрослых из списка.';
   if (a.interests != null && (!Array.isArray(a.interests) || a.interests.some(id => id !== 'sights' && !interestCatalog.has(id)))) errors.interests = 'Проверьте выбранные занятия.';
   if (a.outingMode != null && !['stay', 'visit'].includes(a.outingMode)) errors.outingMode = 'Выберите отдых на территории или выезды к достопримечательностям.';
   if (!Number.isFinite(minutes(a.wake)) || !Number.isFinite(minutes(a.rest)) || minutes(a.rest) - minutes(a.wake) < 120) errors.wake = 'Между началом дня и вечерним отдыхом должно быть хотя бы 2 часа.';
@@ -188,7 +191,7 @@ function activity(id, a) {
   };
   const suggestion = {
     walk: { title: 'Прогулка у воды', duration: 60, detail: routeIdeas.walk, page: 'leisure-nature.html' },
-    bike: { title: 'Велопрогулка', duration: a.pace === 'active' ? 90 : 60, detail: routeIdeas.bike, page: 'leisure-active.html' },
+    bike: { title: 'Велопрогулка', duration: a.pace === 'active' ? 90 : 60, detail: routeIdeas.bike, page: 'leisure-active.html', confirmation: 'Согласуйте веломаршрут, наличие проката и условия участия с командой отеля.' },
     buggy: { title: 'Багги с инструктором', duration: 90, detail: routeIdeas.buggy, page: 'leisure-buggy.html', confirmation: 'Подтвердить прокат, инструктора и условия участия.' },
   }[id];
   if (!suggestion) {
@@ -201,7 +204,7 @@ function activity(id, a) {
     route: demoLocalRoute(id), routeLabel: id === 'bike' ? 'Пример веломаршрута' : 'Пример пешего маршрута',
   };
   if (id === 'buggy' && a.children) {
-    if (canSplitFamily(a)) return parallelActivity(a, suggestion, 'Багги для взрослых и детская программа');
+    if (canSplitFamily(a) && !a.adultActivity) return parallelActivity(a, suggestion, 'Багги для взрослых и детская программа');
     return { ...suggestion, title: 'Семейный выезд на багги — по согласованию', detail: `${suggestion.detail} Сначала подтвердите допустимый возраст и состав семейного экипажа. Пока условия не подтверждены, используйте этот интервал для совместной прогулки, без поездки на багги.` };
   }
   return suggestion;
@@ -245,9 +248,11 @@ function canSplitFamily(a) {
 
 function parallelActivity(a, adult, title = 'Параллельная программа для детей и взрослых') {
   const withParent = a.ages.some(age => age < 3);
+  const chosen = a.childActivities?.length === 1 && childActivityOptions.find(option =>
+    option.id === a.childActivities[0] && a.ages.every(age => age >= option.minAge));
   const child = {
     audience: withParent ? 'Дети с одним взрослым' : 'Дети',
-    title: withParent ? 'Игры и отдых со взрослым' : 'Программа с аниматором по возрасту',
+    title: chosen?.title || (withParent ? 'Игры и отдых со взрослым' : 'Программа с аниматором по возрасту'),
     detail: childrenProgramme(a),
     page: 'leisure-children.html',
   };
@@ -302,7 +307,14 @@ export function notesForSchedule({ answers, days }) {
   return notes;
 }
 
-export function buildHolidayPlan(a, { today = '', currentMinute = -1 } = {}) {
+function addMealBreaks(days, priorityMeals) {
+  for (const day of days) {
+    if (!day.items.some(item => item.service === 'restaurant' && item.start < 15 * 60)) insert(day, { kind: 'meal', meal: 'lunch', title: 'Обед в своём ритме', duration: 45, detail: 'Свободное время на обед; столик автоматически не бронируется.' }, 13 * 60, 12 * 60, 15 * 60);
+    if (!day.items.some(item => ['restaurant', 'barbecue'].includes(item.service) && (!priorityMeals || item.start >= 15 * 60) && item.end > 17 * 60)) insert(day, { kind: 'meal', meal: 'dinner', title: 'Свободное время на ужин', duration: 45, detail: 'Выберите удобный формат ужина.' }, 19 * 60, 18 * 60, 21 * 60);
+  }
+}
+
+export function buildHolidayPlan(a, { today = '', currentMinute = -1, priorityMeals = false } = {}) {
   const errors = validateAnswers(a, today, currentMinute);
   if (Object.keys(errors).length) return { errors, days: [], unplaced: [], notes: [] };
   const days = [], unplaced = [];
@@ -335,7 +347,7 @@ export function buildHolidayPlan(a, { today = '', currentMinute = -1 } = {}) {
       Math.max(start, breakfastStart), breakfastStart, breakfastEnd);
   }
 
-  for (const id of new Set(a.services || [])) {
+  function placeService(id) {
     const preferred = minutes(a.preferred[id]);
     const service = createServiceItem(a, id);
     const item = {
@@ -346,6 +358,14 @@ export function buildHolidayPlan(a, { today = '', currentMinute = -1 } = {}) {
       && placeAcross(days, item, preferred, { from: preferred, to: preferred + item.duration, oncePerDay: 'service' });
     if (!exactTime && !placeAcross(days, item, preferred, { from: 11 * 60, to: 21 * 60, oncePerDay: 'service' })) unplaced.push({ id: item.id, title: item.title, reason: 'Для полного сеанса не нашлось свободного времени. Увеличьте длительность отдыха или уберите одно из занятий.' });
   }
+
+  const requestedServices = [...new Set(a.services || [])];
+  if (priorityMeals) {
+    const servesFood = id => id === 'restaurant' || id === 'barbecue';
+    requestedServices.filter(servesFood).forEach(placeService);
+    addMealBreaks(days, true);
+    requestedServices.filter(id => !servesFood(id)).forEach(placeService);
+  } else requestedServices.forEach(placeService);
 
   if (includesSightseeing(a)) {
     const priority = outing => (outing.excursionDate ? 2 : 0) + (outing.excursionTime ? 1 : 0);
@@ -426,26 +446,28 @@ export function buildHolidayPlan(a, { today = '', currentMinute = -1 } = {}) {
   }
 
   // A selected buggy ride can be the adult programme in the same block.
-  const splitBuggy = separate && recurring.includes('buggy');
+  const splitBuggy = separate && !a.adultActivity && recurring.includes('buggy');
   if (splitBuggy) placeInterest('buggy');
   if (a.children) {
+    const chosenAdult = separate && a.adultActivity;
     const item = separate ? parallelActivity(a, adultBreak(a)) : familyActivity(a);
     const shortBreak = { title: 'Короткая передышка', duration: 30, detail: 'Отдохните рядом с местом встречи с детьми.' };
     const shortItem = separate ? parallelActivity(a, shortBreak) : { ...item, duration: 30 };
     for (const day of days) {
       if (day.items.some(block => block.kind === 'parallel')) continue;
-      if (!insert(day, item, 11 * 60, 9 * 60, 18 * 60)) insert(day, shortItem, 11 * 60, 9 * 60, 18 * 60);
+      if (chosenAdult) {
+        const adult = createInterestItem(chosenAdult, day.date, a);
+        if (adult) insert(day, parallelActivity(a, adult), 11 * 60, 9 * 60, 18 * 60);
+      } else if (!insert(day, item, 11 * 60, 9 * 60, 18 * 60)) insert(day, shortItem, 11 * 60, 9 * 60, 18 * 60);
     }
     if (!days.some(day => day.items.some(block => block.kind === 'parallel' || block.kind === 'family'))) {
-      unplaced.push({ id: separate ? 'parallel' : 'family', title: separate ? 'Параллельная программа для детей и взрослых' : 'Семейная программа', reason: 'Свободного интервала не хватило. Сократите другие занятия или добавьте день.' });
+      unplaced.push({ id: separate ? 'parallel' : 'family', title: separate ? 'Параллельная программа для детей и взрослых' : 'Семейная программа', reason: chosenAdult && !availableInterestInStay(chosenAdult, a.startDate, a.endDate)
+        ? unavailableInterestReason(chosenAdult) : 'Свободного интервала не хватило. Сократите другие занятия или добавьте день.' });
     }
   }
   for (const id of selectedInterests) if (id !== 'buggy' || !splitBuggy) placeInterest(id);
 
-  for (const day of days) {
-    if (!day.items.some(item => item.service === 'restaurant' && item.start < 15 * 60)) insert(day, { kind: 'meal', meal: 'lunch', title: 'Обед в своём ритме', duration: 45, detail: 'Свободное время на обед; столик автоматически не бронируется.' }, 13 * 60, 12 * 60, 15 * 60);
-    if (!day.items.some(item => ['restaurant', 'barbecue'].includes(item.service) && item.end > 17 * 60)) insert(day, { kind: 'meal', meal: 'dinner', title: 'Свободное время на ужин', duration: 45, detail: 'Выберите удобный формат ужина.' }, 19 * 60, 18 * 60, 21 * 60);
-  }
+  if (!priorityMeals) addMealBreaks(days, false);
 
   if (separate) {
     const shared = { ...familyActivity(a), id: 'family:shared', duration: 45,

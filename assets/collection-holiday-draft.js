@@ -1,5 +1,5 @@
 import { attractions, childActivityOptions, interests, outingTransports, services } from './collection-holiday-data.js?v=20261108-route-pdf-1';
-import { dateNumber, minutes } from './collection-holiday-engine.js?v=20261108-route-pdf-1';
+import { dateNumber, minutes, familyAdultInterests } from './collection-holiday-engine.js?v=20261119-family-1';
 import { isHotelEventEdit } from './collection-holiday-edits.js?v=20261108-route-pdf-1';
 import { holidayLodgings } from './collection-holiday-lodging.js';
 
@@ -10,6 +10,7 @@ const listFields = { childActivities: childActivityOptions, interests, places: a
 const choices = {
   lodging: ['', ...holidayLodgings.map(room => room.id)],
   familyMode: ['together', 'separate'],
+  adultActivity: ['', ...familyAdultInterests.map(item => item.id)],
   pace: ['calm', 'balanced', 'active'],
   outingMode: ['stay', 'visit'],
   transport: Object.keys(outingTransports),
@@ -88,6 +89,8 @@ export function loadHolidayDraft(city, defaults, storage) {
       step: steps.has(saved.step) ? saved.step : 'dates',
       edits: Array.isArray(saved.edits) ? saved.edits.filter(validEdit) : [],
       completed: saved.completed === true,
+      priorityMeals: saved.priorityMeals === true,
+      marks: Array.isArray(saved.marks) ? saved.marks.filter(mark => typeof mark === 'string' && mark.length < 800) : [],
     };
   } catch {
     return null;
@@ -97,11 +100,11 @@ export function loadHolidayDraft(city, defaults, storage) {
 export function saveHolidayDraft(city, draft, storage) {
   try {
     if (!isRecord(draft?.answers)) return false;
-    const { answers, step, edits, completed } = draft;
+    const { answers, step, edits, completed, priorityMeals, marks } = draft;
     const target = browserStorage(storage);
     if (!target) return false;
     const savedAnswers = { ...answers, suggestActivities: answers.suggestActivities === true };
-    target.setItem(draftKey(city), JSON.stringify({ version, answers: savedAnswers, step, edits, completed }));
+    target.setItem(draftKey(city), JSON.stringify({ version, answers: savedAnswers, step, edits, completed, priorityMeals, marks }));
     return true;
   } catch {
     return false;

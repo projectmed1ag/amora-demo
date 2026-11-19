@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#303442">
-  <title>Помощник по отдыху — A’MORE Collection</title>
+  <title>План отдыха — A’MORE Collection</title>
   <meta name="description" content="Выберите хаусбот и составьте программу отдыха у Можайского водохранилища с занятиями для детей и взрослых. Скачайте расписание в PDF.">
   <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg?v=20261105-emblem-1">
   <link rel="stylesheet" href="./assets/collection-refinement.css?v=20261118-headings-1">
@@ -12,9 +12,10 @@
   <link rel="stylesheet" href="./assets/collection-holiday-planner.css?v=20261118-headings-1">
   <link rel="stylesheet" href="./assets/collection-holiday-chat.css?v=20261118-headings-1">
   <script type="module" src="./assets/collection-runtime.js?v=20261109-bstudy-fonts-1"></script>
-  <script type="module" src="./assets/collection-holiday-planner.js?v=20261118-aero-home-1"></script>
-    <link rel="stylesheet" href="./assets/collection-aero.css?v=20261119-card-depth-1">
+  <script type="module" src="./assets/collection-holiday-planner.js?v=20261119-row-actions-1"></script>
+    <link rel="stylesheet" href="./assets/collection-aero.css?v=20261119-site-depth-4">
     <link rel="stylesheet" href="./assets/collection-body-copy.css?v=20261118-2">
+    <link rel="stylesheet" href="./assets/collection-holiday-board.css?v=20261119-row-actions-1">
 </head>
 <body class="holiday-planner-page collection-site-page" data-page="holiday-planner">
   <a class="planner-skip" href="#content">К помощнику</a>
@@ -39,15 +40,15 @@
   </header>
   <main id="content" class="planner-main" tabindex="-1">
     <div class="planner-masthead" id="planner-masthead">
-      <p class="planner-eyebrow">Можайское водохранилище</p>
-      <h1>Помощник по отдыху</h1>
+      <h1>План отдыха</h1>
       <div class="planner-view-switch" id="planner-assistant" role="group" aria-label="Режим помощника" hidden>
         <button type="button" data-planner-view="plan" aria-pressed="true" aria-controls="planner-plan-view">План отдыха</button>
         <button type="button" data-planner-view="chat" aria-pressed="false" aria-controls="planner-chat">Чат с помощником</button>
       </div>
+      <p class="holiday-board-intro">Соберите свой день в A’MORE — добавляйте, передвигайте и согласовывайте занятия.</p>
     </div>
     <div id="planner-plan-view">
-      <div id="planner-app" data-holiday-api-base="https://amora-med1ag-booking.ai-vipsup.chatgpt.site/api/v1/"><p class="planner-loading" role="status">Готовим вопросы для вашей программы…</p></div>
+      <div id="planner-app" data-holiday-api-base="https://amora-med1ag-booking.ai-vipsup.chatgpt.site/api/v1/"><p class="planner-loading" role="status">Открываем доску отдыха…</p></div>
       <div class="planner-draft" id="planner-draft" hidden>
         <p data-draft-status role="status"></p>
         <button type="button" class="planner-edit" data-reset-draft>Начать заново</button>

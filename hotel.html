@@ -29,10 +29,12 @@
   <link rel="icon" type="image/svg+xml" sizes="any" href="./assets/favicon.svg?v=20261105-emblem-1">
   <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon-32.png?v=20261105-emblem-1">
   <link rel="apple-touch-icon" sizes="180x180" href="./assets/apple-touch-icon.png?v=20261105-emblem-1">
-    <link rel="stylesheet" href="./assets/collection-aero.css?v=20261119-card-depth-1">
+    <link rel="stylesheet" href="./assets/collection-aero.css?v=20261119-site-depth-4">
     <link rel="stylesheet" href="./assets/collection-aero-home.css?v=20261118-headings-1">
     <script type="module" src="./assets/collection-aero-home.js?v=20261118-2"></script>
     <link rel="stylesheet" href="./assets/collection-body-copy.css?v=20261118-2">
+<link rel="stylesheet" href="./assets/collection-planner-showcase.css?v=20261119-tour-3">
+<script type="module" src="./assets/collection-planner-showcase.js?v=20261119-tour-2"></script>
 </head>
   <body data-page="home" class="collection-home-page collection-site-page collection-aero-home" data-collection-static="">
     <a class="skip-link" href="#content">К содержанию</a>
@@ -75,6 +77,31 @@
     </div>
     <p class="aero-planner-error" id="aero-planner-error" role="alert" hidden></p>
   </form>
+</section>
+<section class="planner-showcase" id="planner-showcase" aria-labelledby="planner-showcase-title">
+  <div class="planner-showcase-layout">
+    <div class="planner-showcase-copy">
+      <h2 id="planner-showcase-title">Спланируйте свой отдых</h2>
+      <p>Расставьте занятия между завтраком, обедом и ужином. Посмотрите на карте, куда идти дальше, и отмечайте то, что уже успели.</p>
+      <a class="planner-showcase-primary" href="./holiday-planner.html?city=mozhaysk&amp;from=hotel">Открыть план отдыха</a>
+    </div>
+    <figure class="planner-showcase-film">
+      <video class="planner-showcase-video" width="1000" height="800" controls muted loop playsinline
+        preload="none" poster="./images/holiday-board/planner-tour-poster.webp"
+        aria-label="Как работает планировщик отдыха" aria-describedby="planner-showcase-transcript">
+        <source src="./images/holiday-board/planner-tour.mp4" type="video/mp4">
+        <a href="./images/holiday-board/planner-tour.mp4">Открыть ролик о планировщике</a>
+      </video>
+      <p id="planner-showcase-transcript" hidden>В ролике прогулку, велосипед, отдых у воды и баню расставляют между приёмами пищи. Карта показывает пример пути из хаусбота к прокату и бане. За первое выполненное занятие дают «Первое впечатление», за велопрогулку — «На двух колёсах», за пешую прогулку — «По берегу», за три занятия — «День удался».</p>
+    </figure>
+    <div class="planner-showcase-more">
+      <div class="planner-showcase-links">
+        <a href="./holiday-planner.html?city=mozhaysk&amp;from=hotel&amp;mode=auto">Три варианта отдыха</a>
+        <a href="./holiday-planner.html?city=mozhaysk&amp;from=hotel&amp;mode=family">Раздельный отдых</a>
+      </div>
+      <p>Готовый план можно скачать в PDF, а услуги согласовать с отелем.</p>
+    </div>
+  </div>
 </section>
 <nav class="aero-highlights" aria-label="Отдых в отеле">
   <a href="./rooms.html?city=mozhaysk"><img src="./images/responsive/rooms/mozhaysk/standard-houseboat/exterior-day-768.webp" alt="" loading="lazy" width="768" height="512"><span>Хаусботы</span></a>
