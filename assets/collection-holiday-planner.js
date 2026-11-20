@@ -51,7 +51,7 @@ const isFamilyRoute = () => new URLSearchParams(location.search).get('mode') ===
 const isChoiceRoute = () => new URLSearchParams(location.search).get('mode') === 'choose';
 const draftBanner = document.getElementById('planner-draft');
 const draftCity = 'mozhaysk';
-const { scope: bookingScope, handoff: bookingHandoff } = bookingContext();
+const { scope: bookingScope, handoff: bookingHandoff, party: bookedParty } = bookingContext();
 const { stay: plannedStay, party: plannedParty } = readPlannedStay();
 const staySelection = bookingHandoff || plannedStay;
 const stayGuestCount = () => staySelection.adults + (staySelection.children || 0);
@@ -167,6 +167,10 @@ function receiveBookingGuestNames() {
   history.replaceState(history.state, '', url);
 }
 
+function bookingStayKey(startDate, endDate, lodging, guests) {
+  return `${draftCity}:stay:${startDate}:${endDate}:${lodging}:${guests}`;
+}
+
 function bookingContext() {
   const url = new URL(location.href);
   if (url.searchParams.get('city') !== draftCity) return {};
@@ -178,7 +182,13 @@ function bookingContext() {
     };
     const handoff = validatedBookingHandoff(stay);
     if (handoff) {
-      const tripKey = `${draftCity}:stay:${stay.checkIn}:${stay.checkOut}:${stay.roomId}:${stay.guests}`;
+      const adults = Number(fragment.get('partyAdults'));
+      const ages = fragment.getAll('partyAge');
+      if (Number.isInteger(adults) && adults >= 1 && adults + ages.length === stay.guests
+        && ages.length <= 10 && ages.every(age => /^(?:[0-9]|1[0-7])$/.test(age))) {
+        stay.party = { adults, children: ages.length, ages: ages.map(Number) };
+      }
+      const tripKey = bookingStayKey(stay.checkIn, stay.checkOut, stay.roomId, stay.guests);
       let token;
       try {
         token = sessionStorage.getItem(tripKey) || crypto.randomUUID();
@@ -190,7 +200,7 @@ function bookingContext() {
       } catch {
         // Keep the fragment available on reload when browser storage is blocked.
       }
-      return { token, scope: token ? `${draftCity}:booking:${token}` : tripKey, handoff };
+      return { token, scope: token ? `${draftCity}:booking:${token}` : tripKey, handoff, party: stay.party };
     }
   }
   const token = url.searchParams.get('booking');
@@ -198,18 +208,35 @@ function bookingContext() {
   const scope = `${draftCity}:booking:${token}`;
   try {
     const saved = JSON.parse(sessionStorage.getItem(`amore-holiday-booking:${token}`));
-    return { token, scope, handoff: validatedBookingHandoff(saved) };
+    return { token, scope, handoff: validatedBookingHandoff(saved), party: saved?.party };
   } catch {
     return { token, scope };
   }
 }
 
 function bookingDefaults() {
-  if (!bookingHandoff || bookingHandoff.startDate !== today()) return bookingHandoff;
+  if (!bookingHandoff) return;
+  const trip = { ...bookingHandoff, ...bookedParty };
+  if (trip.startDate !== today()) return trip;
   const minute = nowMinute();
   const nextQuarter = ceilQuarterHour(minute + 1);
   return clock(minute) >= defaultAnswers.arrival && nextQuarter < 1440
-    ? { ...bookingHandoff, arrival: clock(nextQuarter) } : bookingHandoff;
+    ? { ...trip, arrival: clock(nextQuarter) } : trip;
+}
+
+function checkoutDraft() {
+  const trip = bookingHandoff;
+  if (!trip) return null;
+  try {
+    const key = bookingStayKey(trip.startDate, trip.endDate, trip.lodging, trip.adults);
+    const previousScope = sessionStorage.getItem(`amore-holiday-checkout:${key}`);
+    const draft = previousScope && loadHolidayDraft(previousScope, defaultAnswers);
+    const saved = draft?.answers;
+    return saved && saved.startDate === trip.startDate && saved.endDate === trip.endDate
+      && saved.lodging === trip.lodging && saved.adults + saved.children === trip.adults ? draft : null;
+  } catch {
+    return null;
+  }
 }
 
 function matchesStaySelection() {
@@ -1580,9 +1607,10 @@ function bookingPartyParams(trip) {
   return party;
 }
 
-function bookingCheckoutURL(trip) {
+function bookingCheckoutURL(trip, { withoutPlan = false } = {}) {
   const booking = new URL('https://amora-med1ag-booking.ai-vipsup.chatgpt.site/booking');
   booking.searchParams.set('city', draftCity);
+  if (withoutPlan) booking.searchParams.set('withoutPlan', '1');
   const guests = trip.adults + trip.children;
   if (trip.endDate <= trip.startDate || !holidayLodgings.some(room => room.id === trip.lodging && room.capacity >= guests)) return booking;
 
@@ -1888,7 +1916,7 @@ function renderPlan({ scroll = true, message = '', save = true } = {}) {
   const activeDay = plan.days.find(day => day.date === selectedDay) || plan.days[0];
   const alreadyBooked = isBookedLodging(answers.lodging);
   const booking = alreadyBooked ? null : bookingCheckoutURL(answers);
-  const continueWithoutPlan = booking?.href || './hotel.html?city=mozhaysk';
+  const continueWithoutPlan = alreadyBooked ? './hotel.html?city=mozhaysk' : bookingCheckoutURL(answers, { withoutPlan: true }).href;
   root.innerHTML = `<section class="planner-result" aria-labelledby="planner-result-title">
     <h2 id="planner-result-title" class="planner-sr-only" tabindex="-1">Ваш план</h2>
     <div class="holiday-placement-status">
@@ -1969,6 +1997,14 @@ function renderPlan({ scroll = true, message = '', save = true } = {}) {
   </section>`;
   bindBoard(activeDay.date);
   bindGuestGroupControls();
+  root.querySelector('.holiday-booking-button')?.addEventListener('click', () => {
+    const key = bookingStayKey(answers.startDate, answers.endDate, answers.lodging, guestCount());
+    try {
+      sessionStorage.setItem(`amore-holiday-checkout:${key}`, draftScope);
+    } catch {
+      // Booking and PDF generation can continue without session storage.
+    }
+  });
   void showBoardStayPrice();
   const pdfButton = root.querySelector('[data-pdf]');
   const pdfStatus = root.querySelector('[data-pdf-status]');
@@ -2068,7 +2104,7 @@ function renderModeChoice({ focus = false } = {}) {
   root.dataset.boardScreen = 'choose';
   showPlannerView('plan');
   const trip = boardRecord.answers;
-  const booking = bookingCheckoutURL(trip);
+  const booking = bookingCheckoutURL(trip, { withoutPlan: true });
   const change = new URL(booking);
   change.search = new URLSearchParams({
     city: draftCity, from: 'hotel-planner', startDate: trip.startDate, endDate: trip.endDate,
@@ -2078,9 +2114,8 @@ function renderModeChoice({ focus = false } = {}) {
   const lodging = holidayLodgings.find(room => room.id === trip.lodging);
   const partyLabel = trip.children > 0 ? `Взрослых: ${trip.adults} · Детей: ${trip.children}` : `Гостей: ${trip.adults}`;
   const modes = [
-    ['manual', 'map', 'Спланировать отдых самостоятельно', 'Соберите своё расписание на доске.'],
+    ['manual', 'map', 'Спланировать отдых самостоятельно', 'Соберите общее расписание или отдельные планы для гостей.'],
     ['auto', 'achievement', 'Спланируй отдых за меня', 'Выберите интересы, а помощник предложит три программы.'],
-    ['family', 'family', 'Спланировать раздельный отдых', 'Создайте расписания для отдельных гостей и групп.'],
   ];
   root.innerHTML = `<section class="holiday-mode-choice" aria-labelledby="planner-question">
     <h2 id="planner-question" tabindex="-1">Как спланируем отдых?</h2>
@@ -2100,7 +2135,7 @@ function renderModeChoice({ focus = false } = {}) {
       if (mode === 'auto') {
         setPlannerRoute('auto');
         showAutomatic({ resume: true });
-      } else returnToBoard({ mode: mode === 'family' ? 'separate' : 'together' });
+      } else returnToBoard({ mode: 'together' });
       if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
         root.animate?.([{ opacity: 0, transform: 'translateY(36px)' }, { opacity: 1, transform: 'translateY(0)' }],
           { duration: 420, easing: 'cubic-bezier(.22, 1, .36, 1)' });
@@ -2186,11 +2221,18 @@ function renderAlternatives() {
 
 function restoreDraft() {
   const url = new URL(location.href);
+  const downloadOnArrival = url.searchParams.get('download') === 'plan' && Boolean(bookingHandoff);
+  if (downloadOnArrival) {
+    url.searchParams.delete('download');
+    history.replaceState(history.state, '', url);
+  }
   const fromHome = !plannedStay && !bookingScope && !bookingHandoff && url.searchParams.get('city') === draftCity
     && url.searchParams.get('from') === 'hotel';
   if (fromHome) draftScope = `${draftCity}:home`;
   if (plannedStay) draftScope = `${draftCity}:stay:${Object.values(plannedStay).join(':')}`;
-  const bookingDraft = bookingScope ? loadHolidayDraft(bookingScope, defaultAnswers) : null;
+  const bookingDraft = bookingScope
+    ? loadHolidayDraft(bookingScope, defaultAnswers) || (downloadOnArrival ? checkoutDraft() : null)
+    : null;
   if (bookingHandoff || bookingDraft) draftScope = bookingScope;
   const draft = draftScope === bookingScope ? bookingDraft : loadHolidayDraft(draftScope, defaultAnswers);
   const incoming = fromHome ? Object.fromEntries(stepFields.dates.map(field => [field, url.searchParams.get(field) || ''])) : null;
@@ -2217,6 +2259,11 @@ function restoreDraft() {
   else if (isAutoRoute()) showAutomatic({ resume: true, focus: false });
   else if (isFamilyRoute()) returnToBoard({ replace: true, focus: false, mode: 'separate' });
   else returnToBoard({ focus: false });
+  const pdfButton = downloadOnArrival && matchesStaySelection() && root.querySelector('[data-pdf]');
+  if (pdfButton) {
+    pdfButton.scrollIntoView({ block: 'center' });
+    pdfButton.click();
+  }
 }
 
 if (root) {
