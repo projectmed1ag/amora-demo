@@ -5,7 +5,12 @@ body.holiday-planner-page {
   --planner-action: #e6c275; --planner-action-hover: #efd18c; --planner-control-border: #95866f;
 }
 .holiday-planner-page [hidden] { display: none !important; }
-.holiday-planner-page .home-menu-toggle:focus-visible ~ .home-header-end .home-menu { outline: 2px solid #a89268; outline-offset: -2px; }
+body.holiday-planner-page .home-header { display: flex; justify-content: space-between; }
+.holiday-planner-page .home-header-end { display: flex; }
+.collection-aero body.holiday-planner-page .home-header-end > .planner-home-link {
+  width: auto;
+  padding-inline: 12px;
+}
 .planner-skip { position: fixed; left: 20px; top: -100px; padding: 12px; background: #fff; z-index: 200; }
 .planner-skip:focus { top: 16px; }
 .planner-main {
@@ -304,7 +309,6 @@ body.holiday-planner-page {
 .planner-text textarea { width: 100%; max-width: 100%; min-height: 350px; border: 1px solid #d4d5db; padding: 16px; font: 400 13px/1.8 var(--body-font); color: #303442; background: #fff; resize: vertical; }
 .planner-text button { margin-top: 12px; }
 .planner-footer { display: flex; align-items: center; justify-content: space-between; font-size: 12px; }
-.planner-footer > a:not(.amore-logo) { display: inline-flex; align-items: center; min-height: 44px; text-decoration: underline; text-underline-offset: 4px; }
 .planner-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
 .holiday-planner-page :is(a, button, input, select, textarea):focus-visible { outline: 2px solid #a89268; outline-offset: 4px; }
 .holiday-planner-page :is(.planner-event-edit, summary):focus-visible { outline: 2px solid #806b43; outline-offset: 4px; }

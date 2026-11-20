@@ -48,6 +48,7 @@ const draftCity = 'mozhaysk';
 const { token: bookingToken, scope: bookingScope, handoff: bookingHandoff } = bookingContext();
 const plannedStay = readPlannedStay();
 const staySelection = bookingHandoff || plannedStay;
+const stayGuestCount = () => staySelection.adults + (staySelection.children || 0);
 const bookingStatus = 'Даты, хаусбот и число гостей взяты из бронирования. Уточните состав компании.';
 const bookingFallbackStatus = 'Чтобы перенести данные бронирования, откройте планировщик со страницы подтверждения.';
 let draftScope = draftCity;
@@ -116,12 +117,19 @@ function readPlannedStay() {
   if (query.get('city') !== draftCity || query.get('from') !== 'hotel' || query.get('selection') !== 'stay') return;
   const stay = Object.fromEntries(stepFields.dates.map(field => [field, query.get(field) || '']));
   const lodging = query.get('lodging');
-  const adults = Number(query.get('guests'));
+  const guests = Number(query.get('guests'));
   const capacity = holidayLodgings.find(room => room.id === lodging)?.capacity;
-  if (!capacity || !Number.isInteger(adults) || adults < 1 || adults > capacity || stay.endDate <= stay.startDate
+  if (!capacity || !Number.isInteger(guests) || guests < 1 || guests > capacity || stay.endDate <= stay.startDate
     || !isQuarterHour(stay.arrival) || !isQuarterHour(stay.departure)
     || Object.keys(validateTripDates(stay)).length) return;
-  return { ...stay, lodging, adults };
+  const party = new URLSearchParams(location.hash.slice(1));
+  const adults = Number(party.get('partyAdults'));
+  const ages = party.getAll('partyAge');
+  if (Number.isInteger(adults) && adults >= 1 && ages.length > 0 && ages.length <= 10
+    && adults + ages.length === guests && ages.every(age => /^(?:[0-9]|1[0-7])$/.test(age))) {
+    return { ...stay, lodging, adults, children: ages.length, ages: ages.map(Number) };
+  }
+  return { ...stay, lodging, adults: guests };
 }
 
 function bookingContext() {
@@ -171,7 +179,7 @@ function bookingDefaults() {
 
 function matchesStaySelection() {
   return staySelection && answers.startDate === staySelection.startDate && answers.endDate === staySelection.endDate
-    && answers.lodging === staySelection.lodging && (!Number.isFinite(guestCount()) || guestCount() === staySelection.adults);
+    && answers.lodging === staySelection.lodging && (!Number.isFinite(guestCount()) || guestCount() === stayGuestCount());
 }
 
 function canUseCompactStay() {
@@ -227,12 +235,12 @@ function stayPartyMarkup() {
   return `<div class="planner-note planner-booking-summary">
     <strong>${bookingHandoff ? 'Из бронирования' : 'Выбранное размещение'}</strong>
     <div>${esc(dateLabel(answers.startDate))} — ${esc(dateLabel(answers.endDate))} · ${esc(lodgingLabel())}</div>
-    <div>Гостей · ${staySelection.adults}</div>
+    <div>Гостей · ${stayGuestCount()}</div>
     <div>Время для плана · ${esc(answers.arrival)}–${esc(answers.departure)} по Москве</div>
     <div class="planner-booking-actions">${bookingEditButtons()}</div>
   </div>
   <div class="planner-fields">
-    ${field('children', 'Дети до 18 лет', 'number', answers.children, `min="0" max="${Math.min(10, staySelection.adults - 1)}" step="1" inputmode="numeric" required`)}
+    ${field('children', 'Дети до 18 лет', 'number', answers.children, `min="0" max="${Math.min(10, stayGuestCount() - 1)}" step="1" inputmode="numeric" required`)}
     <p class="planner-help" aria-live="polite">Взрослые · <span data-booked-adults>${Number.isInteger(answers.adults) && answers.adults > 0 ? answers.adults : '—'}</span></p>
   </div>`;
 }
@@ -568,7 +576,7 @@ function capture() {
   for (const key of ['startDate', 'endDate', 'arrival', 'departure', 'lodging', 'familyMode', 'pace', 'wake', 'rest', 'outingMode', 'origin']) if (data.has(key)) answers[key] = data.get(key);
   for (const key of ['adults', 'children']) if (data.has(key)) answers[key] = data.get(key) === '' ? NaN : Number(data.get(key));
   if (current === 'party' && stayCompact && data.has('children')) {
-    answers.adults = staySelection.adults - answers.children;
+    answers.adults = stayGuestCount() - answers.children;
     form.querySelector('[data-booked-adults]').textContent = Number.isInteger(answers.adults) && answers.adults > 0 ? answers.adults : '—';
   }
   if (current === 'party') answers.ages = Array.from({ length: Math.max(0, Math.min(10, answers.children || 0)) }, (_, i) => data.has(`age-${i}`) ? data.get(`age-${i}`) === '' ? '' : Number(data.get(`age-${i}`)) : answers.ages[i] ?? '');
@@ -1724,12 +1732,25 @@ function renderModeChoice({ focus = false } = {}) {
   root.dataset.boardScreen = 'choose';
   showPlannerView('plan');
   const trip = boardRecord.answers;
-  const change = new URL('https://amora-med1ag-booking.ai-vipsup.chatgpt.site/booking');
+  const booking = new URL('https://amora-med1ag-booking.ai-vipsup.chatgpt.site/booking');
+  const change = new URL(booking);
+  const stay = new URLSearchParams({
+    plan: '1', checkIn: trip.startDate, checkOut: trip.endDate, roomId: trip.lodging, guests: trip.adults + trip.children,
+  });
+  booking.search = new URLSearchParams({ city: draftCity, step: 'checkout' });
   change.search = new URLSearchParams({
     city: draftCity, from: 'hotel-planner', startDate: trip.startDate, endDate: trip.endDate,
     arrival: trip.arrival, departure: trip.departure, room: trip.lodging, guests: trip.adults + trip.children,
   });
+  if (trip.children > 0) {
+    const party = new URLSearchParams({ partyAdults: trip.adults });
+    for (const age of trip.ages) party.append('partyAge', String(age));
+    change.hash = party.toString();
+    for (const [key, value] of party) stay.append(key, value);
+  }
+  booking.hash = stay.toString();
   const lodging = holidayLodgings.find(room => room.id === trip.lodging);
+  const partyLabel = trip.children > 0 ? `Взрослых: ${trip.adults} · Детей: ${trip.children}` : `Гостей: ${trip.adults}`;
   const modes = [
     ['manual', 'map', 'Спланировать отдых самостоятельно', 'Соберите своё расписание на доске.'],
     ['auto', 'achievement', 'Спланируй отдых за меня', 'Выберите интересы, а помощник предложит три программы.'],
@@ -1737,10 +1758,14 @@ function renderModeChoice({ focus = false } = {}) {
   ];
   root.innerHTML = `<section class="holiday-mode-choice" aria-labelledby="planner-question">
     <h2 id="planner-question" tabindex="-1">Как спланируем отдых?</h2>
-    <p class="holiday-mode-stay">${esc(dateLabel(trip.startDate))} — ${esc(dateLabel(trip.endDate))} · ${esc(lodging?.label || 'Размещение уточняется')} · Гостей: ${trip.adults + trip.children}</p>
+    <p class="holiday-mode-stay">${esc(dateLabel(trip.startDate))} — ${esc(dateLabel(trip.endDate))} · ${esc(lodging?.label || 'Размещение уточняется')} · ${esc(partyLabel)}</p>
     <div class="holiday-mode-buttons">${modes.map(([id, icon, label, detail]) => `<button type="button" class="holiday-mode-button" data-plan-mode="${id}">
       ${boardIcon(icon)}<strong>${label}</strong><span>${detail}</span>
-    </button>`).join('')}</div>
+    </button>`).join('')}
+      <a class="holiday-mode-button" href="${esc(booking.href)}" rel="noreferrer">
+        ${boardIcon('walk')}<strong>Не нужен план. Буду импровизировать</strong><span>Перейдите сразу к оформлению бронирования.</span>
+      </a>
+    </div>
     <a class="planner-edit" href="${esc(change.href)}">Изменить даты или хаусбот</a>
   </section>`;
   for (const button of root.querySelectorAll('[data-plan-mode]')) {
@@ -1793,7 +1818,7 @@ function renderFamily({ focus = true } = {}) {
   Object.assign(answers, structuredClone(previous));
   stayCompact = canUseCompactStay();
   quickEdit = undefined;
-  const selectedTotal = stayCompact ? staySelection.adults : 0;
+  const selectedTotal = stayCompact ? stayGuestCount() : 0;
   const adultChoices = familyAdultInterests.map(item => ({
     ...item, disabled: !availableInterestInStay(item.id, previous.startDate, previous.endDate),
   }));
