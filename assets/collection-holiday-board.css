@@ -32,6 +32,49 @@
 .holiday-planner-page .planner-view-switch button { color: var(--board-ink); }
 .holiday-planner-page .planner-view-switch button[aria-pressed="true"] { background: #fffdf8; border-color: var(--board-line); }
 .holiday-planner-page .planner-view-switch button:focus-visible { outline-color: var(--board-ink); }
+.holiday-planner-page .planner-view-switch[hidden],
+[data-holiday-view="choose"] :is(.holiday-board-intro, .planner-draft) { display: none; }
+.holiday-mode-choice { padding: clamp(4px, 1.4vw, 20px) 0 18px; }
+#content .holiday-mode-choice h2 { margin: 0; font-size: clamp(23px, 3vw, 36px); text-transform: none; }
+.holiday-mode-stay { margin: 8px 0 18px; color: #62513b; }
+.holiday-mode-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(12px, 2vw, 24px);
+  margin-bottom: 18px;
+}
+.holiday-mode-button {
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: 10px;
+  min-width: 0;
+  min-height: 160px;
+  padding: clamp(14px, 2.2vw, 26px);
+  border: 1px solid #c7a87c;
+  border-radius: 18px;
+  background: linear-gradient(155deg, #fffaf0, #f0dfc1);
+  box-shadow: inset 0 1px #fff, 0 4px 0 #b69368, 0 9px 18px #62472130;
+  color: var(--board-ink);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+.holiday-mode-button strong { font-size: clamp(16px, 1.65vw, 23px); line-height: 1.2; }
+.holiday-mode-button span { color: #594d40; line-height: 1.35; }
+.holiday-mode-button:hover { background: linear-gradient(155deg, #fffdf8, #efd8ab); }
+.holiday-mode-button:active { box-shadow: inset 0 2px 6px #62472140, 0 1px 0 #b69368; }
+.holiday-mode-button:focus-visible { outline: 2px solid var(--board-ink); outline-offset: 4px; }
+@media (max-width: 700px) {
+  .holiday-mode-buttons { grid-template-columns: minmax(0, 1fr); }
+  .holiday-mode-button {
+    grid-template-columns: 28px minmax(0, 1fr);
+    column-gap: 12px;
+    row-gap: 4px;
+    min-height: 0;
+  }
+  .holiday-mode-button .holiday-icon { grid-row: span 2; align-self: center; }
+}
 .holiday-board-surface {
   min-width: 0;
   background: var(--board-surface);
@@ -572,8 +615,9 @@
 .holiday-family-party .planner-fields { max-width: 480px; }
 .holiday-family-mode { margin: 16px 0 0; padding: 0; border: 0; }
 .holiday-family-mode .planner-choices { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
-.holiday-family-programmes { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; align-items: start; }
+.holiday-family-programmes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px),1fr)); gap: 16px; align-items: start; }
 .holiday-family-programme { min-inline-size: 0; }
+.holiday-family-programme[hidden] { display: none; }
 .holiday-family-programme legend { padding-inline: 7px; font-weight: 650; font-size: 1.1rem; }
 .holiday-family-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 110px), 1fr)); gap: 10px; }
 .holiday-family-options .holiday-tile { min-height: 66px; }

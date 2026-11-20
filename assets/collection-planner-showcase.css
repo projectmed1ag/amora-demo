@@ -37,45 +37,25 @@ html body.collection-aero-home[data-page="home"] #content .planner-showcase-copy
   font-size: clamp(15px, 1.4vw, 21px);
   line-height: 1.45;
 }
-.planner-showcase .planner-showcase-primary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 50px;
-  width: min(100%, 325px);
-  padding: 9px 16px;
-  border: 1px solid var(--aero-dark);
-  border-radius: var(--aero-small);
-  background: var(--aero-dark);
-  color: #fffaf0;
-  font: 650 .92rem/1.15 var(--body-font);
-  text-align: center;
-  text-decoration: none;
+.planner-showcase-benefits {
+  max-width: 42ch;
+  margin: 0;
+  padding-inline-start: 1.15em;
+  list-style: disc;
+  font-size: clamp(14px, 1.2vw, 18px);
+  line-height: 1.45;
 }
-.planner-showcase .planner-showcase-primary:hover { background: #464b5d; }
-.planner-showcase a:focus-visible { outline: 2px solid #665333; outline-offset: 3px; }
-.planner-showcase-more { grid-column: 1; grid-row: 3; }
-.planner-showcase-links {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  column-gap: 16px;
-  width: fit-content;
-  padding: 0 12px;
-  border: 1px solid #d9c5a7;
-  border-radius: 14px;
+.planner-showcase-benefits li + li { margin-block-start: 8px; }
+.planner-showcase-benefits li::marker { color: #8b6c3d; }
+.planner-showcase-more {
+  grid-column: 1;
+  grid-row: 3;
+  max-width: 38ch;
+  margin: 0;
+  color: #675949;
+  font-size: .85rem;
+  line-height: 1.4;
 }
-.planner-showcase-links a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  color: inherit;
-  font-size: .86rem;
-  font-weight: 590;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-.planner-showcase-more p { margin: 8px 0 0; max-width: 38ch; color: #675949; font-size: .85rem; line-height: 1.4; }
 .planner-showcase-film {
   --showcase-film-padding: 7px;
   position: relative;
@@ -131,8 +111,5 @@ html body.collection-aero-home[data-page="home"] #content .planner-showcase-copy
   html body.collection-aero-home[data-page="home"] main#content > .planner-showcase { border-radius: var(--aero-medium); }
   .planner-showcase-layout { padding: 15px 9px 13px; }
   .planner-showcase-copy, .planner-showcase-more { padding-inline: 4px; }
-  .planner-showcase .planner-showcase-primary { width: 100%; min-height: 44px; }
   .planner-showcase-film { --showcase-film-padding: 4px; }
-  .planner-showcase-links { width: 100%; justify-content: space-between; column-gap: 8px; padding-inline: 8px; }
-  .planner-showcase-links a { font-size: .78rem; }
 }

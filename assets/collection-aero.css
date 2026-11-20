@@ -40,13 +40,26 @@ html.collection-aero {
   justify-content: center;
   min-height: 42px;
   padding: 4px clamp(10px, 1.35vw, 20px);
-  border: 1px solid #c0b4a3;
+  border: 1px solid #c7b699;
+  border-color: #dacbac #c7b699 #978569;
   border-radius: 999px;
+  background: linear-gradient(#ffffff22, #00000012), #3c4252;
+  box-shadow: 0 5px 9px #11152288, 0 2px 3px #11152266,
+    inset 0 1px #ffffff26, inset 0 -2px #13172469;
   font-family: var(--body-font);
   letter-spacing: 0;
   text-transform: none;
+  transition: background-color 160ms ease, box-shadow 160ms ease;
 }
-.collection-aero body .aero-hotels-link:hover { background: #ffffff18; }
+@media (hover: hover) and (pointer: fine) {
+  .collection-aero body .home-header-end > .aero-hotels-link:hover {
+    background-color: #50586a;
+  }
+}
+.collection-aero body .home-header-end > .aero-hotels-link:active {
+  background-color: #333949;
+  box-shadow: 0 1px 3px #11152288, inset 0 2px 4px #11152288;
+}
 .collection-aero body .home-header .refine-booking { display: none; }
 @media (max-width: 1099px) {
   .collection-aero body .home-header-end > .aero-hotels-link {
@@ -177,6 +190,51 @@ html.collection-aero {
     font: 400 clamp(14px, 1.18vw, 18px)/1.25 var(--body-font);
     letter-spacing: 0;
     text-transform: none;
+  }
+}
+
+@media (min-width: 1100px) {
+  .collection-aero body .home-header:has(> .home-nav--document-tabs) {
+    --tab-header-inset: 18px;
+    padding-block: var(--tab-header-inset);
+    border-bottom-color: var(--aero-line);
+  }
+  .collection-aero body .home-header > .home-nav--document-tabs {
+    align-self: end;
+    align-items: end;
+    gap: clamp(4px, .45vw, 8px);
+    margin-block-end: calc(-1px - var(--tab-header-inset));
+    clip-path: inset(-16px -12px 0);
+  }
+  .collection-aero body .home-header .home-nav--document-tabs > a:not(.mobile-hotels-link) {
+    padding-inline: clamp(7px, calc(1.5vw - 9px), 16px);
+    border: 1px solid #ffffff26;
+    border-bottom-color: var(--aero-line);
+    border-radius: 12px 12px 0 0;
+    background: linear-gradient(#4a5061, #363b4b);
+    box-shadow: 0 -3px 9px #14182455, inset 0 1px #ffffff1f;
+    text-decoration: none;
+  }
+  .collection-aero body .home-header .home-nav--document-tabs > a:not([aria-current]):hover {
+    background: linear-gradient(#5a6173, #42485a);
+  }
+  .collection-aero body.collection-site-page .home-header .home-nav--document-tabs > a[aria-current="page"] {
+    position: relative;
+    z-index: 1;
+    min-height: 50px;
+    border-color: var(--aero-paper);
+    background: linear-gradient(var(--aero-surface), var(--aero-paper) 80%);
+    box-shadow: 0 -4px 12px #171a2580, 0 -1px 3px #171a2540, inset 0 1px #fff;
+    color: var(--aero-dark);
+  }
+  .collection-aero body .home-header .home-nav--document-tabs > a:focus-visible {
+    outline-offset: -5px;
+  }
+}
+
+@media (min-width: 1100px) and (max-width: 1599px) {
+  .collection-aero body .home-header:has(> .home-nav--document-tabs) {
+    --tab-header-inset: 14px;
   }
 }
 

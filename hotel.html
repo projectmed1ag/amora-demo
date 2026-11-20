@@ -19,7 +19,7 @@
       <link rel="preload" href="./fonts/tiktok-sans-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="./assets/collection-refinement.css?v=20261118-headings-1">
     <link rel="stylesheet" href="./assets/collection-refinement-pages.css?v=20261118-headings-1">
-    <link rel="stylesheet" href="./assets/collection-navigation.css?v=20261104-mobile-header-navigation-1">
+    <link rel="stylesheet" href="./assets/collection-navigation.css?v=20261120-bottom-document-tabs-1">
     <script type="module" src="./assets/collection-refinement.js?v=20261118-home-header-1"></script>
       <link rel="stylesheet" href="./assets/collection-page-motion.css?v=20261027-heading-reveal-1">
     <script type="module" src="./assets/collection-page-motion.js?v=20261027-heading-reveal-1"></script>
@@ -29,18 +29,18 @@
   <link rel="icon" type="image/svg+xml" sizes="any" href="./assets/favicon.svg?v=20261105-emblem-1">
   <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon-32.png?v=20261105-emblem-1">
   <link rel="apple-touch-icon" sizes="180x180" href="./assets/apple-touch-icon.png?v=20261105-emblem-1">
-    <link rel="stylesheet" href="./assets/collection-aero.css?v=20261119-mobile-hotels-1">
-    <link rel="stylesheet" href="./assets/collection-aero-home.css?v=20261119-mobile-hotels-1">
-    <script type="module" src="./assets/collection-aero-home.js?v=20261119-quarter-hour-1"></script>
+    <link rel="stylesheet" href="./assets/collection-aero.css?v=20261120-raised-hotels-1">
+    <link rel="stylesheet" href="./assets/collection-aero-home.css?v=20261120-glass-planner-1">
+    <script type="module" src="./assets/collection-aero-home.js?v=20261120-booking-planner-1"></script>
     <link rel="stylesheet" href="./assets/collection-body-copy.css?v=20261118-2">
-<link rel="stylesheet" href="./assets/collection-planner-showcase.css?v=20261119-inline-video-3">
+<link rel="stylesheet" href="./assets/collection-planner-showcase.css?v=20261120-benefits-1">
 <script type="module" src="./assets/collection-planner-showcase.js?v=20261119-inline-video-2"></script>
 </head>
   <body data-page="home" class="collection-home-page collection-site-page collection-aero-home" data-collection-static="">
     <a class="skip-link" href="#content">К содержанию</a>
     <header class="home-header" data-header="" data-no-booking-link>
 <a class="home-brand amore-logo" href="./hotel.html?city=mozhaysk" aria-label="A’MORE Collection — на главную"><span class="brand-name">A’MORE</span><span class="brand-collection">COLLECTION</span></a>
-<input class="home-menu-toggle" id="home-menu-toggle" type="checkbox" aria-label="Меню разделов" aria-controls="home-nav"><nav class="home-nav" id="home-nav" aria-label="Разделы сайта">
+<input class="home-menu-toggle" id="home-menu-toggle" type="checkbox" aria-label="Меню разделов" aria-controls="home-nav"><nav class="home-nav home-nav--document-tabs" id="home-nav" aria-label="Разделы сайта">
 <a href="./hotel.html?city=mozhaysk" aria-current="page">Главная</a>
 <a href="./rooms.html?city=mozhaysk">Хаусботы</a>
 <a href="./restaurant.html?city=mozhaysk">Ресторан</a>
@@ -64,10 +64,11 @@
     <h1 id="home-title">Отдых у воды</h1>
     <p>Можайское водохранилище</p>
   </div>
-  <form class="aero-planner" action="./holiday-planner.html" aria-labelledby="aero-planner-title" novalidate>
-    <h2 id="aero-planner-title">Планировщик отдыха</h2>
+  <form class="aero-planner" action="https://amora-med1ag-booking.ai-vipsup.chatgpt.site/booking" aria-labelledby="aero-planner-title" novalidate>
+    <h2 id="aero-planner-title">Спланируйте свой отдых до мелочей</h2>
     <input type="hidden" name="city" value="mozhaysk">
-    <input type="hidden" name="from" value="hotel">
+    <input type="hidden" name="room" value="standard">
+    <input type="hidden" name="from" value="hotel-planner">
     <div class="aero-planner-fields">
       <label for="aero-start"><span>Дата приезда</span><input id="aero-start" name="startDate" type="date" required></label>
       <label for="aero-end"><span>Дата отъезда</span><input id="aero-end" name="endDate" type="date" required></label>
@@ -82,8 +83,12 @@
   <div class="planner-showcase-layout">
     <div class="planner-showcase-copy">
       <h2 id="planner-showcase-title">Спланируйте свой отдых</h2>
-      <p>Расставьте занятия между завтраком, обедом и ужином. Посмотрите на карте, куда идти дальше, и отмечайте то, что уже успели.</p>
-      <a class="planner-showcase-primary" href="./holiday-planner.html?city=mozhaysk&amp;from=hotel">Открыть план отдыха</a>
+      <p>Составьте расписание заранее, чтобы на месте больше времени осталось на отдых.</p>
+      <ul class="planner-showcase-benefits">
+        <li><strong>Весь день перед глазами.</strong> Расставьте прогулки, баню и другие занятия между приёмами пищи.</li>
+        <li><strong>Проще сориентироваться.</strong> На схеме видно, где находятся хаусботы, прокат и баня.</li>
+        <li><strong>Планы легко менять.</strong> Переносите занятия, если хочется задержаться, и отмечайте, что уже успели.</li>
+      </ul>
     </div>
     <figure class="planner-showcase-film">
       <video id="planner-showcase-video" class="planner-showcase-video" width="1000" height="800" muted loop playsinline
@@ -95,13 +100,7 @@
       <button type="button" class="planner-showcase-playback" aria-controls="planner-showcase-video" hidden><span>Смотреть ролик</span></button>
       <p id="planner-showcase-transcript" hidden>В ролике прогулку, велосипед, отдых у воды и баню расставляют между приёмами пищи. Карта показывает пример пути из хаусбота к прокату и бане. За первое выполненное занятие дают «Первое впечатление», за велопрогулку — «На двух колёсах», за пешую прогулку — «По берегу», за три занятия — «День удался».</p>
     </figure>
-    <div class="planner-showcase-more">
-      <div class="planner-showcase-links">
-        <a href="./holiday-planner.html?city=mozhaysk&amp;from=hotel&amp;mode=auto">Три варианта отдыха</a>
-        <a href="./holiday-planner.html?city=mozhaysk&amp;from=hotel&amp;mode=family">Раздельный отдых</a>
-      </div>
-      <p>Готовый план можно скачать в PDF, а услуги согласовать с отелем.</p>
-    </div>
+    <p class="planner-showcase-more">Готовый план можно скачать в PDF, а услуги согласовать с отелем.</p>
   </div>
 </section>
 <nav class="aero-highlights" aria-label="Отдых в отеле">

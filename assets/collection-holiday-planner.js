@@ -1,15 +1,15 @@
 import { onsiteInterests, services, attractions, mapRoute, demoOrigin, demoOriginLabel, outingTransports, childActivityOptions } from './collection-holiday-data.js?v=20261108-route-pdf-1';
-import { breakfastNotice, buildHolidayPlan, planToText, validateAnswers, validateTripDates, addDays, dateLabel, dateNumber, clock, excursionSettings, outingDurationMinutes, availableInterestInStay, interestSeasonLabel, familyAdultInterests } from './collection-holiday-engine.js?v=20261119-quarter-hour-1';
+import { breakfastNotice, buildHolidayPlan, planToText, validateAnswers, validateTripDates, addDays, dateLabel, dateNumber, clock, excursionSettings, outingDurationMinutes, availableInterestInStay, interestSeasonLabel, familyAdultInterests } from './collection-holiday-engine.js?v=20261120-split-stay-1';
 import { holidayLodgings } from './collection-holiday-lodging.js';
 import { canEditScheduleItem, canMoveScheduleItem, scheduleReplacementOptions, applyScheduleEdit, replayScheduleEdits } from './collection-holiday-edits.js?v=20261119-quarter-hour-1';
-import { loadHolidayDraft, saveHolidayDraft, clearHolidayDraft } from './collection-holiday-draft.js?v=20261119-family-1';
+import { loadHolidayDraft, saveHolidayDraft, clearHolidayDraft } from './collection-holiday-draft.js?v=20261120-split-stay-1';
 import { mountPlanRequests } from './collection-holiday-requests.js?v=20261108-route-pdf-1';
 import { hotelEventLabels, loadHotelEvents, mountHotelEvents } from './collection-holiday-events.js?v=20261112-chat-3';
 import { destinationDateParts, destinationLocalDate } from './collection-destinations.js?v=20261024-all-hotels-1';
 import { mountHolidayChat } from './collection-holiday-chat.js?v=20261119-quarter-hour-1';
-import { activityTiles, alternativesMarkup, badgesMarkup, boardIcon, boardMark, boardPalette, boardPhoto, buildBoardAlternatives, isBoardActivity } from './collection-holiday-board.js?v=20261119-row-actions-1';
+import { activityTiles, alternativesMarkup, badgesMarkup, boardIcon, boardMark, boardPalette, boardPhoto, buildBoardAlternatives, isBoardActivity } from './collection-holiday-board.js?v=20261120-split-stay-1';
 import { hasBoardLocation, mountBoardMap } from './collection-holiday-board-map.js?v=20261119-row-actions-1';
-import { ceilQuarterHour, quarterHourOptions } from './collection-time-slots.js?v=20261119-quarter-hour-1';
+import { ceilQuarterHour, isQuarterHour, quarterHourOptions } from './collection-time-slots.js?v=20261119-quarter-hour-1';
 
 const root = document.getElementById('planner-app');
 const masthead = document.getElementById('planner-masthead');
@@ -22,7 +22,7 @@ const nowMinute = () => { const { hour, minute } = destinationDateParts(new Date
 const initialDate = addDays(today(), 1);
 const defaultAnswers = {
   startDate: initialDate, endDate: initialDate, arrival: '09:00', departure: '20:00', lodging: '',
-  adults: 2, children: 0, ages: [], childActivities: [], familyMode: 'together', adultActivity: '', pace: 'balanced', wake: '09:00', rest: '21:00',
+  adults: 2, children: 0, ages: [], childActivities: [], familyMode: 'together', adultActivity: '', secondAdultActivity: '', pace: 'balanced', wake: '09:00', rest: '21:00',
   interests: [], suggestActivities: false, services: [], preferred: Object.fromEntries(services.map(s => [s.id, s.preferred])),
   outingMode: 'stay', places: [], outings: {}, origin: demoOrigin,
   transport: 'auto',
@@ -42,13 +42,16 @@ let priorityMeals = true, marks = new Set(), boardRecord, autoRecord, selectedDa
 let boardTab = 'schedule';
 const isAutoRoute = () => new URLSearchParams(location.search).get('mode') === 'auto';
 const isFamilyRoute = () => new URLSearchParams(location.search).get('mode') === 'family';
+const isChoiceRoute = () => new URLSearchParams(location.search).get('mode') === 'choose';
 const draftBanner = document.getElementById('planner-draft');
 const draftCity = 'mozhaysk';
 const { token: bookingToken, scope: bookingScope, handoff: bookingHandoff } = bookingContext();
+const plannedStay = readPlannedStay();
+const staySelection = bookingHandoff || plannedStay;
 const bookingStatus = 'Даты, хаусбот и число гостей взяты из бронирования. Уточните состав компании.';
 const bookingFallbackStatus = 'Чтобы перенести данные бронирования, откройте планировщик со страницы подтверждения.';
 let draftScope = draftCity;
-let bookingCompact = false;
+let stayCompact = false;
 const localBookingHost = ['localhost', '127.0.0.1', '[::1]', '::1'].includes(location.hostname);
 const holidayApiBase = coordinationApiBase();
 const lodgingAvailabilityUrl = holidayApiBase
@@ -59,8 +62,8 @@ const guestCount = () => answers.adults + answers.children;
 const stayingAtHotel = () => answers.outingMode === 'stay';
 const steps = () => [
   'outings',
-  ...(!bookingCompact ? ['dates'] : []), 'party',
-  ...(!bookingCompact && overnight() ? ['lodging'] : []),
+  ...(!stayCompact ? ['dates'] : []), 'party',
+  ...(!stayCompact && overnight() ? ['lodging'] : []),
   'rhythm', ...(!stayingAtHotel() ? ['routes'] : []), 'services', 'review',
 ];
 const selectedPlaces = () => attractions.filter(place => answers.places.includes(place.id));
@@ -108,6 +111,19 @@ function validatedBookingHandoff(saved) {
   return { startDate: checkIn, endDate: checkOut, lodging: roomId, adults: guests };
 }
 
+function readPlannedStay() {
+  const query = new URLSearchParams(location.search);
+  if (query.get('city') !== draftCity || query.get('from') !== 'hotel' || query.get('selection') !== 'stay') return;
+  const stay = Object.fromEntries(stepFields.dates.map(field => [field, query.get(field) || '']));
+  const lodging = query.get('lodging');
+  const adults = Number(query.get('guests'));
+  const capacity = holidayLodgings.find(room => room.id === lodging)?.capacity;
+  if (!capacity || !Number.isInteger(adults) || adults < 1 || adults > capacity || stay.endDate <= stay.startDate
+    || !isQuarterHour(stay.arrival) || !isQuarterHour(stay.departure)
+    || Object.keys(validateTripDates(stay)).length) return;
+  return { ...stay, lodging, adults };
+}
+
 function bookingContext() {
   const url = new URL(location.href);
   if (url.searchParams.get('city') !== draftCity) return {};
@@ -153,13 +169,13 @@ function bookingDefaults() {
     ? { ...bookingHandoff, arrival: clock(nextQuarter) } : bookingHandoff;
 }
 
-function matchesBooking() {
-  return bookingHandoff && answers.startDate === bookingHandoff.startDate && answers.endDate === bookingHandoff.endDate
-    && answers.lodging === bookingHandoff.lodging && (!Number.isFinite(guestCount()) || guestCount() === bookingHandoff.adults);
+function matchesStaySelection() {
+  return staySelection && answers.startDate === staySelection.startDate && answers.endDate === staySelection.endDate
+    && answers.lodging === staySelection.lodging && (!Number.isFinite(guestCount()) || guestCount() === staySelection.adults);
 }
 
-function canUseCompactBooking() {
-  return Boolean(matchesBooking() && !Object.keys(validateAnswers(answers, today(), nowMinute())).some(key => stepFields.dates.includes(key)));
+function canUseCompactStay() {
+  return Boolean(matchesStaySelection() && !Object.keys(validateAnswers(answers, today(), nowMinute())).some(key => stepFields.dates.includes(key)));
 }
 
 function showDraftStatus(message, canReset = true) {
@@ -207,22 +223,22 @@ function lodgingEditButton() {
     ? '<button type="button" class="planner-edit" data-edit-booking="lodging">Проверить или изменить хаусбот</button>' : '';
 }
 
-function bookingPartyMarkup() {
+function stayPartyMarkup() {
   return `<div class="planner-note planner-booking-summary">
-    <strong>Из бронирования</strong>
+    <strong>${bookingHandoff ? 'Из бронирования' : 'Выбранное размещение'}</strong>
     <div>${esc(dateLabel(answers.startDate))} — ${esc(dateLabel(answers.endDate))} · ${esc(lodgingLabel())}</div>
-    <div>Гостей · ${bookingHandoff.adults}</div>
+    <div>Гостей · ${staySelection.adults}</div>
     <div>Время для плана · ${esc(answers.arrival)}–${esc(answers.departure)} по Москве</div>
     <div class="planner-booking-actions">${bookingEditButtons()}</div>
   </div>
   <div class="planner-fields">
-    ${field('children', 'Дети до 18 лет', 'number', answers.children, `min="0" max="${Math.min(10, bookingHandoff.adults - 1)}" step="1" inputmode="numeric" required`)}
+    ${field('children', 'Дети до 18 лет', 'number', answers.children, `min="0" max="${Math.min(10, staySelection.adults - 1)}" step="1" inputmode="numeric" required`)}
     <p class="planner-help" aria-live="polite">Взрослые · <span data-booked-adults>${Number.isInteger(answers.adults) && answers.adults > 0 ? answers.adults : '—'}</span></p>
   </div>`;
 }
 
 function partyMarkup() {
-  const counts = bookingCompact ? bookingPartyMarkup() : `<div class="planner-fields">
+  const counts = stayCompact ? stayPartyMarkup() : `<div class="planner-fields">
     ${field('adults', 'Взрослые', 'number', answers.adults, 'min="1" max="20" step="1" inputmode="numeric" required')}
     ${field('children', 'Дети до 18 лет', 'number', answers.children, 'min="0" max="10" step="1" inputmode="numeric" required')}
   </div>`;
@@ -540,7 +556,7 @@ function questionMarkup() {
   return `<p class="planner-help">Соберу дни без пересечений: оставлю время на дорогу, еду, сборы и свободные паузы. Если всё не поместится, покажу, что осталось за рамками программы.</p><dl class="planner-review">${summaryLines().map(([label, text, sub]) => `<div><dt>${esc(label)}</dt><dd>${esc(text)}${sub ? `<small>${esc(sub)}</small>` : ''}</dd></div>`).join('')}</dl>
     <button type="button" class="planner-edit" data-edit-outings>Изменить занятия и поездки</button>
     <button type="button" class="planner-edit" data-edit-services>Изменить услуги</button>
-    ${bookingCompact ? bookingEditButtons() : lodgingEditButton()}
+    ${stayCompact ? bookingEditButtons() : lodgingEditButton()}
     ${answers.children ? '<button type="button" class="planner-edit" data-edit-family>Изменить семейный отдых</button>' : ''}
     ${answers.children ? `<p class="planner-note">${familyModeNote()}</p>` : ''}`;
 }
@@ -551,14 +567,14 @@ function capture() {
   const data = new FormData(form);
   for (const key of ['startDate', 'endDate', 'arrival', 'departure', 'lodging', 'familyMode', 'pace', 'wake', 'rest', 'outingMode', 'origin']) if (data.has(key)) answers[key] = data.get(key);
   for (const key of ['adults', 'children']) if (data.has(key)) answers[key] = data.get(key) === '' ? NaN : Number(data.get(key));
-  if (current === 'party' && bookingCompact && data.has('children')) {
-    answers.adults = bookingHandoff.adults - answers.children;
+  if (current === 'party' && stayCompact && data.has('children')) {
+    answers.adults = staySelection.adults - answers.children;
     form.querySelector('[data-booked-adults]').textContent = Number.isInteger(answers.adults) && answers.adults > 0 ? answers.adults : '—';
   }
   if (current === 'party') answers.ages = Array.from({ length: Math.max(0, Math.min(10, answers.children || 0)) }, (_, i) => data.has(`age-${i}`) ? data.get(`age-${i}`) === '' ? '' : Number(data.get(`age-${i}`)) : answers.ages[i] ?? '');
   if (current === 'party') {
     answers.childActivities = data.getAll('childActivities').filter(id => childActivityChoices().some(item => item.id === id));
-    if (!answers.children) answers.familyMode = 'together';
+    if (!answers.children && !answers.secondAdultActivity) answers.familyMode = 'together';
   }
   if (current === 'outings') {
     answers.interests = data.getAll('interests');
@@ -650,7 +666,7 @@ function closeQuickEdit(cancelled) {
       if (!overnight() || (Number.isFinite(guestCount()) && !lodgingChoice())) answers.lodging = '';
       clearOutingDatesOutsideStay();
     }
-    bookingCompact = bookingCompact && Boolean(matchesBooking());
+    stayCompact = stayCompact && Boolean(matchesStaySelection());
   }
   if (source === 'result') {
     if (!cancelled) rebuildPlan({ alreadyPlanned: true });
@@ -751,7 +767,7 @@ function renderQuestion(focus = true) {
   const history = previousSteps();
   const stickyActions = ['lodging', 'outings', 'routes', 'services', 'review'].includes(current);
   const title = current === 'outings' && !quickEdit ? 'Выберите фишки отдыха' : current === 'party'
-    ? quickEdit ? 'Как проведём семейный отдых?' : bookingCompact ? 'Сколько из гостей — дети?' : questions.party
+    ? quickEdit ? 'Как проведём семейный отдых?' : stayCompact ? 'Сколько из гостей — дети?' : questions.party
     : questions[current];
   root.innerHTML = `<div class="planner-layout">
     <section class="planner-conversation holiday-board-surface" aria-labelledby="planner-question">
@@ -829,7 +845,7 @@ function renderQuestion(focus = true) {
     if (event.target.name === 'children' && !Object.is(oldChildCount, answers.children)) {
       document.getElementById('plan-children-details').hidden = !(answers.children > 0);
       document.getElementById('plan-ages').innerHTML = agesMarkup();
-      if (!answers.children) form.querySelector('[name="familyMode"][value="together"]').checked = true;
+      if (!answers.children && !answers.secondAdultActivity) form.querySelector('[name="familyMode"][value="together"]').checked = true;
     }
     if (event.target.name === 'children' || event.target.name.startsWith('age-')) {
       form.querySelector('[data-child-activities]').innerHTML = childActivityMarkup();
@@ -947,7 +963,9 @@ function eventMarkup(item, day, index) {
         <div class="holiday-event-label">
           <h4 tabindex="-1">${esc(title)}</h4>
           ${item.confirmation ? '<span class="holiday-event-confirm">Уточнить время и условия</span>' : ''}
-          ${item.kind === 'parallel' ? `<span class="holiday-parallel-summary">${[...item.tracks].reverse().map(track => `<span><strong>${esc(track.audience)}</strong> · ${esc(track.title)}</span>`).join('')}</span>` : ''}
+          ${item.kind === 'parallel' ? `<span class="holiday-parallel-summary">${[...item.tracks]
+            .sort((first, second) => Number(first.audience.startsWith('Дети')) - Number(second.audience.startsWith('Дети')))
+            .map(track => `<span><strong>${esc(track.audience)}</strong> · ${esc(track.title)}</span>`).join('')}</span>` : ''}
           ${trackable ? `<span class="holiday-event-done"${marked ? '' : ' hidden'}>Выполнено</span>` : ''}
         </div>
         <div class="holiday-row-actions">
@@ -1208,6 +1226,7 @@ function releasePreparedPdf() {
 
 function setBoardHeading(tab) {
   document.body.dataset.holidayView = tab;
+  viewSwitch.hidden = tab === 'choose';
   const title = { map: 'Карта отдыха', badges: 'Достижения', pick: 'Подбор отдыха', family: 'Раздельный отдых' }[tab] || 'План отдыха';
   masthead.querySelector('h1').textContent = title;
   document.title = `${title} — A’MORE Collection`;
@@ -1569,7 +1588,7 @@ function renderPlan({ scroll = true, message = '', save = true } = {}) {
         <button class="planner-button planner-button-light" data-copy>Скопировать текст</button>
         <button class="planner-edit" data-edit-outings>Изменить занятия и поездки</button>
         <button class="planner-edit" data-edit-services>Изменить услуги</button>
-        ${bookingCompact ? bookingEditButtons() : lodgingEditButton()}
+        ${stayCompact ? bookingEditButtons() : lodgingEditButton()}
       </div>
       ${lodgingResult()}
       <p class="planner-note">${format}. Время услуг и сопровождение детей подтверждаются отдельно.</p>
@@ -1699,6 +1718,49 @@ function setPlannerRoute(mode, replace = false) {
   if (url.href !== location.href) history[replace ? 'replaceState' : 'pushState'](history.state, '', url);
 }
 
+function renderModeChoice({ focus = false } = {}) {
+  releasePreparedPdf();
+  setBoardHeading('choose');
+  root.dataset.boardScreen = 'choose';
+  showPlannerView('plan');
+  const trip = boardRecord.answers;
+  const change = new URL('https://amora-med1ag-booking.ai-vipsup.chatgpt.site/booking');
+  change.search = new URLSearchParams({
+    city: draftCity, from: 'hotel-planner', startDate: trip.startDate, endDate: trip.endDate,
+    arrival: trip.arrival, departure: trip.departure, room: trip.lodging, guests: trip.adults + trip.children,
+  });
+  const lodging = holidayLodgings.find(room => room.id === trip.lodging);
+  const modes = [
+    ['manual', 'map', 'Спланировать отдых самостоятельно', 'Соберите своё расписание на доске.'],
+    ['auto', 'achievement', 'Спланируй отдых за меня', 'Выберите интересы, а помощник предложит три программы.'],
+    ['family', 'family', 'Спланировать раздельный отдых', 'Подберите разные занятия для взрослых и, если едут дети, отдельную программу для них.'],
+  ];
+  root.innerHTML = `<section class="holiday-mode-choice" aria-labelledby="planner-question">
+    <h2 id="planner-question" tabindex="-1">Как спланируем отдых?</h2>
+    <p class="holiday-mode-stay">${esc(dateLabel(trip.startDate))} — ${esc(dateLabel(trip.endDate))} · ${esc(lodging?.label || 'Размещение уточняется')} · Гостей: ${trip.adults + trip.children}</p>
+    <div class="holiday-mode-buttons">${modes.map(([id, icon, label, detail]) => `<button type="button" class="holiday-mode-button" data-plan-mode="${id}">
+      ${boardIcon(icon)}<strong>${label}</strong><span>${detail}</span>
+    </button>`).join('')}</div>
+    <a class="planner-edit" href="${esc(change.href)}">Изменить даты или хаусбот</a>
+  </section>`;
+  for (const button of root.querySelectorAll('[data-plan-mode]')) {
+    button.addEventListener('click', () => {
+      const mode = button.dataset.planMode;
+      if (mode === 'manual') returnToBoard();
+      else {
+        setPlannerRoute(mode);
+        if (mode === 'auto') showAutomatic({ resume: true });
+        else renderFamily();
+      }
+      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        root.animate?.([{ opacity: 0, transform: 'translateY(36px)' }, { opacity: 1, transform: 'translateY(0)' }],
+          { duration: 420, easing: 'cubic-bezier(.22, 1, .36, 1)' });
+      }
+    });
+  }
+  if (focus) root.querySelector('#planner-question').focus({ preventScroll: true });
+}
+
 function showAutomatic({ resume = false, focus = true } = {}) {
   const saved = autoRecord || loadHolidayDraft(`${draftScope}:auto`, defaultAnswers);
   Object.assign(answers, structuredClone(saved?.answers || boardRecord?.answers || defaultAnswers));
@@ -1706,7 +1768,7 @@ function showAutomatic({ resume = false, focus = true } = {}) {
   if (!resume && boardDates && Object.keys(validateTripDates(answers, today(), nowMinute())).length) {
     for (const field of stepFields.dates) answers[field] = boardDates[field];
   }
-  bookingCompact = canUseCompactBooking();
+  stayCompact = canUseCompactStay();
   quickEdit = undefined;
   current = resume && steps().includes(saved?.step) ? saved.step : 'outings';
   renderQuestion(focus);
@@ -1729,13 +1791,14 @@ function renderFamily({ focus = true } = {}) {
   const previous = boardRecord.answers;
   const savedEdits = boardRecord.edits;
   Object.assign(answers, structuredClone(previous));
-  bookingCompact = canUseCompactBooking();
+  stayCompact = canUseCompactStay();
   quickEdit = undefined;
-  const bookedTotal = bookingCompact ? bookingHandoff.adults : 0;
+  const selectedTotal = stayCompact ? staySelection.adults : 0;
   const adultChoices = familyAdultInterests.map(item => ({
     ...item, disabled: !availableInterestInStay(item.id, previous.startDate, previous.endDate),
   }));
   const adultChoice = adultChoices.some(item => item.id === previous.adultActivity && !item.disabled) ? previous.adultActivity : '';
+  const secondChoice = adultChoices.some(item => item.id === previous.secondAdultActivity && !item.disabled) ? previous.secondAdultActivity : 'auto';
   const childIcons = { creative: 'garden', games: 'ball-games', quest: 'learning-games', walk: 'walk' };
   const tile = (name, item, type, selected, icon = item.id) => `<label class="holiday-tile">
     <input type="${type}" name="${name}" value="${item.id}"${checked(selected)}${item.disabled ? ' disabled' : ''}>
@@ -1746,12 +1809,12 @@ function renderFamily({ focus = true } = {}) {
   showPlannerView('plan');
   renderAssistant();
   root.innerHTML = `<form class="holiday-family" novalidate aria-labelledby="planner-question">
-    <p id="planner-question" class="holiday-family-intro" tabindex="-1">Выберите занятия для взрослых и детей. Планировщик подберёт общее время для обеих программ.</p>
+    <p id="planner-question" class="holiday-family-intro" tabindex="-1">Выберите отдельные занятия для взрослых и при необходимости для детей. Планировщик подберёт общий интервал.</p>
     <div class="planner-errors" role="alert" tabindex="-1" hidden></div>
     <section class="holiday-board-surface holiday-family-party" aria-labelledby="family-party-title">
       <h2 id="family-party-title">Кто едет</h2>
-      <div class="planner-fields">${field('adults', 'Взрослые', 'number', previous.adults, `min="1" max="20" inputmode="numeric" required${bookedTotal ? ' readonly' : ''}`)}
-      ${field('children', 'Дети до 18 лет', 'number', previous.children, `min="0" max="${bookedTotal ? Math.min(10, bookedTotal - 1) : 10}" inputmode="numeric" required`)}</div>
+      <div class="planner-fields">${field('adults', 'Взрослые', 'number', previous.adults, `min="1" max="20" inputmode="numeric" required${selectedTotal ? ' readonly' : ''}`)}
+      ${field('children', 'Дети до 18 лет', 'number', previous.children, `min="0" max="${selectedTotal ? Math.min(10, selectedTotal - 1) : 10}" inputmode="numeric" required`)}</div>
       <div data-family-ages>${agesMarkup(previous)}</div>
       <fieldset class="holiday-family-mode"><legend>Формат отдыха</legend><div class="planner-choices">
         ${choice('familyMode', 'separate', 'Раздельно', '', true)}
@@ -1766,7 +1829,14 @@ function renderFamily({ focus = true } = {}) {
           ${adultChoices.map(item => tile('adultActivity', item, 'radio', item.id === adultChoice)).join('')}
         </div>
       </fieldset>
-      <fieldset class="holiday-board-surface holiday-family-programme">
+      <fieldset class="holiday-board-surface holiday-family-programme" data-family-second>
+        <legend>Для второго взрослого</legend>
+        <div class="holiday-family-options">
+          ${tile('secondAdultActivity', { id: 'auto', title: 'Подобрать занятие' }, 'radio', secondChoice === 'auto', 'achievement')}
+          ${adultChoices.map(item => tile('secondAdultActivity', item, 'radio', item.id === secondChoice)).join('')}
+        </div>
+      </fieldset>
+      <fieldset class="holiday-board-surface holiday-family-programme" data-family-children>
         <legend>Для детей</legend>
         <div class="holiday-family-options">${childActivityOptions.map(item => tile('childActivities', item, 'checkbox', previous.childActivities.includes(item.id), childIcons[item.id])).join('')}</div>
         <p class="planner-help" data-family-child-help></p>
@@ -1790,15 +1860,23 @@ function renderFamily({ focus = true } = {}) {
     const ages = readAges();
     const known = ages.filter(age => Number.isInteger(age) && age >= 0 && age <= 17);
     const separate = fields.familyMode.value === 'separate';
+    const adults = readNumber(fields.adults);
+    const withToddler = known.some(age => age < 3);
+    const second = separate && adults >= 2 && !withToddler;
     const adultPanel = form.querySelector('[data-family-adults]');
-    adultPanel.hidden = adultPanel.disabled = !separate;
+    adultPanel.hidden = adultPanel.disabled = !separate || (adults < 2 && !childCount());
+    adultPanel.querySelector('legend').textContent = second ? 'Для первого взрослого' : 'Для взрослых';
+    const secondPanel = form.querySelector('[data-family-second]');
+    secondPanel.hidden = secondPanel.disabled = !second;
+    secondPanel.querySelector('legend').textContent = adults > 2 ? 'Для остальных взрослых' : 'Для второго взрослого';
+    const childPanel = form.querySelector('[data-family-children]');
+    childPanel.hidden = childPanel.disabled = !childCount();
     for (const input of childFields) {
       const age = childActivityOptions.find(item => item.id === input.value).minAge;
       input.disabled = !known.some(value => value >= age);
       if (input.disabled) input.checked = false;
     }
     form.querySelector('[data-family-child-help]').textContent = known.length ? 'Можно выбрать несколько занятий или доверить выбор планировщику.' : 'Укажите возраст детей, чтобы выбрать подходящие занятия.';
-    const withToddler = known.some(age => age < 3);
     const support = form.querySelector('[data-family-support]');
     support.hidden = !separate || !childCount();
     support.textContent = withToddler ? (readNumber(fields.adults) > 1 ? 'С ребёнком до трёх лет один взрослый остаётся с детьми на весь интервал.' : 'Если взрослый один и ребёнку меньше трёх лет, планировщик предложит совместное занятие.') : 'Сопровождение детей аниматором нужно подтвердить у отеля на весь интервал.';
@@ -1808,7 +1886,7 @@ function renderFamily({ focus = true } = {}) {
     if (event.target === fields.children && Number.isInteger(childCount())) {
       const ages = readAges();
       if (ages.length !== childCount()) ageFields.innerHTML = agesMarkup({ children: childCount(), ages: ages.map(age => Number.isFinite(age) ? age : '') });
-      if (bookedTotal) fields.adults.value = bookedTotal - childCount();
+      if (selectedTotal) fields.adults.value = selectedTotal - childCount();
     }
     syncFamily();
   });
@@ -1817,10 +1895,11 @@ function renderFamily({ focus = true } = {}) {
     event.preventDefault();
     const data = new FormData(form);
     const next = { ...structuredClone(previous), adults: readNumber(fields.adults), children: readNumber(fields.children),
-      ages: readAges(), familyMode: data.get('familyMode'), adultActivity: data.get('adultActivity') || '', childActivities: data.getAll('childActivities') };
+      ages: readAges(), familyMode: data.get('familyMode'), adultActivity: data.get('adultActivity') || '',
+      secondAdultActivity: data.get('secondAdultActivity') || '', childActivities: data.getAll('childActivities') };
     const issues = validateAnswers(next);
-    if (next.familyMode === 'separate' && next.children === 0) issues.children = 'Добавьте хотя бы одного ребёнка для раздельного отдыха.';
-    if (bookedTotal && next.adults + next.children !== bookedTotal) issues.children = 'Число гостей должно совпадать с бронированием.';
+    if (next.familyMode === 'separate' && next.adults + next.children < 2) issues.children = 'Для раздельного отдыха нужны хотя бы два гостя.';
+    if (selectedTotal && next.adults + next.children !== selectedTotal) issues.children = 'Число взрослых и детей должно совпадать с числом гостей.';
     let result;
     if (!Object.keys(issues).length) {
       if (next.lodging && holidayLodgings.find(item => item.id === next.lodging)?.capacity < next.adults + next.children) next.lodging = '';
@@ -1842,7 +1921,7 @@ function renderFamily({ focus = true } = {}) {
     undoEdit = undefined;
     boardTab = 'schedule';
     setPlannerRoute('', true);
-    renderPlan({ message: 'Семейная программа обновлена.' });
+    renderPlan({ message: 'Программа отдыха обновлена.' });
   });
   syncFamily();
   if (focus) {
@@ -1859,7 +1938,7 @@ function returnToBoard({ replace = false, focus = true } = {}) {
   marks = new Set(record.marks);
   planEdits = [...record.edits];
   plan = quickEdit = undefined;
-  bookingCompact = canUseCompactBooking();
+  stayCompact = canUseCompactStay();
   rebuildPlan({ alreadyPlanned: true });
   showPlannerView('plan');
   renderPlan({ scroll: focus, save: false });
@@ -1900,9 +1979,10 @@ function renderAlternatives() {
 
 function restoreDraft() {
   const url = new URL(location.href);
-  const fromHome = !bookingScope && !bookingHandoff && url.searchParams.get('city') === draftCity
+  const fromHome = !plannedStay && !bookingScope && !bookingHandoff && url.searchParams.get('city') === draftCity
     && url.searchParams.get('from') === 'hotel';
   if (fromHome) draftScope = `${draftCity}:home`;
+  if (plannedStay) draftScope = `${draftCity}:stay:${Object.values(plannedStay).join(':')}`;
   const bookingDraft = bookingScope ? loadHolidayDraft(bookingScope, defaultAnswers) : null;
   if (bookingHandoff || bookingDraft) draftScope = bookingScope;
   const draft = draftScope === bookingScope ? bookingDraft : loadHolidayDraft(draftScope, defaultAnswers);
@@ -1913,7 +1993,7 @@ function restoreDraft() {
     boardRecord = draft;
     showDraftStatus('Черновик восстановлен из этого браузера.');
   } else {
-    const fresh = { ...structuredClone(defaultAnswers), ...booked, ...(incomingValid ? incoming : {}) };
+    const fresh = { ...structuredClone(defaultAnswers), ...plannedStay, ...booked, ...(incomingValid ? incoming : {}) };
     if (Object.keys(validateAnswers(fresh)).length) Object.assign(fresh, structuredClone(defaultAnswers));
     boardRecord = { answers: fresh, edits: [], marks: [], priorityMeals: true };
     if (draft && !draft.completed && !incomingValid) autoRecord = draft;
@@ -1924,7 +2004,8 @@ function restoreDraft() {
     if (bookingHandoff) showDraftStatus(bookingStatus, false);
     else if (bookingScope && draftScope === draftCity) showDraftStatus(bookingFallbackStatus, false);
   }
-  if (isAutoRoute()) showAutomatic({ resume: true, focus: false });
+  if (isChoiceRoute() && plannedStay) renderModeChoice();
+  else if (isAutoRoute()) showAutomatic({ resume: true, focus: false });
   else if (isFamilyRoute()) renderFamily({ focus: false });
   else returnToBoard({ focus: false });
 }
@@ -1957,7 +2038,7 @@ if (root) {
       showAutomatic();
       return;
     }
-    const fresh = { ...structuredClone(defaultAnswers), ...bookingDefaults() };
+    const fresh = { ...structuredClone(defaultAnswers), ...plannedStay, ...bookingDefaults() };
     boardRecord = { answers: fresh, edits: [], marks: [], priorityMeals: true };
     selectedDay = selectedMapItem = undefined;
     boardTab = 'schedule';
@@ -1967,7 +2048,8 @@ if (root) {
     returnToBoard();
   });
   window.addEventListener('popstate', () => {
-    if (isAutoRoute()) showAutomatic({ resume: true });
+    if (isChoiceRoute() && plannedStay) renderModeChoice({ focus: true });
+    else if (isAutoRoute()) showAutomatic({ resume: true });
     else if (isFamilyRoute()) renderFamily();
     else returnToBoard();
   });

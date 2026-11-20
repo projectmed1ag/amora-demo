@@ -1,5 +1,5 @@
 import { attractions, childActivityOptions, interests, outingTransports, services } from './collection-holiday-data.js?v=20261108-route-pdf-1';
-import { dateNumber, minutes, familyAdultInterests } from './collection-holiday-engine.js?v=20261119-family-1';
+import { dateNumber, minutes, familyAdultInterests } from './collection-holiday-engine.js?v=20261120-split-stay-1';
 import { isHotelEventEdit } from './collection-holiday-edits.js?v=20261108-route-pdf-1';
 import { holidayLodgings } from './collection-holiday-lodging.js';
 
@@ -11,6 +11,7 @@ const choices = {
   lodging: ['', ...holidayLodgings.map(room => room.id)],
   familyMode: ['together', 'separate'],
   adultActivity: ['', ...familyAdultInterests.map(item => item.id)],
+  secondAdultActivity: ['', 'auto', ...familyAdultInterests.map(item => item.id)],
   pace: ['calm', 'balanced', 'active'],
   outingMode: ['stay', 'visit'],
   transport: Object.keys(outingTransports),

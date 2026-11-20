@@ -35,29 +35,31 @@ html body.collection-aero-home #content .aero-hero-copy h1 {
 }
 .aero-hero-copy p { margin: 8px 0 0; font: 400 clamp(17px, 2vw, 28px)/1.25 var(--body-font); }
 
-.aero-planner {
+html.collection-aero body[data-page="home"] #content .aero-planner {
   color: #29251d;
-  background: #eeeadf;
-  border: 1px solid #fffbece0;
+  background: #f5edde;
+  border: 1px solid #e2c38e9e;
+  border-color: #fff0d5d9 #e2c38ea6 #c7a676b3;
   border-radius: 28px;
   padding: clamp(14px, 2.4vw, 32px);
   margin-inline: clamp(0px, 1vw, 16px);
-  box-shadow: inset 0 1px 0 #ffffff6b, 0 10px 28px #19201524;
+  box-shadow: inset 0 1px #ffffffd9, inset 0 -1px #94764e34,
+    0 2px 5px #252a2440, 0 20px 42px -12px #1821209c;
 }
 @supports ((backdrop-filter: blur(18px)) or (-webkit-backdrop-filter: blur(18px))) {
-  .aero-planner {
-    background: #f5efe0ad;
-    -webkit-backdrop-filter: blur(18px) saturate(1.12);
-    backdrop-filter: blur(18px) saturate(1.12);
+  html.collection-aero body[data-page="home"] #content .aero-planner {
+    background: linear-gradient(145deg, #fff9e7c7, #f7eace9e 55%, #f9eedad1);
+    -webkit-backdrop-filter: blur(11px) saturate(1.14);
+    backdrop-filter: blur(11px) saturate(1.14);
   }
 }
 html body.collection-aero-home #content .aero-planner h2 {
-  margin: 0 0 14px;
+  margin: 0 0 16px;
   color: inherit;
-  font: 700 calc(clamp(24px, 2.55vw, 37px) * .5)/1.13 var(--display-font);
-  font-stretch: 75%;
-  letter-spacing: .005em;
+  font: 700 clamp(23px, 3.2vw, 36px)/1.1 var(--body-font);
+  letter-spacing: -.025em;
   text-transform: none;
+  text-wrap: balance;
 }
 .aero-planner-fields { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)) auto; gap: clamp(8px, 1.2vw, 18px); }
 .aero-planner-fields label {
@@ -67,7 +69,8 @@ html body.collection-aero-home #content .aero-planner h2 {
   min-height: 61px;
   padding: 8px 12px;
   border-radius: 13px;
-  background: var(--aero-field);
+  background: linear-gradient(160deg, #fffaf1f2, #f8f1e5dc);
+  box-shadow: inset 0 1px #ffffffb3, inset 0 -1px #8e745e26, 0 3px 9px #4738241a;
   font-size: 13px;
   font-weight: 600;
   line-height: 1.3;
@@ -92,15 +95,18 @@ html body.collection-aero-home #content .aero-planner h2 {
 .aero-planner-fields button {
   min-height: 52px;
   padding: 10px clamp(12px, 1.55vw, 24px);
-  border: 1px solid #f6efdc;
+  border: 1px solid #a3773e;
+  border-top-color: #e9c78a;
   border-radius: 14px;
-  background: var(--aero-action);
-  color: #fff;
+  background: linear-gradient(#fff6db4d, #8b54141a), #e1b56b;
+  box-shadow: 0 4px 10px #714b2938, inset 0 1px #fff6dc99;
+  color: #302617;
   cursor: pointer;
-  font: 400 clamp(17px, 1.5vw, 22px)/1.2 var(--body-font);
+  font: 650 clamp(17px, 1.5vw, 22px)/1.2 var(--body-font);
 }
-.aero-planner-fields button:hover { background: var(--aero-action-hover); }
-.aero-planner-fields button:focus-visible { outline: 2px solid #273218; outline-offset: 2px; }
+.aero-planner-fields button:hover { background-color: #edc481; }
+.aero-planner-fields button:active { box-shadow: inset 0 2px 4px #714b294d; }
+.aero-planner-fields button:focus-visible { outline: 2px solid #53391d; outline-offset: 3px; }
 .aero-planner-error {
   width: fit-content;
   margin-top: 12px;
@@ -138,7 +144,11 @@ html body.collection-aero-home #content .aero-planner h2 {
   .aero-panorama::after { background: linear-gradient(0deg, #182419bb, transparent 76%); }
   .aero-hero-copy { display: grid; align-content: end; min-height: clamp(218px, calc(61vw - 64px), 311px); padding: 20px 9px 16px; }
   html body.collection-aero-home #content .aero-hero-copy h1 { font-size: calc(clamp(39px, 9.6vw, 62px) * .5); }
-  .aero-planner { margin-inline: 0; border-radius: 22px; padding: 13px; }
+  html.collection-aero body[data-page="home"] #content .aero-planner {
+    margin-inline: 0;
+    border-radius: 22px;
+    padding: 13px;
+  }
   .aero-planner-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .aero-planner-fields label { padding-inline: 8px; }
   .aero-highlights { grid-template-columns: 1fr; gap: 23px; }

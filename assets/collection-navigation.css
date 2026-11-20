@@ -107,3 +107,52 @@ html:has(body.has-page-navigation) { scroll-padding-bottom: calc(96px + env(safe
   .section-navigation { grid-template-columns: 44px minmax(0, 1fr) 44px; gap: 6px; padding-inline: max(8px, env(safe-area-inset-left, 0px)) max(8px, env(safe-area-inset-right, 0px)); font-size: 13px; }
   .section-navigation-arrow { width: 44px; }
 }
+
+@media (max-width: 1099px) {
+  .collection-aero[data-city='mozhaysk'] .page-navigation {
+    align-items: start;
+    padding-block: 0 calc(7px + env(safe-area-inset-bottom, 0px));
+    border-top: 0;
+    /* Carry the page color to the selected tab over photos and cards. */
+    background: linear-gradient(var(--aero-paper) 4px, transparent 4px),
+      linear-gradient(#303442, #292d39);
+  }
+  .collection-aero[data-city='mozhaysk'] .page-navigation-links {
+    align-items: start;
+    gap: 6px;
+    padding: 0 10px 9px;
+    mask-image: linear-gradient(to right, transparent, #000 9px, #000 calc(100% - 9px), transparent);
+  }
+  .collection-aero[data-city='mozhaysk'] .page-navigation-link {
+    min-height: 44px;
+    margin-block-start: 4px;
+    padding-inline: 11px;
+    border: 1px solid #ffffff26;
+    border-top: 0;
+    border-radius: 0 0 10px 10px;
+    background: linear-gradient(#363b4b, #4a5061);
+    box-shadow: 0 3px 7px #14182480, inset 0 -1px #ffffff1f;
+    color: #fff;
+    text-decoration: none;
+  }
+  .collection-aero[data-city='mozhaysk'] .page-navigation-link[aria-current='page'] {
+    min-height: 48px;
+    margin-block-start: 0;
+    border-color: var(--aero-paper);
+    background: linear-gradient(var(--aero-paper) 10%, var(--aero-surface));
+    box-shadow: 0 4px 10px #171a2580, 0 1px 3px #171a2555, inset 0 -1px #fff;
+    color: var(--aero-dark);
+    font-weight: 600;
+  }
+  .collection-aero[data-city='mozhaysk'] .page-navigation .section-navigation-arrow {
+    margin-block-start: 4px;
+    color: #f8f2e9;
+  }
+  .collection-aero[data-city='mozhaysk'] .page-navigation .section-navigation-arrow[aria-disabled='true'] {
+    color: #9a9dab;
+  }
+  .collection-aero[data-city='mozhaysk'] .page-navigation a:focus-visible {
+    outline-color: currentColor;
+    outline-offset: -4px;
+  }
+}

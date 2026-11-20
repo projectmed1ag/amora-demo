@@ -95,6 +95,9 @@ export function validateAnswers(a, today = '', currentMinute = -1) {
   if (!['calm', 'balanced', 'active'].includes(a.pace)) errors.pace = 'Выберите желаемый темп.';
   if (!['together', 'separate'].includes(a.familyMode)) errors.familyMode = 'Выберите формат семейного отдыха.';
   if (a.adultActivity && !familyAdultInterests.some(item => item.id === a.adultActivity)) errors.adultActivity = 'Выберите занятие для взрослых из списка.';
+  if (a.secondAdultActivity && a.secondAdultActivity !== 'auto' && !familyAdultInterests.some(item => item.id === a.secondAdultActivity)) {
+    errors.secondAdultActivity = 'Выберите занятие для второго взрослого из списка.';
+  }
   if (a.interests != null && (!Array.isArray(a.interests) || a.interests.some(id => id !== 'sights' && !interestCatalog.has(id)))) errors.interests = 'Проверьте выбранные занятия.';
   if (a.outingMode != null && !['stay', 'visit'].includes(a.outingMode)) errors.outingMode = 'Выберите отдых на территории или выезды к достопримечательностям.';
   if (!Number.isFinite(minutes(a.wake)) || !Number.isFinite(minutes(a.rest)) || minutes(a.rest) - minutes(a.wake) < 120) errors.wake = 'Между началом дня и вечерним отдыхом должно быть хотя бы 2 часа.';
@@ -205,7 +208,7 @@ function activity(id, a) {
     route: demoLocalRoute(id), routeLabel: id === 'bike' ? 'Пример веломаршрута' : 'Пример пешего маршрута',
   };
   if (id === 'buggy' && a.children) {
-    if (canSplitFamily(a) && !a.adultActivity) return parallelActivity(a, suggestion, 'Багги для взрослых и детская программа');
+    if (canSplitFamily(a) && !a.adultActivity && !a.secondAdultActivity) return parallelActivity(a, suggestion, 'Багги для взрослых и детская программа');
     return { ...suggestion, title: 'Семейный выезд на багги — по согласованию', detail: `${suggestion.detail} Сначала подтвердите допустимый возраст и состав семейного экипажа. Пока условия не подтверждены, используйте этот интервал для совместной прогулки, без поездки на багги.` };
   }
   return suggestion;
@@ -247,7 +250,7 @@ function canSplitFamily(a) {
   return a.children > 0 && a.familyMode === 'separate' && (a.adults >= 2 || a.ages.every(age => age >= 3));
 }
 
-function parallelActivity(a, adult, title = 'Параллельная программа для детей и взрослых') {
+function parallelActivity(a, adult, title = 'Параллельная программа для детей и взрослых', secondAdult) {
   const withParent = a.ages.some(age => age < 3);
   const chosen = a.childActivities?.length === 1 && childActivityOptions.find(option =>
     option.id === a.childActivities[0] && a.ages.every(age => age >= option.minAge));
@@ -257,16 +260,21 @@ function parallelActivity(a, adult, title = 'Параллельная прогр
     detail: childrenProgramme(a),
     page: 'leisure-children.html',
   };
+  const adults = number => a.adults === 2 ? `Взрослый ${number}` : number === 1 ? 'Первый взрослый' : 'Остальные взрослые';
+  const adultTracks = secondAdult
+    ? [{ ...adult, audience: adults(1) }, { ...secondAdult, audience: adults(2) }]
+    : [{ ...adult, audience: withParent ? 'Остальные взрослые' : 'Взрослые' }];
   return {
     kind: 'parallel',
-    title,
-    duration: adult.duration,
-    detail: withParent
+    title: a.children ? title : 'Раздельная программа для взрослых',
+    duration: Math.max(adult.duration, secondAdult?.duration || 0),
+    detail: !a.children ? 'У каждого своя программа в один и тот же интервал. Договоритесь, где встретитесь после занятий.'
+      : withParent
       ? 'Один взрослый остаётся со всеми детьми на весь интервал. Остальные взрослые занимаются своей программой и возвращаются к указанному времени.'
       : 'Занятия идут одновременно, если аниматор подтвердил сопровождение на весь интервал. Заложите время на встречу с аниматором до и после занятия. Взрослые остаются на связи.',
-    tracks: [child, { ...adult, audience: withParent ? 'Остальные взрослые' : 'Взрослые' }],
-    fallback: 'Если сопровождение или выбранное занятие не подтверждено, проведите этот интервал вместе: короткая прогулка и игры на территории.',
-    confirmation: [withParent ? '' : 'Подтвердить аниматора, условия по возрасту и сопровождение на весь интервал.', adult.confirmation].filter(Boolean).join(' '),
+    tracks: a.children ? [child, ...adultTracks] : adultTracks,
+    ...(a.children && { fallback: 'Если сопровождение или выбранное занятие не подтверждено, проведите этот интервал вместе: короткая прогулка и игры на территории.' }),
+    confirmation: [...new Set([a.children && !withParent ? 'Подтвердить аниматора, условия по возрасту и сопровождение на весь интервал.' : '', adult.confirmation, secondAdult?.confirmation].filter(Boolean))].join(' '),
   };
 }
 
@@ -447,9 +455,23 @@ export function buildHolidayPlan(a, { today = '', currentMinute = -1, priorityMe
   }
 
   // A selected buggy ride can be the adult programme in the same block.
-  const splitBuggy = separate && !a.adultActivity && recurring.includes('buggy');
+  const separateAdults = a.familyMode === 'separate' && a.adults >= 2
+    && (!a.children || (a.secondAdultActivity && a.ages.every(age => age >= 3)));
+  const splitBuggy = separate && !a.adultActivity && !a.secondAdultActivity && !separateAdults && recurring.includes('buggy');
   if (splitBuggy) placeInterest('buggy');
-  if (a.children) {
+  if (separateAdults) {
+    const separateTitle = a.children ? 'Параллельная программа для детей и взрослых' : 'Раздельная программа для взрослых';
+    const secondChoice = a.secondAdultActivity && a.secondAdultActivity !== 'auto' ? a.secondAdultActivity : '';
+    for (const day of days) {
+      const adult = a.adultActivity ? createInterestItem(a.adultActivity, day.date, a) : adultBreak(a);
+      const second = secondChoice ? createInterestItem(secondChoice, day.date, a)
+        : { title: 'Свободное время для отдыха', duration: 45, detail: 'Отдохните в своём темпе у воды или в хаусботе.' };
+      if (adult && second) insert(day, parallelActivity(a, adult, separateTitle, second), 11 * 60, 9 * 60, 18 * 60);
+    }
+    if (!days.some(day => day.items.some(item => item.kind === 'parallel'))) {
+      unplaced.push({ id: 'parallel', title: separateTitle, reason: 'Занятия нужно разместить в одном свободном интервале. Попробуйте другие занятия или измените время отдыха.' });
+    }
+  } else if (a.children) {
     const chosenAdult = separate && a.adultActivity;
     const item = separate ? parallelActivity(a, adultBreak(a)) : familyActivity(a);
     const shortBreak = { title: 'Короткая передышка', duration: 30, detail: 'Отдохните рядом с местом встречи с детьми.' };
