@@ -1,12 +1,11 @@
 .holiday-planner-page {
-  --board-paper: #faf4e9;
   --board-surface: #fffdf8;
   --board-line: #e1d2bb;
   --board-tan: #bb8e53;
   --board-ink: #303442;
   --board-green: #38574c;
   --board-shadow: 0 16px 34px #5a40271c, 0 4px 8px #5a402717;
-  background: var(--board-paper);
+  background: var(--aero-paper);
 }
 .holiday-planner-page .planner-main { width: min(calc(100% - 2 * var(--planner-gutter)), 1280px); }
 .holiday-planner-page .planner-masthead {
@@ -171,9 +170,145 @@
 }
 .holiday-day-tabs button:hover { background: #fff7e9; }
 .holiday-day-tabs button:focus-visible { outline: 2px solid var(--board-ink); outline-offset: -3px; }
+.holiday-scope-tabs button {
+  min-width: 0;
+  min-height: 44px;
+  max-width: min(100%, 22rem);
+  align-items: center;
+  overflow-wrap: anywhere;
+  font-size: .88rem;
+  font-weight: 650;
+}
+.holiday-guest-tabs button { background: #fff4e3; }
+.holiday-guest-settings { margin: 0 0 14px; padding: 0 clamp(12px, 2vw, 22px); }
+.holiday-guest-settings[open] { padding-bottom: 16px; }
+.holiday-guest-settings > summary { min-height: 44px; padding: 12px 0; font-weight: 650; cursor: pointer; }
+.holiday-guest-roster { max-width: 620px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--board-line); }
+.holiday-guest-roster .planner-button { margin-top: 10px; min-height: 44px; border-color: var(--board-line); border-radius: 12px; }
+.holiday-guest-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 9.25rem), 1fr));
+  gap: 12px;
+  max-width: 735px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.planner-guest-cards { margin-bottom: 20px; }
+@media (min-width: 961px) {
+  .holiday-guest-roster { display: none; }
+  .holiday-guest-cards { display: flex; flex-wrap: wrap; justify-content: center; margin-inline: auto; }
+  .holiday-guest-cards > li { flex: 0 0 calc((100% - 36px) / 4); min-width: 0; }
+}
+.holiday-guest-card {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 8px;
+  min-width: 0;
+  padding: 12px 10px;
+  border: 1px solid var(--board-line);
+  border-radius: 14px;
+  background: linear-gradient(160deg, #fffdf8, #f6ebd9);
+  box-shadow: inset 0 1px #fff, 0 3px 7px #5a40271a;
+}
+.holiday-guest-figure {
+  display: grid;
+  place-items: center;
+  justify-self: center;
+  width: 48px;
+  height: 48px;
+  border: 1px solid #d8ba8f;
+  border-radius: 50%;
+  background: #f4e3c7;
+  color: #5a4027;
+}
+.holiday-guest-figure svg { width: 29px; height: 29px; }
+.holiday-guest-card[data-guest-type="child"] .holiday-guest-figure {
+  border-color: #c7cbb9;
+  background: #e9eddd;
+  color: var(--board-green);
+}
+.holiday-guest-card[data-guest-type="child"] .holiday-guest-figure svg { width: 23px; height: 23px; }
+.holiday-guest-caption { display: grid; align-content: start; gap: 3px; color: var(--board-ink); text-align: center; overflow-wrap: anywhere; }
+.holiday-guest-caption strong { font-size: .95rem; }
+.holiday-guest-caption span { font-size: .8rem; }
+.holiday-guest-pick { width: 100%; height: 100%; color: var(--board-ink); font: inherit; }
+.holiday-guest-pick:enabled {
+  border-color: #729877;
+  box-shadow: 0 0 0 3px #a6c7a195, 0 3px 8px #456e3e38;
+  cursor: pointer;
+}
+.holiday-guest-pick[aria-pressed="true"] {
+  border-color: #38574c;
+  background: #e1efdb;
+  box-shadow: 0 0 0 3px #7ba779, 0 3px 8px #456e3e38;
+}
+.holiday-guest-pick[aria-pressed="true"] .holiday-guest-figure {
+  border-color: #729877;
+  background: #cbdfc4;
+  color: var(--board-green);
+}
+.holiday-guest-pick:focus-visible { outline: 2px solid #38574c; outline-offset: -5px; }
+.holiday-joint-card, .holiday-joint-add {
+  width: 100%;
+  height: 100%;
+  min-height: 110px;
+  align-content: center;
+  justify-items: center;
+  grid-template-rows: auto auto;
+  color: var(--board-ink);
+  font: inherit;
+  text-align: center;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+.holiday-joint-entry { position: relative; }
+.holiday-joint-card { padding-top: 42px; }
+.holiday-joint-card span { width: 100%; font-size: .84rem; }
+.holiday-joint-card[aria-pressed="true"] { border-color: #94714a; background: #f5e5cb; }
+.holiday-joint-remove {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  cursor: pointer;
+}
+.holiday-joint-remove:hover { background: #e8d7bf; }
+.holiday-joint-remove .holiday-icon { width: 18px; height: 18px; }
+.holiday-joint-add { border-color: #b89b73; border-style: dashed; background: #fffaf0; }
+.holiday-joint-add .holiday-icon { width: 25px; height: 25px; }
+.holiday-joint-add:hover, .holiday-joint-add[aria-expanded="true"] { background: #f5e8d2; }
+.holiday-joint-hint { margin: 0 0 12px; color: var(--board-green); font-weight: 650; }
+.holiday-joint-picker:not([hidden]) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+.holiday-joint-picker .planner-button { min-height: 44px; border-radius: 12px; }
+.holiday-joint-picker .planner-button:disabled { opacity: .55; cursor: default; }
+.holiday-guest-roster label { display: grid; min-width: 0; gap: 4px; color: var(--board-ink); font-size: .81rem; font-weight: 600; }
+.holiday-guest-roster input {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 8px 9px;
+  border: 1px solid var(--board-line);
+  border-radius: 10px;
+  background: #fffdf8;
+  color: var(--board-ink);
+  font: 400 max(1rem, 16px)/1.35 var(--body-font);
+}
 .holiday-board-layout { display: grid; grid-template-columns: minmax(184px, .85fr) minmax(0, 1.83fr) minmax(190px, .82fr); gap: 14px; align-items: start; }
 .holiday-board-layout > * { min-width: 0; }
-.holiday-palette, .holiday-timeline, .holiday-coordination, .holiday-map, .holiday-badge-panel { padding: clamp(12px, 1.7vw, 23px); }
+.holiday-palette, .holiday-timeline, .holiday-day-section, .holiday-coordination, .holiday-map, .holiday-badge-panel { padding: clamp(12px, 1.7vw, 23px); }
 #content :is(.holiday-palette, .holiday-coordination, .holiday-map, .holiday-badge-panel) h3 { margin: 0 0 12px; font-size: clamp(18px, 2vw, 25px); }
 .holiday-palette-grid, .holiday-pick-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; }
 .holiday-tile {
@@ -211,12 +346,12 @@
 .holiday-board-tabs .holiday-icon, .holiday-event-confirm .holiday-icon { width: 18px; height: 18px; }
 .holiday-palette-hint, .holiday-board-note { color: #685b48; font-size: .84rem; line-height: 1.4; }
 .holiday-palette-hint { margin: 13px 0 8px; }
-.holiday-board-tools summary, .holiday-variant summary { padding: 8px 0; cursor: pointer; font-weight: 600; }
+.holiday-variant summary { padding: 8px 0; cursor: pointer; font-weight: 600; }
 .holiday-timeline .planner-days { margin: 0; display: block; }
 .holiday-timeline .planner-day { padding: 0; margin: 0; border: 0; background: transparent; box-shadow: none; }
 .holiday-timeline .planner-day-heading { margin: 0 0 14px; padding: 0; border: 0; gap: 7px; flex-wrap: wrap; }
 .holiday-timeline .planner-day-heading h3 { margin: 0; font-size: 1.18rem; }
-.holiday-timeline .planner-day > ol { display: grid; gap: 8px; padding: 0; margin: 0; }
+.holiday-timeline :is(.planner-day, .holiday-day-section) > ol { display: grid; gap: 8px; padding: 0; margin: 0; }
 .holiday-timeline .planner-event {
   display: grid;
   grid-template-columns: 55px minmax(0,1fr);
@@ -249,6 +384,7 @@
 .holiday-board-top-actions .holiday-trip-controls .planner-button {
   min-height: 44px;
   padding: 7px 12px;
+  text-decoration: none;
   white-space: normal;
   overflow-wrap: anywhere;
   box-shadow: 0 3px 7px #5a402725, inset 0 1px #ffffff35;
@@ -274,14 +410,63 @@
 .holiday-timeline .planner-item-editor .planner-fields { grid-template-columns: repeat(auto-fit, minmax(min(100%, 132px), 1fr)); }
 .holiday-board-note { margin: 14px 0 0; }
 .holiday-board-sidebar { display: grid; gap: 12px; }
-.holiday-board-photo { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; border: 1px solid var(--board-line); border-radius: 16px; box-shadow: var(--board-shadow); }
+.holiday-board-photo {
+  position: relative;
+  display: grid;
+  align-items: end;
+  width: 100%;
+  aspect-ratio: 1.12;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--board-line);
+  border-radius: 16px;
+  background: #354037;
+  box-shadow: var(--board-shadow);
+}
+.holiday-board-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.holiday-board-photo figcaption {
+  position: relative;
+  display: grid;
+  gap: 3px;
+  padding: 28px clamp(12px, 1.5vw, 21px) 13px;
+  background: linear-gradient(0deg, #171919f5, #171919d4 61%, transparent);
+  color: #fffaf2;
+  line-height: 1.25;
+}
+.holiday-board-photo figcaption strong { font-size: clamp(1rem, 1.4vw, 1.32rem); }
+.holiday-board-photo figcaption span { font-size: .87rem; }
+.holiday-board-photo figcaption .holiday-board-price { font-weight: 650; }
 .holiday-coordination ul { padding: 0; list-style: none; margin: 0 0 10px; display: grid; gap: 8px; }
 .holiday-coordination li { padding: 8px; border-radius: 8px; background: #f6ecde; display: grid; gap: 4px; }
 .holiday-coordination li small { color: #614b31; }
 .holiday-coordination p { font-size: .87rem; line-height: 1.45; margin: 0 0 12px; }
-.holiday-board-tools { margin-top: 16px; padding: 5px 14px; border: 1px solid var(--board-line); border-radius: 12px; }
-.holiday-board-tools[open] { padding-bottom: 12px; }
-.holiday-planner-page .planner-afisha { margin-top: 18px; }
+:is(.holiday-programme-download, .holiday-programme-booking):not([hidden]) { display: grid; justify-items: center; gap: 8px; margin-top: 20px; text-align: center; }
+:is(.holiday-programme-download, .holiday-programme-booking) .planner-button {
+  justify-content: center;
+  width: min(100%, 310px);
+  min-height: 48px;
+  border: 1px solid var(--aero-dark, var(--board-ink));
+  border-radius: 12px;
+  background: var(--aero-dark, var(--board-ink));
+  color: #fff;
+  box-shadow: 0 4px 10px #30344236;
+}
+.holiday-programme-download .planner-button:enabled:hover { background: #454b60; }
+.holiday-programme-booking .holiday-booking-button {
+  border-color: #a3773e;
+  border-top-color: #e9c78a;
+  background: linear-gradient(#fff6db4d, #8b54141a), #e1b56b;
+  box-shadow: 0 4px 10px #714b2938, inset 0 1px #fff6dc99;
+  color: #302617;
+  font-weight: 650;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+.holiday-programme-booking .holiday-booking-button:hover { background-color: #edc481; }
+.holiday-programme-booking .holiday-booking-button:active { box-shadow: inset 0 2px 4px #714b294d; }
+.holiday-programme-booking .holiday-booking-button:focus-visible { outline: 2px solid #53391d; outline-offset: 3px; }
+.holiday-programme-download .planner-feedback { margin: 0; }
+.holiday-programme-download .planner-feedback:empty { display: none; }
 [data-board-screen="pick"] .planner-layout { align-items: start; gap: 16px; }
 [data-board-screen="pick"] .planner-conversation { border-top: 1px solid var(--board-line); padding: clamp(14px, 3vw, 35px); }
 [data-board-screen="pick"] .planner-step-header { gap: 8px 16px; justify-content: space-between; }
@@ -347,14 +532,12 @@
 @media (max-width: 960px) {
   .holiday-board-layout { grid-template-columns: minmax(165px, 1fr) minmax(0, 2fr); }
   .holiday-board-sidebar { grid-column: 1 / -1; grid-template-columns: minmax(145px, 1fr) minmax(0, 2fr); align-items: start; }
-  .holiday-board-photo { aspect-ratio: 16 / 9; }
 }
 @media (max-width: 670px) {
   .holiday-planner-page .planner-masthead { gap: 8px; }
   .holiday-planner-page .planner-masthead .planner-view-switch { flex-basis: 100%; }
   .holiday-board-layout, .holiday-map-layout, .holiday-variant-grid { grid-template-columns: minmax(0,1fr); }
   .holiday-board-sidebar { grid-template-columns: minmax(0,1fr); }
-  .holiday-board-sidebar > img { display: none; }
 
   .holiday-pick-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
   .holiday-planner-page .holiday-primary { width: 100%; }
@@ -371,7 +554,7 @@
 
 /* Artwork and raised pieces from the selected board and map composition. */
 .collection-aero body.holiday-planner-page,
-.collection-aero body.holiday-planner-page main#content { background: var(--board-paper); }
+.collection-aero body.holiday-planner-page main#content { background: var(--aero-paper); }
 .holiday-board-intro { flex-basis: 100%; margin: 0; color: #4d483e; }
 .holiday-board-toolbar { margin-bottom: 12px; }
 .holiday-board-layout { grid-template-columns: minmax(178px, .95fr) minmax(0, 1.78fr) minmax(190px, .95fr); gap: 12px; }
@@ -417,8 +600,8 @@
 }
 .holiday-row-toggle .holiday-icon { width: 23px; height: 23px; }
 .holiday-row-remove .holiday-icon { width: 21px; height: 21px; }
-.holiday-timeline .planner-day > ol { padding-left: 14px; position: relative; }
-.holiday-timeline .planner-day > ol::before { content: ""; position: absolute; left: 4px; top: 23px; bottom: 23px; border-left: 1px solid #be9157; }
+.holiday-timeline :is(.planner-day, .holiday-day-section) > ol { padding-left: 14px; position: relative; }
+.holiday-timeline :is(.planner-day, .holiday-day-section) > ol::before { content: ""; position: absolute; left: 4px; top: 23px; bottom: 23px; border-left: 1px solid #be9157; }
 .holiday-timeline .planner-event time { position: relative; padding: 8px 0; }
 .holiday-timeline .planner-event:not([data-free-start], [data-transition]) time::before {
   content: "";
@@ -455,12 +638,20 @@
   gap: 6px;
   border: 0;
   border-radius: 12px;
-  background: transparent;
-  color: var(--board-ink);
+  background: #edf3e5;
+  color: #365e3b;
   font: 600 .86rem var(--body-font);
   cursor: pointer;
 }
-.holiday-slot-add .holiday-icon { width: 17px; height: 17px; }
+.holiday-slot-add .holiday-icon { display: none; }
+.holiday-slot-add::before {
+  content: "";
+  flex: 0 0 20px;
+  height: 20px;
+  background: currentColor;
+  mask: url("./holiday-icons/plus.svg") center / contain no-repeat;
+}
+.holiday-slot-add[aria-expanded="true"] { border: 1px solid #7c9b72; background: #e2edd9; }
 .holiday-slot-add:disabled { cursor: default; opacity: .5; }
 .holiday-timeline [data-drop-allowed] > div { background: #e9f0dd; border-color: #54764d; box-shadow: inset 0 0 0 1px #54764d; }
 .holiday-timeline [data-drop-allowed]:hover > div { background: #dce9ce; }
@@ -471,7 +662,6 @@
 .holiday-placement-status .planner-feedback { margin: 0; }
 .holiday-placement-status:has(.planner-feedback:not(:empty)) { margin-bottom: 10px; }
 .holiday-placement-status .planner-edit { min-height: 44px; }
-.holiday-board-photo { aspect-ratio: 1.12; }
 .holiday-coordination li { grid-template-columns: 26px minmax(0,1fr); align-items: center; background: #fdf4e6; box-shadow: 0 2px 6px #5a402712; }
 .holiday-coordination li div { display: grid; align-content: center; gap: 4px; min-width: 0; overflow-wrap: anywhere; }
 .holiday-coordination li div strong { font-size: .93rem; }
@@ -502,8 +692,8 @@
   }
   .holiday-board-sidebar > .holiday-board-photo {
     flex: 0 1 auto;
-    min-height: 0;
-    max-height: max(0px, calc(var(--holiday-day-height, 75svh) - 225px));
+    min-height: 112px;
+    max-height: max(112px, calc(var(--holiday-day-height, 75svh) - 225px));
   }
   .holiday-coordination { flex: 0 1 auto; padding: clamp(12px, 1.2vw, 18px); }
 }
@@ -564,12 +754,21 @@
 @media (max-width: 670px) {
   .holiday-board-intro { font-size: .9rem; }
   .holiday-board-layout, .holiday-map-layout { grid-template-columns: minmax(0,1fr); }
+  .holiday-board-layout > [data-board-palette] { display: none; }
   .holiday-palette-grid { grid-template-columns: repeat(4, minmax(0,1fr)); gap: 7px; }
   .holiday-palette .holiday-tile { min-height: 54px; }
   .holiday-palette .holiday-tile strong { font-size: .71rem; }
   .holiday-palette .holiday-tile .holiday-icon { width: 20px; height: 20px; }
-  .holiday-timeline .planner-day > ol { padding-left: 11px; }
+  .holiday-timeline :is(.planner-day, .holiday-day-section) > ol { padding-left: 11px; }
   .holiday-timeline .planner-event:not([data-free-start], [data-transition]) time::before { left: -11px; width: 7px; height: 7px; }
+  .holiday-timeline[data-day-split] { padding: 0; border: 0; background: transparent; box-shadow: none; }
+  .holiday-timeline[data-day-split] .planner-day:not([hidden]) { display: grid; gap: 12px; }
+  .holiday-timeline [data-slot-palette] { margin: 0; padding: 0; border: 0; background: transparent; }
+  .holiday-day-section > .holiday-schedule-footer:first-child .holiday-board-note { margin-top: 0; }
+  .holiday-timeline [data-slot-palette] .holiday-tile { padding-inline: 2px; cursor: pointer; }
+  .holiday-timeline [data-slot-palette] .holiday-tile:disabled { cursor: not-allowed; }
+  .holiday-slot-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 13px; }
+  .holiday-slot-actions .planner-button { min-height: 44px; }
   .holiday-event-header { gap: 5px; }
   .holiday-event-photo { width: clamp(49px, 17vw, 84px); height: 43px; }
   .holiday-event-symbol { width: 31px; height: 34px; }
@@ -581,6 +780,15 @@
   .holiday-map-pin .holiday-map-pin-label { padding-inline: 5px; }
   .holiday-map-pin[data-map-point="banya"] .holiday-map-pin-label { top: 0; right: 0; transform: translateY(-70%); }
   .holiday-map-activity-photo { width: 30%; min-height: 100px; }
+}
+@keyframes holiday-slot-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.23); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .holiday-slot-add:enabled[aria-expanded="false"]::before {
+    animation: holiday-slot-pulse 1.8s ease-in-out infinite;
+  }
 }
 @media (max-width: 420px) {
   .holiday-row-actions { flex-direction: column; }
@@ -611,36 +819,16 @@
 .holiday-board-top-actions { display: flex; flex-wrap: wrap; gap: 4px 16px; align-items: center; margin-inline-start: auto; }
 .holiday-planner-page[data-holiday-view="map"] :is(.holiday-board-top-actions,.holiday-board-intro),
 .holiday-planner-page[data-holiday-view="badges"] :is(.holiday-board-top-actions,.holiday-board-intro),
-.holiday-planner-page:is([data-holiday-view="pick"], [data-holiday-view="family"]) .holiday-board-intro { display: none; }
-.holiday-family { display: grid; gap: 18px; }
-.holiday-family-intro { margin: 0; max-width: 62ch; }
-.holiday-family-party, .holiday-family-programme { margin: 0; padding: clamp(14px, 2.2vw, 26px); }
-#content .holiday-family-party h2 { margin: 0 0 14px; font-size: clamp(19px, 2.5vw, 26px); }
-.holiday-family-party .planner-fields { max-width: 480px; }
-.holiday-family-mode { margin: 16px 0 0; padding: 0; border: 0; }
-.holiday-family-mode .planner-choices { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
-.holiday-family-programmes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px),1fr)); gap: 16px; align-items: start; }
-.holiday-family-programme { min-inline-size: 0; }
-.holiday-family-programme[hidden] { display: none; }
-.holiday-family-programme legend { padding-inline: 7px; font-weight: 650; font-size: 1.1rem; }
-.holiday-family-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 110px), 1fr)); gap: 10px; }
-.holiday-family-options .holiday-tile { min-height: 66px; }
-.holiday-family-options .holiday-icon { width: 23px; height: 23px; }
-.holiday-family-programme .planner-help { margin: 12px 0 0; }
-.holiday-family > .planner-note { margin: 0; }
-.holiday-family-actions { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; }
+.holiday-planner-page[data-holiday-view="pick"] .holiday-board-intro { display: none; }
 .holiday-parallel-summary { display: grid; gap: 3px; color: #554b3d; font-size: .76rem; line-height: 1.3; }
 @media (max-width: 670px) {
-  .holiday-planner-page:not(.holiday-chat-open) .planner-masthead .planner-view-switch { display: none; }
+  .holiday-planner-page:not(.holiday-chat-open):not(:has(#planner-app[data-board-screen="board"])) .planner-masthead .planner-view-switch { display: none; }
   .holiday-board-top-actions { order: -1; width: 100%; margin-inline-start: 0; gap: 10px; }
-  .holiday-board-top-actions .holiday-primary { flex-basis: 100%; }
   .holiday-palette { padding-block: 9px; }
   #content .holiday-palette h3 { margin-bottom: 8px; }
   .holiday-palette-hint { margin: 8px 0 3px; }
   .holiday-map-head { margin-bottom: 9px; }
   .holiday-timeline .planner-event time span { margin-left: 0; }
-  .holiday-family-programmes { grid-template-columns: minmax(0,1fr); }
-  .holiday-family-actions > button { flex: 1 1 138px; }
 }
 @media (max-width: 359px) {
   .holiday-palette-grid { grid-template-columns: repeat(3, minmax(0,1fr)); }

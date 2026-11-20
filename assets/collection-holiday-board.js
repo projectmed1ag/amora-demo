@@ -46,11 +46,12 @@ export function activityTiles(items, { action = 'select' } = {}) {
   return items.map(item => {
     const service = services.some(candidate => candidate.id === item.id);
     const id = service ? `service:${item.id}` : `activity:${item.id}`;
+    const unavailable = item.disabled ? item.disabledReason || 'Вне сезона' : '';
     const input = `<input type="checkbox" name="${service ? 'services' : 'interests'}" value="${item.id}"${item.selected ? ' checked' : ''}${item.disabled ? ' disabled' : ''}>`;
     const body = `${boardIcon(item.id)}<strong>${esc(action === 'add' ? tileTitles[item.id] || item.title : item.title)}</strong>${item.detail && action === 'select' ? `<small>${esc(item.detail)}</small>` : ''}`;
     return action === 'select'
       ? `<label class="holiday-tile">${input}${body}</label>`
-      : `<button class="holiday-tile" type="button" data-board-add="${id}" data-tile-title="${esc(item.title)}" aria-label="${esc(item.title)}${item.disabled ? ', вне сезона' : ''}" aria-pressed="false"${item.disabled ? ` disabled title="${esc(interestSeasonLabel(item.id))}"` : ''}>${body}${item.disabled ? '<small>Вне сезона</small>' : ''}</button>`;
+      : `<button class="holiday-tile" type="button" data-board-add="${id}" data-tile-title="${esc(item.title)}" aria-label="${esc(unavailable ? `${item.title}, ${unavailable.toLowerCase()}` : item.title)}" aria-pressed="false"${unavailable ? ` disabled title="${esc(item.disabledReason || interestSeasonLabel(item.id))}"` : ''}>${body}${unavailable ? `<small>${esc(unavailable)}</small>` : ''}</button>`;
   }).join('');
 }
 
@@ -103,17 +104,30 @@ export function boardPhoto(id) {
   return '';
 }
 
-export function boardPalette(options) {
+export function boardPalette(options, { slotId, slotOptions } = {}) {
   const available = new Set(options.map(item => item.id));
+  const fitting = slotOptions && new Set(slotOptions.map(item => item.id));
+  const titleId = slotId ? `${slotId}-activities` : 'holiday-palette-title';
+  function tile(item, prefix) {
+    const id = `${prefix}:${item.id}`;
+    const availableToday = available.has(id);
+    const tooLong = availableToday && fitting && !fitting.has(id);
+    return { ...item, disabled: !availableToday || tooLong, disabledReason: tooLong ? 'Не помещается' : '' };
+  }
   const featured = ['walk', 'bike', 'beach'].map(id => activities.get(id));
   const leisure = [...featured, ...onsiteInterests.filter(item => !featured.includes(item))]
-    .map(item => ({ ...item, disabled: !available.has(`activity:${item.id}`) }));
-  return `<aside class="holiday-palette holiday-board-surface" aria-labelledby="holiday-palette-title">
-    <h3 id="holiday-palette-title">Активности</h3>
-    <p class="holiday-palette-hint">Выберите фишку или перетащите её в свободное окно.</p>
+    .map(item => tile(item, 'activity'));
+  return `<aside class="holiday-palette holiday-board-surface" aria-labelledby="${titleId}">
+    <h3 id="${titleId}">Активности</h3>
+    ${slotId ? '<p class="planner-errors" role="alert" data-slot-feedback hidden></p>'
+      : '<p class="holiday-palette-hint">Выберите фишку или перетащите её в свободное окно.</p>'}
     <div class="holiday-palette-grid">${activityTiles(leisure, { action: 'add' })}</div>
     <h4 class="holiday-palette-group-title">Услуги отеля</h4>
-    <div class="holiday-palette-grid">${activityTiles(services, { action: 'add' })}</div>
+    <div class="holiday-palette-grid">${activityTiles(fitting ? services.map(item => tile(item, 'service')) : services, { action: 'add' })}</div>
+    ${slotId ? `<div class="holiday-slot-actions">
+      <button type="button" class="planner-button planner-button-light" data-slot-custom>Своё занятие</button>
+      <button type="button" class="planner-button planner-button-light" data-close-slot>Свернуть</button>
+    </div>` : ''}
   </aside>`;
 }
 

@@ -1,6 +1,6 @@
 /* Shared visual treatment for the public collection. Page styles own layout. */
 html.collection-aero {
-  --aero-paper: #f8f2e9;
+  --aero-paper: #fcf8f2;
   --aero-surface: #fffaf3;
   --aero-field: #fbf6ee;
   --aero-line: #dcd0bf;
@@ -17,9 +17,11 @@ html.collection-aero {
   --aero-photo-shadow: 0 3px 8px #40382c14, 0 14px 24px -14px #40382c66;
   background: var(--aero-paper);
 }
-.collection-aero body { background: var(--aero-paper); }
+.collection-aero body,
+.collection-aero body.collection-entry-page { background: var(--aero-paper); }
 .collection-aero body :is(main#content, .interior-page) { --page-paper: var(--aero-paper); }
-.collection-aero body.collection-site-page main#content { background-color: var(--aero-paper); }
+.collection-aero body.collection-site-page main#content,
+.collection-aero body .credits-page { background-color: var(--aero-paper); }
 
 .collection-aero body :is(.home-header, .site-header) {
   background: var(--aero-dark);
@@ -68,6 +70,20 @@ html.collection-aero {
     padding: 0;
     font: 400 14px/1.25 var(--body-font);
     white-space: nowrap;
+  }
+  .collection-aero body .home-header > .home-nav > a[aria-current="page"] {
+    position: relative;
+    isolation: isolate;
+    text-decoration: none;
+  }
+  .collection-aero body .home-header > .home-nav > a[aria-current="page"]::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: 4px -8px;
+    pointer-events: none;
+    border-radius: 10px;
+    background: #f1e3ce;
   }
 }
 @media (max-width: 359px) {

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Отдых у Можайского водохранилища: хаусботы, террасы и прогулки на природе.">
-    <meta name="theme-color" content="#f8f2e9">
+    <meta name="theme-color" content="#fcf8f2">
     <title>A’MORE Collection — Можайское водохранилище</title>
     <link rel="preload" href="./fonts/spectral-400-latin.woff2" as="font" type="font/woff2" crossorigin>
     
@@ -29,11 +29,11 @@
   <link rel="icon" type="image/svg+xml" sizes="any" href="./assets/favicon.svg?v=20261105-emblem-1">
   <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon-32.png?v=20261105-emblem-1">
   <link rel="apple-touch-icon" sizes="180x180" href="./assets/apple-touch-icon.png?v=20261105-emblem-1">
-    <link rel="stylesheet" href="./assets/collection-aero.css?v=20261120-raised-hotels-1">
-    <link rel="stylesheet" href="./assets/collection-aero-home.css?v=20261120-glass-planner-1">
+    <link rel="stylesheet" href="./assets/collection-aero.css?v=20261121-rounded-menu-selection-1">
+    <link rel="stylesheet" href="./assets/collection-aero-home.css?v=20261121-sunlight-3">
     <script type="module" src="./assets/collection-aero-home.js?v=20261120-booking-planner-1"></script>
     <link rel="stylesheet" href="./assets/collection-body-copy.css?v=20261118-2">
-<link rel="stylesheet" href="./assets/collection-planner-showcase.css?v=20261120-benefits-1">
+<link rel="stylesheet" href="./assets/collection-planner-showcase.css?v=20261121-benefits-2">
 <script type="module" src="./assets/collection-planner-showcase.js?v=20261119-inline-video-2"></script>
 </head>
   <body data-page="home" class="collection-home-page collection-site-page collection-aero-home" data-collection-static="">
@@ -56,10 +56,17 @@
 
     <main id="content" tabindex="-1">
 <section class="aero-hero" id="section-home" aria-labelledby="home-title">
-  <picture class="aero-panorama">
-    <source media="(max-width: 700px)" srcset="./images/mobile/destinations/mozhaysk.jpg">
-    <img src="./images/destinations/mozhaysk.jpg" alt="Дом с панорамными окнами на лесном берегу Можайского водохранилища" width="1536" height="1024" fetchpriority="high">
-  </picture>
+  <div class="aero-panorama aero-panorama-sunlight">
+    <picture>
+      <source media="(max-width: 700px)" srcset="./images/mobile/destinations/mozhaysk.jpg">
+      <img src="./images/destinations/mozhaysk.jpg" alt="Дом с панорамными окнами на лесном берегу Можайского водохранилища" width="1536" height="1024" fetchpriority="high">
+    </picture>
+    <span class="aero-sunlight" aria-hidden="true"></span>
+    <label class="aero-sunlight-toggle">
+      <input type="checkbox" aria-label="Пауза анимации солнечного света">
+      <span aria-hidden="true"></span>
+    </label>
+  </div>
   <div class="aero-hero-copy">
     <h1 id="home-title">Отдых у воды</h1>
     <p>Можайское водохранилище</p>
@@ -100,7 +107,6 @@
       <button type="button" class="planner-showcase-playback" aria-controls="planner-showcase-video" hidden><span>Смотреть ролик</span></button>
       <p id="planner-showcase-transcript" hidden>В ролике прогулку, велосипед, отдых у воды и баню расставляют между приёмами пищи. Карта показывает пример пути из хаусбота к прокату и бане. За первое выполненное занятие дают «Первое впечатление», за велопрогулку — «На двух колёсах», за пешую прогулку — «По берегу», за три занятия — «День удался».</p>
     </figure>
-    <p class="planner-showcase-more">Готовый план можно скачать в PDF, а услуги согласовать с отелем.</p>
   </div>
 </section>
 <nav class="aero-highlights" aria-label="Отдых в отеле">

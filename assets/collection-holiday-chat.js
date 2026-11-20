@@ -1,6 +1,6 @@
 import { answerHolidayChat } from './collection-holiday-chat-intents.js?v=20261119-quarter-hour-1';
 import { answerHolidayChatFollowup } from './collection-holiday-chat-followups.js?v=20261119-quarter-hour-1';
-import { answerHolidayChatEvents } from './collection-holiday-chat-events.js?v=20261116-assistant-masthead-1';
+import { answerHolidayChatEvents } from './collection-holiday-chat-events.js?v=20261120-programme-download-1';
 import { answerHolidayChatHotel } from './collection-holiday-chat-hotel.js?v=20261112-chat-3';
 
 const family = { label: 'Для детей', description: 'Игры и прогулки', icon: 'family', query: 'Что есть в отеле для детей?' };
@@ -60,7 +60,7 @@ function icon(name, className) {
   return svg;
 }
 
-export function mountHolidayChat(host, { state, getPlan, getClock, getEvents, getGuideDates, applyEdit, preparePdf, openPlanSection, interpretMessage }) {
+export function mountHolidayChat(host, { state, getPlan, getClock, getEvents, getGuideDates, applyEdit, preparePdf, interpretMessage }) {
   state.messages ??= [];
   state.suggestions ??= [];
   const guide = !getPlan();
@@ -157,12 +157,7 @@ export function mountHolidayChat(host, { state, getPlan, getClock, getEvents, ge
         if (url.origin !== location.origin) continue;
         const link = element('a', '', label);
         link.href = url.href;
-        if (href.startsWith('#') && openPlanSection) {
-          link.addEventListener('click', event => {
-            event.preventDefault();
-            openPlanSection(href.slice(1));
-          });
-        } else if (!href.startsWith('#')) {
+        if (!href.startsWith('#')) {
           link.target = '_blank';
           link.rel = 'noopener';
         }

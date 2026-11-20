@@ -13,15 +13,9 @@ html body.collection-aero-home[data-page="home"] main#content > .planner-showcas
 .planner-showcase-layout {
   display: grid;
   grid-template-columns: minmax(235px, .75fr) minmax(0, 1.45fr);
-  grid-template-rows: 1fr auto 1fr;
   gap: 16px clamp(24px, 4vw, 64px);
-  align-items: start;
+  align-items: center;
   padding: clamp(22px, 3.8vw, 52px);
-}
-.planner-showcase-copy {
-  grid-column: 1;
-  grid-row: 2;
-  align-self: end;
 }
 html body.collection-aero-home[data-page="home"] #content .planner-showcase-copy h2 {
   margin: 0;
@@ -47,20 +41,9 @@ html body.collection-aero-home[data-page="home"] #content .planner-showcase-copy
 }
 .planner-showcase-benefits li + li { margin-block-start: 8px; }
 .planner-showcase-benefits li::marker { color: #8b6c3d; }
-.planner-showcase-more {
-  grid-column: 1;
-  grid-row: 3;
-  max-width: 38ch;
-  margin: 0;
-  color: #675949;
-  font-size: .85rem;
-  line-height: 1.4;
-}
 .planner-showcase-film {
   --showcase-film-padding: 7px;
   position: relative;
-  grid-column: 2;
-  grid-row: 1 / span 3;
   min-width: 0;
   margin: 0;
   padding: var(--showcase-film-padding);
@@ -103,13 +86,12 @@ html body.collection-aero-home[data-page="home"] #content .planner-showcase-copy
 .planner-showcase-playback:focus-visible { outline: 2px solid #665333; outline-offset: -2px; }
 .planner-showcase-playback:focus-visible span { opacity: 1; }
 @media (max-width: 790px) {
-  .planner-showcase-layout { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; gap: 14px; }
-  .planner-showcase-copy, .planner-showcase-film, .planner-showcase-more { grid-column: auto; grid-row: auto; }
+  .planner-showcase-layout { grid-template-columns: minmax(0, 1fr); gap: 14px; }
   .planner-showcase-copy p { margin: 10px 0 14px; }
 }
 @media (max-width: 480px) {
   html body.collection-aero-home[data-page="home"] main#content > .planner-showcase { border-radius: var(--aero-medium); }
   .planner-showcase-layout { padding: 15px 9px 13px; }
-  .planner-showcase-copy, .planner-showcase-more { padding-inline: 4px; }
+  .planner-showcase-copy { padding-inline: 4px; }
   .planner-showcase-film { --showcase-film-padding: 4px; }
 }

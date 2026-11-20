@@ -87,10 +87,9 @@ async function readEvents(plan, { dates, theme, late, time, name, adding, neares
   const shown = matches.slice(0, 5);
   const heading = adding ? 'Какое мероприятие добавить?' : nearest ? 'Афиша на ближайшие 30 дней' : 'Афиша отеля';
   const descriptions = shown.map(event => eventDescription(event, plan, shown.length > 1)).join('\n\n');
-  const links = plan && matches.length > shown.length ? [{ label: 'Полная афиша', href: '#planner-afisha-title' }] : undefined;
   const suggestions = plan ? shown.filter(event => !alreadyAdded(plan, event) && !isPast(event, now)).map(addSuggestion) : [];
-  const more = !plan && matches.length > shown.length ? '\n\nУкажите конкретную дату, чтобы посмотреть другие события.' : '';
-  return reply(`${heading}\n\n${descriptions}${more}`, { suggestions, links });
+  const more = matches.length > shown.length ? '\n\nУкажите конкретную дату, чтобы посмотреть другие события.' : '';
+  return reply(`${heading}\n\n${descriptions}${more}`, { suggestions });
 }
 
 export function answerHolidayChatEvents(plan, input, now, getEvents, guideDates) {

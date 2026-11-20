@@ -288,9 +288,9 @@ export function familyActivity(a) {
   const youngChild = a.ages.some(age => age < 3);
   return {
     kind: 'family',
-    title: youngChild ? 'Семейное время с малышом' : 'Общая семейная программа',
+    title: !a.adults ? 'Детская программа' : youngChild ? 'Семейное время с малышом' : 'Общая семейная программа',
     duration: youngChild || a.pace === 'calm' ? 45 : 75,
-    detail: `${childrenProgramme(a, true)} Взрослые участвуют вместе с детьми.`,
+    detail: `${childrenProgramme(a, true)} ${a.adults ? 'Взрослые участвуют вместе с детьми.' : 'Заранее договоритесь, кто из взрослых будет сопровождать детей.'}`,
     page: 'leisure-children.html',
   };
 }
@@ -323,8 +323,9 @@ function addMealBreaks(days, priorityMeals) {
   }
 }
 
-export function buildHolidayPlan(a, { today = '', currentMinute = -1, priorityMeals = false } = {}) {
+export function buildHolidayPlan(a, { today = '', currentMinute = -1, priorityMeals = false, allowChildOnly = false } = {}) {
   const errors = validateAnswers(a, today, currentMinute);
+  if (allowChildOnly && a.adults === 0 && a.children > 0) delete errors.adults;
   if (Object.keys(errors).length) return { errors, days: [], unplaced: [], notes: [] };
   const days = [], unplaced = [];
   const count = (dateNumber(a.endDate) - dateNumber(a.startDate)) / DAY + 1;

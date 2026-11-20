@@ -1,5 +1,5 @@
 import { onsiteInterests, services } from './collection-holiday-data.js?v=20261108-route-pdf-1';
-import { availableInterestOnDate, breakfastNotice, clock, createInterestItem, createServiceItem, dateNumber, familyActivity, isBreakfastTime, minutes, notesForSchedule, unavailableInterestReason, withScheduleGaps } from './collection-holiday-engine.js?v=20261108-route-pdf-1';
+import { availableInterestOnDate, breakfastNotice, clock, createInterestItem, createServiceItem, dateNumber, familyActivity, isBreakfastTime, minutes, notesForSchedule, unavailableInterestReason, withScheduleGaps } from './collection-holiday-engine.js?v=20261120-guest-plans-1';
 import { ceilQuarterHour, isQuarterHour, timeStepMessage } from './collection-time-slots.js?v=20261119-quarter-hour-1';
 
 const fixedKinds = new Set(['arrival', 'departure', 'visit', 'free']);
@@ -43,7 +43,7 @@ function replacementTemplates(answers, date) {
     const family = familyActivity(answers);
     templates.push(
       { ...family, id: 'family' },
-      { ...family, id: 'family:short', title: 'Короткое семейное занятие', duration: 30 },
+      { ...family, id: 'family:short', title: answers.adults ? 'Короткое семейное занятие' : 'Короткое детское занятие', duration: 30 },
     );
   }
   for (const { id } of onsiteInterests) {

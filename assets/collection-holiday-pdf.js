@@ -5,10 +5,10 @@ import { getSeasonForDate } from './collection-seasons.js';
 
 const width = 960;
 const height = 540;
+const imageScale = 2;
 const margin = 38;
 const bottom = 492;
 const contentWidth = width - margin * 2;
-const timeColumn = 103;
 const ink = '#303442';
 const muted = '#535a66';
 const accent = '#796341';
@@ -26,6 +26,10 @@ const smallStyle = { font: font(11, 500), lineHeight: 15, color: accent };
 const trackStyle = { font: font(12, 600), lineHeight: 16, color: ink };
 const display = size => font(size, 600);
 const headingStyle = { font: display(38), lineHeight: 45, color: ink };
+const scheduleBody = { font: font(16), lineHeight: 19, color: muted };
+const scheduleTitle = { font: display(17), lineHeight: 21, color: ink };
+const scheduleTrack = { font: display(15), lineHeight: 19, color: ink };
+const scheduleLabel = { font: font(13, 500), lineHeight: 17, color: accent };
 const galleryPhoto = name => `../images/mobile/mozhaysk/entertainment-gallery-v1/${name}.webp`;
 const seasonalPhoto = (season, name) => `../images/mobile/mozhaysk/entertainment-seasons-v1/${season}-${name}.webp`;
 const tripPhotos = {
@@ -153,22 +157,56 @@ function scheduleRow(ctx, item, availableWidth, answers, hasLocalMaps) {
     detail = item.detail;
   }
   const blocks = [
-    wrap(ctx, item.kind === 'free' && !item.edited ? 'Свободное время' : item.title, availableWidth, item.kind === 'free' ? bodyStyle : titleStyle),
-    ...(detail ? [wrap(ctx, detail, availableWidth, bodyStyle)] : []),
+    wrap(ctx, item.kind === 'free' && !item.edited ? 'Свободное время' : item.title, availableWidth, item.kind === 'free' ? scheduleBody : scheduleTitle),
+    ...(detail ? [wrap(ctx, detail, availableWidth, scheduleBody)] : []),
   ];
   for (const track of item.tracks || []) {
     const kids = track.audience.startsWith('Дети');
     const custom = kids && childIdeas;
     blocks.push(
-      wrap(ctx, `${track.audience}: ${custom || track.title}`, availableWidth, trackStyle),
+      wrap(ctx, `${track.audience}: ${custom || track.title}`, availableWidth, scheduleTrack),
     );
-    if (kids && !custom) blocks.push(wrap(ctx, track.detail, availableWidth, bodyStyle));
+    if (kids && !custom) blocks.push(wrap(ctx, track.detail, availableWidth, scheduleBody));
   }
-  return { time: timeRange(item.start, item.end), blocks, height: 6 + blocks.reduce((sum, block) => sum + block.height, 0) };
+  return { labels: [timeRange(item.start, item.end)], blocks };
 }
 
 function timeRange(start, end) {
   return end > start ? `${clock(start)} - ${clock(end)}` : clock(start);
+}
+
+const scheduleRowPadding = 16;
+
+function schedulePages(rows, availableHeight) {
+  const pages = [{ rows: [], height: 0 }];
+  let page = pages[0];
+  for (const { labels, blocks } of rows) {
+    // Keep complete rows together when they fit on a page. Longer entries
+    // continue on the next page with their date or time repeated.
+    const lines = blocks.flatMap(block => block.lines.map(line => ({
+      ...block, lines: [line], height: block.lineHeight,
+    })));
+    let fragment = [];
+    let textHeight = 0;
+    function addFragment() {
+      const height = Math.max(textHeight, scheduleBody.lineHeight) + scheduleRowPadding;
+      if (page.height + height > availableHeight && page.rows.length) {
+        page = { rows: [], height: 0 };
+        pages.push(page);
+      }
+      page.rows.push({ labels, blocks: fragment, height });
+      page.height += height;
+      fragment = [];
+      textHeight = 0;
+    }
+    for (const line of lines) {
+      if (textHeight + line.height + scheduleRowPadding > availableHeight) addFragment();
+      fragment.push(line);
+      textHeight += line.height;
+    }
+    addFragment();
+  }
+  return pages;
 }
 
 function jpeg(canvas) {
@@ -293,7 +331,7 @@ function loadImage(path) {
   });
 }
 
-export async function buildHolidayPdf(plan, { lodging = '' } = {}) {
+async function renderProgrammePages(plan, { lodging, title }, pages) {
   if (!plan.days.length) throw new Error('Сначала составьте программу отдыха.');
   const dayPhotos = selectDayPhotos(plan.days);
   const photoPaths = [...new Set([tripPhotos.cover, tripPhotos.overview, ...dayPhotos])];
@@ -307,13 +345,11 @@ export async function buildHolidayPdf(plan, { lodging = '' } = {}) {
     ...fontLoads,
   ]);
   const photos = Object.fromEntries(images);
-  const pages = [];
   const canvas = document.createElement('canvas');
-  const scale = 2;
-  canvas.width = width * scale;
-  canvas.height = height * scale;
+  canvas.width = width * imageScale;
+  canvas.height = height * imageScale;
   const ctx = canvas.getContext('2d', { alpha: false });
-  ctx.scale(scale, scale);
+  ctx.scale(imageScale, imageScale);
   ctx.textBaseline = 'top';
   let pageLinks = [];
 
@@ -393,6 +429,38 @@ export async function buildHolidayPdf(plan, { lodging = '' } = {}) {
     return at(title, margin, 122, contentWidth, headingStyle) + 10;
   }
 
+  const photoWidth = 214;
+  const scheduleWidth = contentWidth - photoWidth - 26;
+  function columnWidth(labels, style) {
+    ctx.font = style.font;
+    return Math.ceil(Math.max(0, ...labels.map(label => ctx.measureText(label).width))) + 18;
+  }
+  async function drawSchedulePages(rows, { section, kicker, heading, photo, number, columns }) {
+    const contentTop = 108;
+    const headingSpace = 76;
+    const rowsHeight = bottom - contentTop - headingSpace;
+    for (const [index, page] of schedulePages(rows, rowsHeight).entries()) {
+      openPage(section);
+      photoPanel(photo, width - margin - photoWidth, 100, photoWidth, 389, number);
+      const y = contentTop + (rowsHeight - page.height) / 2;
+      at(index ? `${kicker}  /  ПРОДОЛЖЕНИЕ` : kicker, margin, y, scheduleWidth, smallStyle);
+      at(heading, margin, y + 21, scheduleWidth, headingStyle);
+      let rowTop = y + headingSpace;
+      for (const row of page.rows) {
+        line(margin, rowTop, scheduleWidth);
+        let x = margin;
+        for (const [index, column] of columns.entries()) {
+          at(row.labels[index] || '', x, rowTop + 8, column.width - 12, column.style);
+          x += column.width;
+        }
+        let textTop = rowTop + 8;
+        for (const block of row.blocks) textTop = paint(ctx, block, x, textTop);
+        rowTop += row.height;
+      }
+      await savePage();
+    }
+  }
+
   const { startDate, endDate, adults, children, ages } = plan.answers;
   const dateRange = startDate === endDate ? longDate(startDate) : `${longDate(startDate).replace(/ \d{4} г\.$/u, '')} — ${longDate(endDate)}`;
   const guestLine = `Взрослых: ${adults}   ·   Детей: ${children}${children ? ` (возраст: ${ages.join(', ')})` : ''}`;
@@ -411,7 +479,16 @@ export async function buildHolidayPdf(plan, { lodging = '' } = {}) {
   line(0, 77, width, gold);
   const white = { ...bodyStyle, color: '#fff' };
   const coverTitle = { font: display(78), lineHeight: 75, color: '#fff' };
-  at('МОЖАЙСКОЕ ВОДОХРАНИЛИЩЕ', margin, 134, 550, { ...smallStyle, color: '#e8d8b9' });
+  if (title) {
+    let heading;
+    for (const size of [32, 26, 20, 15, 11]) {
+      heading = wrap(ctx, title, contentWidth, { font: display(size), lineHeight: size + 4, color: '#fff' });
+      if (heading.height <= 64) break;
+    }
+    paint(ctx, heading, margin, 149 - heading.height);
+  } else {
+    at('МОЖАЙСКОЕ ВОДОХРАНИЛИЩЕ', margin, 134, 550, { ...smallStyle, color: '#e8d8b9' });
+  }
   at('Программа', margin - 2, 154, 570, coverTitle);
   at('отдыха', margin - 2, 226, 570, coverTitle);
   line(margin, 319, 70, gold);
@@ -424,54 +501,37 @@ export async function buildHolidayPdf(plan, { lodging = '' } = {}) {
   await savePage(true);
 
   if (plan.days.length > 1) {
-    const w = 558;
-    function overviewPage(continued = false) {
-      openPage('ОБЗОР ПОЕЗДКИ');
-      photoPanel(tripPhotos.overview, 624, 100, 298, 389);
-      at(continued ? 'ДНИ ПОЕЗДКИ · ПРОДОЛЖЕНИЕ' : 'ДНИ ПОЕЗДКИ', margin, 105, w, smallStyle);
-      return at('Ваш отдых в A’MORE', margin, 125, w, headingStyle) + 8;
-    }
-    let y = overviewPage();
-    for (const [index, day] of plan.days.entries()) {
-      const highlights = wrap(ctx, dayHighlights(day), w - 155, bodyStyle);
-      const rowHeight = Math.max(highlights.height, 18) + 12;
-      if (y + rowHeight > bottom) { await savePage(); y = overviewPage(true); }
-      line(margin, y, w);
-      at(`ДЕНЬ ${dayNumber(index)}`, margin, y + 6, 64, smallStyle);
-      at(shortLabel(day.date), margin + 65, y + 6, 89, bodyStyle);
-      paint(ctx, highlights, margin + 155, y + 6);
-      y += rowHeight;
-    }
-    await savePage();
+    const numbers = plan.days.map((_, index) => `ДЕНЬ ${dayNumber(index)}`);
+    const dates = plan.days.map(day => shortLabel(day.date));
+    const numberWidth = Math.max(80, columnWidth(numbers, scheduleLabel));
+    const dateWidth = Math.max(140, columnWidth(dates, scheduleBody));
+    const rows = plan.days.map((day, index) => ({
+      labels: [numbers[index], dates[index]],
+      blocks: [wrap(ctx, dayHighlights(day), scheduleWidth - numberWidth - dateWidth, scheduleBody)],
+    }));
+    await drawSchedulePages(rows, {
+      section: 'ОБЗОР ПОЕЗДКИ',
+      kicker: 'ДНИ ПОЕЗДКИ',
+      heading: 'Ваш отдых в A’MORE',
+      photo: tripPhotos.overview,
+      columns: [{ width: numberWidth, style: scheduleLabel }, { width: dateWidth, style: scheduleBody }],
+    });
   }
 
   for (const [index, day] of plan.days.entries()) {
     const number = dayNumber(index);
-    const photoWidth = 254;
-    const gap = 30;
-    const scheduleWidth = contentWidth - photoWidth - gap;
-    const photoLeft = index % 2 === 1;
-    const tx = photoLeft ? margin + photoWidth + gap : margin;
-    const px = photoLeft ? margin : width - margin - photoWidth;
-    function dayPage(continued = false) {
-      openPage(`РАСПИСАНИЕ   /   ДЕНЬ ${number}`);
-      photoPanel(dayPhotos[index], px, 100, photoWidth, 389, number);
-      at(`ДЕНЬ ${number}${continued ? '   /   ПРОДОЛЖЕНИЕ' : ''}`, tx, 103, scheduleWidth, smallStyle);
-      return at(shortLabel(day.date), tx, 123, scheduleWidth, headingStyle) + 6;
-    }
     const items = day.items.filter(item => item.kind !== 'free' || item.edited || item.end - item.start >= 45);
-    const rows = items.map(item => scheduleRow(ctx, item, scheduleWidth - timeColumn, plan.answers, routeGuide?.routes.length));
-    let y = dayPage();
-    if (!rows.length) at('На этот день нет запланированных занятий.', tx, y, scheduleWidth);
-    for (const row of rows) {
-      if (y + row.height > bottom) { await savePage(); y = dayPage(true); }
-      line(tx, y, scheduleWidth);
-      at(row.time, tx, y + 3, timeColumn - 7, smallStyle);
-      let ry = y + 3;
-      for (const block of row.blocks) ry = paint(ctx, block, tx + timeColumn, ry);
-      y += row.height;
-    }
-    await savePage();
+    const timeWidth = Math.max(108, columnWidth(items.map(item => timeRange(item.start, item.end)), scheduleLabel));
+    const rows = items.map(item => scheduleRow(ctx, item, scheduleWidth - timeWidth, plan.answers, routeGuide?.routes.length));
+    if (!rows.length) rows.push({ labels: [], blocks: [wrap(ctx, 'На этот день нет запланированных занятий.', scheduleWidth - timeWidth, scheduleBody)] });
+    await drawSchedulePages(rows, {
+      section: `РАСПИСАНИЕ   /   ДЕНЬ ${number}`,
+      kicker: `ДЕНЬ ${number}`,
+      heading: shortLabel(day.date),
+      photo: dayPhotos[index],
+      number,
+      columns: [{ width: timeWidth, style: scheduleLabel }],
+    });
   }
 
   const confirmations = plan.days.flatMap(day => day.items.filter(item => item.confirmation).map(item => ({
@@ -567,7 +627,14 @@ export async function buildHolidayPdf(plan, { lodging = '' } = {}) {
     }
     await savePage();
   }
-  return makePdf(pages, canvas.width, canvas.height);
+}
+
+export async function buildHolidayPdf(plan, { lodging = '', programmes } = {}) {
+  const pages = [];
+  for (const { plan: schedule, title } of programmes ?? [{ plan }]) {
+    await renderProgrammePages(schedule, { lodging, title }, pages);
+  }
+  return makePdf(pages, width * imageScale, height * imageScale);
 }
 
 export async function prepareHolidayPdfDownload(plan, options) {
@@ -575,7 +642,7 @@ export async function prepareHolidayPdfDownload(plan, options) {
   const url = URL.createObjectURL(blob);
   return {
     url,
-    filename: `amore-plan-${plan.answers.startDate}.pdf`,
+    filename: `amore-${options?.programmes?.length > 1 ? 'programmes' : 'plan'}-${plan.answers.startDate}.pdf`,
     release: () => URL.revokeObjectURL(url),
   };
 }

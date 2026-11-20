@@ -23,6 +23,85 @@ html body.collection-aero-home[data-page="home"] main#content > .aero-hero {
   margin: 12px var(--aero-gutter) 0;
   padding: clamp(18px, 3.25vw, 48px);
 }
+.aero-panorama-sunlight { isolation: isolate; }
+.aero-panorama-sunlight picture { display: block; height: 100%; }
+.aero-panorama-sunlight img { display: block; }
+.aero-sunlight, .aero-sunlight-toggle { display: none; }
+@media (prefers-reduced-motion: no-preference) {
+  .aero-panorama-sunlight ~ .aero-hero-copy { pointer-events: none; }
+  .aero-panorama-sunlight ~ .aero-hero-copy > * { pointer-events: auto; }
+  .aero-sunlight { display: block; position: absolute; inset: 0; pointer-events: none; }
+  .aero-sunlight::before, .aero-sunlight::after {
+    content: "";
+    position: absolute;
+    aspect-ratio: 1;
+    transform: translate(-50%, -50%);
+    animation: 7s ease-in-out infinite alternate;
+  }
+  .aero-sunlight::before {
+    width: 132%;
+    background: radial-gradient(circle closest-side, #edaf5b, transparent);
+    mix-blend-mode: screen;
+    opacity: .27;
+    animation-name: aero-sunlight-glow;
+  }
+  .aero-sunlight::after {
+    width: 126%;
+    background: radial-gradient(circle closest-side, #777d93, transparent);
+    mix-blend-mode: multiply;
+    opacity: .19;
+    animation-name: aero-sunlight-shade;
+  }
+  .aero-hero:has(.aero-sunlight-toggle input:checked) .aero-sunlight::before,
+  .aero-hero:has(.aero-sunlight-toggle input:checked) .aero-sunlight::after { animation-play-state: paused; }
+  .aero-sunlight-toggle {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: grid;
+    justify-items: end;
+    align-items: start;
+    padding: clamp(10px, 1.4vw, 20px);
+  }
+  .aero-sunlight-toggle span {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid #ffffff80;
+    border-radius: 50%;
+    background: #252b31c2;
+    color: #fff;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .aero-sunlight-toggle input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+  .aero-sunlight-toggle span::before { content: ""; width: 10px; height: 12px; border-inline: 3px solid currentColor; }
+  .aero-sunlight-toggle:has(input:checked) span::before {
+    width: 0;
+    height: 0;
+    border: 6px solid transparent;
+    border-right: 0;
+    border-left: 9px solid currentColor;
+  }
+  .aero-sunlight-toggle input:focus-visible + span { opacity: 1; outline: 2px solid #fff; outline-offset: 2px; }
+  @keyframes aero-sunlight-glow {
+    from { left: 14%; top: 57%; }
+    to { left: 92%; top: 40%; }
+  }
+  @keyframes aero-sunlight-shade {
+    from { left: 91%; top: 70%; }
+    to { left: 23%; top: 70%; }
+  }
+}
 .aero-hero-copy { color: #fff; text-shadow: 0 2px 14px #111b13b0; }
 html body.collection-aero-home #content .aero-hero-copy h1 {
   margin: 0;

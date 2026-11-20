@@ -79,6 +79,17 @@ function browserStorage(storage) {
   return storage === undefined ? globalThis.localStorage : storage;
 }
 
+const restoreEdits = edits => Array.isArray(edits) ? edits.filter(validEdit) : [];
+const restoreMarks = marks => Array.isArray(marks) ? marks.filter(mark => typeof mark === 'string' && mark.length < 800) : [];
+
+function restoreGroups(saved) {
+  if (!isRecord(saved)) return undefined;
+  const plans = Object.fromEntries(Object.entries(isRecord(saved.plans) ? saved.plans : {})
+    .filter(([, plan]) => isRecord(plan))
+    .map(([key, plan]) => [key, { edits: restoreEdits(plan.edits), marks: restoreMarks(plan.marks) }]));
+  return { ...saved, plans };
+}
+
 export function loadHolidayDraft(city, defaults, storage) {
   try {
     const raw = browserStorage(storage)?.getItem(draftKey(city));
@@ -88,10 +99,11 @@ export function loadHolidayDraft(city, defaults, storage) {
     return {
       answers: restoreAnswers(saved.answers, defaults),
       step: steps.has(saved.step) ? saved.step : 'dates',
-      edits: Array.isArray(saved.edits) ? saved.edits.filter(validEdit) : [],
+      edits: restoreEdits(saved.edits),
       completed: saved.completed === true,
       priorityMeals: saved.priorityMeals === true,
-      marks: Array.isArray(saved.marks) ? saved.marks.filter(mark => typeof mark === 'string' && mark.length < 800) : [],
+      marks: restoreMarks(saved.marks),
+      guestGroups: restoreGroups(saved.guestGroups),
     };
   } catch {
     return null;
@@ -101,11 +113,11 @@ export function loadHolidayDraft(city, defaults, storage) {
 export function saveHolidayDraft(city, draft, storage) {
   try {
     if (!isRecord(draft?.answers)) return false;
-    const { answers, step, edits, completed, priorityMeals, marks } = draft;
+    const { answers, step, edits, completed, priorityMeals, marks, guestGroups } = draft;
     const target = browserStorage(storage);
     if (!target) return false;
     const savedAnswers = { ...answers, suggestActivities: answers.suggestActivities === true };
-    target.setItem(draftKey(city), JSON.stringify({ version, answers: savedAnswers, step, edits, completed, priorityMeals, marks }));
+    target.setItem(draftKey(city), JSON.stringify({ version, answers: savedAnswers, step, edits, completed, priorityMeals, marks, guestGroups }));
     return true;
   } catch {
     return false;

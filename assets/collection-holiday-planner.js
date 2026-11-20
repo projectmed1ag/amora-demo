@@ -1,13 +1,13 @@
 import { onsiteInterests, services, attractions, mapRoute, demoOrigin, demoOriginLabel, outingTransports, childActivityOptions } from './collection-holiday-data.js?v=20261108-route-pdf-1';
-import { breakfastNotice, buildHolidayPlan, planToText, validateAnswers, validateTripDates, addDays, dateLabel, dateNumber, clock, excursionSettings, outingDurationMinutes, availableInterestInStay, interestSeasonLabel, familyAdultInterests } from './collection-holiday-engine.js?v=20261120-split-stay-1';
-import { holidayLodgings } from './collection-holiday-lodging.js';
-import { canEditScheduleItem, canMoveScheduleItem, scheduleReplacementOptions, applyScheduleEdit, replayScheduleEdits } from './collection-holiday-edits.js?v=20261119-quarter-hour-1';
-import { loadHolidayDraft, saveHolidayDraft, clearHolidayDraft } from './collection-holiday-draft.js?v=20261120-split-stay-1';
-import { mountPlanRequests } from './collection-holiday-requests.js?v=20261108-route-pdf-1';
-import { hotelEventLabels, loadHotelEvents, mountHotelEvents } from './collection-holiday-events.js?v=20261112-chat-3';
+import { breakfastNotice, buildHolidayPlan, validateAnswers, validateTripDates, addDays, dateLabel, dateNumber, clock, excursionSettings, outingDurationMinutes, availableInterestInStay, interestSeasonLabel } from './collection-holiday-engine.js?v=20261120-guest-plans-1';
+import { holidayLodgings } from './collection-holiday-lodging.js?v=20261120-stay-photo-1';
+import { canEditScheduleItem, canMoveScheduleItem, scheduleReplacementOptions, applyScheduleEdit, replayScheduleEdits } from './collection-holiday-edits.js?v=20261120-guest-plans-1';
+import { loadHolidayDraft, saveHolidayDraft, clearHolidayDraft } from './collection-holiday-draft.js?v=20261120-guest-plans-1';
+import { tripGuests, restoreGuestGroups, guestGroupKey, guestAgeLabel, guestGroupLabel, answersForGuestGroup } from './collection-holiday-groups.js?v=20261120-joint-selection-1';
+import { hotelEventLabels, loadHotelEvents } from './collection-holiday-events.js?v=20261112-chat-3';
 import { destinationDateParts, destinationLocalDate } from './collection-destinations.js?v=20261024-all-hotels-1';
-import { mountHolidayChat } from './collection-holiday-chat.js?v=20261119-quarter-hour-1';
-import { activityTiles, alternativesMarkup, badgesMarkup, boardIcon, boardMark, boardPalette, boardPhoto, buildBoardAlternatives, isBoardActivity } from './collection-holiday-board.js?v=20261120-split-stay-1';
+import { mountHolidayChat } from './collection-holiday-chat.js?v=20261120-programme-download-1';
+import { activityTiles, alternativesMarkup, badgesMarkup, boardIcon, boardMark, boardPalette, boardPhoto, buildBoardAlternatives, isBoardActivity } from './collection-holiday-board.js?v=20261120-mobile-slot-1';
 import { hasBoardLocation, mountBoardMap } from './collection-holiday-board-map.js?v=20261119-row-actions-1';
 import { ceilQuarterHour, isQuarterHour, quarterHourOptions } from './collection-time-slots.js?v=20261119-quarter-hour-1';
 
@@ -16,6 +16,7 @@ const masthead = document.getElementById('planner-masthead');
 const viewSwitch = document.getElementById('planner-assistant');
 const planView = document.getElementById('planner-plan-view');
 const chatView = document.getElementById('planner-chat');
+const mobileSchedule = matchMedia('(max-width: 670px)');
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const today = () => destinationLocalDate(new Date(), 'mozhaysk');
 const nowMinute = () => { const { hour, minute } = destinationDateParts(new Date(), 'mozhaysk'); return Number(hour) * 60 + Number(minute); };
@@ -37,16 +38,21 @@ const questions = {
 const stepFields = { dates: ['startDate', 'endDate', 'arrival', 'departure'], party: ['adults', 'children', 'ages', 'familyMode', 'childActivities'], lodging: ['lodging'], rhythm: ['pace', 'wake'], outings: ['outingMode', 'interests', 'suggestActivities'], routes: ['places'], services: ['services', 'restaurant', 'banya', 'barbecue'], review: [] };
 let current = 'dates', plan, quickEdit;
 let chatState = {}, chat;
-let planEdits = [], unappliedEdits = [], undoEdit, itemEditor, pdfPreparation, preparedPdf;
+let planEdits = [], unappliedEdits = [], undoEdit, itemEditor;
+const pdfPreparation = new Map();
+const preparedPdf = new Map();
 let priorityMeals = true, marks = new Set(), boardRecord, autoRecord, selectedDay, selectedMapItem;
 let boardTab = 'schedule';
+let guestGroups, groupSettingsOpen = false;
+const activeGuestGroup = () => guestGroups?.mode === 'separate'
+  ? guestGroups.groups.find(group => guestGroupKey(group) === guestGroups.active) : undefined;
 const isAutoRoute = () => new URLSearchParams(location.search).get('mode') === 'auto';
 const isFamilyRoute = () => new URLSearchParams(location.search).get('mode') === 'family';
 const isChoiceRoute = () => new URLSearchParams(location.search).get('mode') === 'choose';
 const draftBanner = document.getElementById('planner-draft');
 const draftCity = 'mozhaysk';
-const { token: bookingToken, scope: bookingScope, handoff: bookingHandoff } = bookingContext();
-const plannedStay = readPlannedStay();
+const { scope: bookingScope, handoff: bookingHandoff } = bookingContext();
+const { stay: plannedStay, party: plannedParty } = readPlannedStay();
 const staySelection = bookingHandoff || plannedStay;
 const stayGuestCount = () => staySelection.adults + (staySelection.children || 0);
 const bookingStatus = 'Даты, хаусбот и число гостей взяты из бронирования. Уточните состав компании.';
@@ -57,7 +63,6 @@ const localBookingHost = ['localhost', '127.0.0.1', '[::1]', '::1'].includes(loc
 const holidayApiBase = coordinationApiBase();
 const lodgingAvailabilityUrl = holidayApiBase
   ? new URL(localBookingHost ? 'availability' : 'planner-availability', holidayApiBase) : null;
-let bookingConfigRequest;
 const overnight = () => answers.endDate > answers.startDate;
 const guestCount = () => answers.adults + answers.children;
 const stayingAtHotel = () => answers.outingMode === 'stay';
@@ -79,6 +84,10 @@ const isBookedLodging = roomId => bookingHandoff?.lodging === roomId && answers.
 const lodgingOptions = () => holidayLodgings.filter(item => item.capacity >= guestCount() || isBookedLodging(item.id));
 const lodgingChoice = () => overnight() ? lodgingOptions().find(item => item.id === answers.lodging) : undefined;
 const lodgingLabel = () => overnight() ? lodgingChoice()?.label || 'Пока не выбрано' : 'Без ночёвки';
+const nightPlural = new Intl.PluralRules('ru');
+const nightForms = { one: 'ночь', few: 'ночи', many: 'ночей', other: 'ночей' };
+const rubles = new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB', minimumFractionDigits: 0 });
+let stayPriceRequest;
 const checked = value => value ? ' checked' : '';
 const outingField = (id, name) => `outing-${id}-${name}`;
 function field(name, label, type, value, extra = '', slotOptions = { keepSaved: true }) {
@@ -114,22 +123,48 @@ function validatedBookingHandoff(saved) {
 
 function readPlannedStay() {
   const query = new URLSearchParams(location.search);
-  if (query.get('city') !== draftCity || query.get('from') !== 'hotel' || query.get('selection') !== 'stay') return;
+  if (query.get('city') !== draftCity || query.get('from') !== 'hotel' || query.get('selection') !== 'stay') return {};
   const stay = Object.fromEntries(stepFields.dates.map(field => [field, query.get(field) || '']));
   const lodging = query.get('lodging');
   const guests = Number(query.get('guests'));
   const capacity = holidayLodgings.find(room => room.id === lodging)?.capacity;
   if (!capacity || !Number.isInteger(guests) || guests < 1 || guests > capacity || stay.endDate <= stay.startDate
     || !isQuarterHour(stay.arrival) || !isQuarterHour(stay.departure)
-    || Object.keys(validateTripDates(stay)).length) return;
-  const party = new URLSearchParams(location.hash.slice(1));
-  const adults = Number(party.get('partyAdults'));
-  const ages = party.getAll('partyAge');
-  if (Number.isInteger(adults) && adults >= 1 && ages.length > 0 && ages.length <= 10
+    || Object.keys(validateTripDates(stay)).length) return {};
+  const details = new URLSearchParams(location.hash.slice(1));
+  const adults = Number(details.get('partyAdults'));
+  const ages = details.getAll('partyAge');
+  const selection = { ...stay, lodging, adults: guests };
+  if (Number.isInteger(adults) && adults >= 1 && ages.length <= 10
     && adults + ages.length === guests && ages.every(age => /^(?:[0-9]|1[0-7])$/.test(age))) {
-    return { ...stay, lodging, adults, children: ages.length, ages: ages.map(Number) };
+    const party = { adults, children: ages.length, ages: ages.map(Number) };
+    return { stay: ages.length ? { ...selection, ...party } : selection, party };
   }
-  return { ...stay, lodging, adults: guests };
+  // The calendar omits the party fragment when everyone is an adult.
+  if (!details.has('partyAdults') && !ages.length) return { stay: selection, party: { adults: guests, children: 0, ages: [] } };
+  return { stay: selection };
+}
+
+function receiveBookingGuestNames() {
+  const url = new URL(location.href);
+  const details = new URLSearchParams(url.hash.slice(1));
+  const nameKeys = [...new Set(details.keys())].filter(key => key.startsWith('guestName.'));
+  if (!nameKeys.length) return;
+  if (plannedStay) {
+    const currentGuests = new Set(tripGuests(boardRecord.answers).map(guest => guest.id));
+    const names = Object.fromEntries(tripGuests({ ...defaultAnswers, ...plannedStay }).flatMap(({ id }) => {
+      const name = details.get(`guestName.${id}`)?.trim().slice(0, 40);
+      return name && currentGuests.has(id) ? [[id, name]] : [];
+    }));
+    if (Object.keys(names).length) {
+      Object.assign(guestGroups.names, names);
+      boardRecord.guestGroups = guestGroups;
+      saveHolidayDraft(draftScope, { ...boardRecord, step: 'review', completed: true });
+    }
+  }
+  for (const key of nameKeys) details.delete(key);
+  url.hash = details.toString();
+  history.replaceState(history.state, '', url);
 }
 
 function bookingContext() {
@@ -201,7 +236,18 @@ function persistDraft(completed = false) {
   const record = { answers: structuredClone(answers), step: completed ? 'review' : current, edits: [...planEdits], completed, priorityMeals, marks: [...marks] };
   const automatic = !completed && isAutoRoute();
   if (automatic) autoRecord = record;
-  else boardRecord = record;
+  else {
+    const group = activeGuestGroup();
+    if (group) {
+      const key = guestGroupKey(group);
+      if (record.edits.length || record.marks.length) guestGroups.plans[key] = { edits: record.edits, marks: record.marks };
+      else delete guestGroups.plans[key];
+      record.edits = boardRecord.edits;
+      record.marks = boardRecord.marks;
+    }
+    record.guestGroups = guestGroups;
+    boardRecord = record;
+  }
   const saved = saveHolidayDraft(automatic ? `${draftScope}:auto` : draftScope, record);
   showDraftStatus(saved ? 'Черновик сохранён в этом браузере.' : 'Браузер не смог сохранить черновик.', saved);
   return saved;
@@ -231,28 +277,27 @@ function lodgingEditButton() {
     ? '<button type="button" class="planner-edit" data-edit-booking="lodging">Проверить или изменить хаусбот</button>' : '';
 }
 
-function stayPartyMarkup() {
-  return `<div class="planner-note planner-booking-summary">
-    <strong>${bookingHandoff ? 'Из бронирования' : 'Выбранное размещение'}</strong>
-    <div>${esc(dateLabel(answers.startDate))} — ${esc(dateLabel(answers.endDate))} · ${esc(lodgingLabel())}</div>
-    <div>Гостей · ${stayGuestCount()}</div>
-    <div>Время для плана · ${esc(answers.arrival)}–${esc(answers.departure)} по Москве</div>
-    <div class="planner-booking-actions">${bookingEditButtons()}</div>
-  </div>
-  <div class="planner-fields">
-    ${field('children', 'Дети до 18 лет', 'number', answers.children, `min="0" max="${Math.min(10, stayGuestCount() - 1)}" step="1" inputmode="numeric" required`)}
-    <p class="planner-help" aria-live="polite">Взрослые · <span data-booked-adults>${Number.isInteger(answers.adults) && answers.adults > 0 ? answers.adults : '—'}</span></p>
+function partyRosterMarkup() {
+  if (plannedParty) {
+    return `<ul class="holiday-guest-cards planner-guest-cards" role="list" aria-label="Состав гостей">
+      ${tripGuests(answers).map(guest => `<li class="holiday-guest-card" data-guest-type="${guest.type}">${guestCardContent(guest)}</li>`).join('')}
+    </ul>`;
+  }
+  const maxChildren = stayCompact ? Math.min(10, stayGuestCount() - 1) : 10;
+  return `<div class="planner-fields">
+    ${stayCompact ? '' : field('adults', 'Взрослые', 'number', answers.adults, 'min="1" max="20" step="1" inputmode="numeric" required')}
+    ${field('children', 'Дети до 18 лет', 'number', answers.children, `min="0" max="${maxChildren}" step="1" inputmode="numeric" required`)}
+    ${stayCompact ? `<p class="planner-help" aria-live="polite">Взрослые · <span data-booked-adults>${Number.isInteger(answers.adults) && answers.adults > 0 ? answers.adults : '—'}</span></p>` : ''}
   </div>`;
 }
 
 function partyMarkup() {
-  const counts = stayCompact ? stayPartyMarkup() : `<div class="planner-fields">
-    ${field('adults', 'Взрослые', 'number', answers.adults, 'min="1" max="20" step="1" inputmode="numeric" required')}
-    ${field('children', 'Дети до 18 лет', 'number', answers.children, 'min="0" max="10" step="1" inputmode="numeric" required')}
-  </div>`;
-  return `${quickEdit ? `<p class="planner-help">Возраст детей: ${esc(answers.ages.join(', '))}. Можно изменить формат отдыха и занятия.</p>` : counts}
+  const party = quickEdit
+    ? `<p class="planner-help">Возраст детей: ${esc(answers.ages.join(', '))}. Можно изменить формат отдыха и занятия.</p>`
+    : partyRosterMarkup();
+  return `${party}
   <div id="plan-children-details"${answers.children > 0 ? '' : ' hidden'}>
-    ${quickEdit ? '' : `<fieldset><legend>Сколько лет детям?</legend><div id="plan-ages">${agesMarkup()}</div></fieldset>`}
+    ${quickEdit || plannedParty ? '' : `<fieldset><legend>Сколько лет детям?</legend><div id="plan-ages">${agesMarkup()}</div></fieldset>`}
     <fieldset>
       <legend>Как проведём время?</legend>
       <div class="planner-choices">
@@ -490,8 +535,7 @@ function interestsMarkup() {
 }
 
 function outingsMarkup() {
-  return `<fieldset>
-      <legend>Занятия в отеле и рядом</legend>
+  return `<fieldset aria-label="Занятия">
       <div class="planner-selection-help">
         <p class="planner-help">${quickEdit ? 'Выберите занятия для обновлённого плана.' : 'Отметьте любимые занятия. Помощник учтёт ваши пожелания и дополнит их подходящими по сезону идеями.'}</p>
         <p class="planner-selection-count" role="status" data-interest-count>${interestCountLabel()}</p>
@@ -689,13 +733,15 @@ function closeQuickEdit(cancelled) {
 
 function rebuildPlan({ alreadyPlanned = false } = {}) {
   if (plan && (plan.answers.startDate !== answers.startDate || plan.answers.endDate !== answers.endDate)) chatState = {};
-  const base = buildHolidayPlan(structuredClone(answers), {
-    priorityMeals, ...(alreadyPlanned ? {} : { today: today(), currentMinute: nowMinute() }),
+  const group = activeGuestGroup();
+  const scheduleAnswers = group ? answersForGuestGroup(answers, group) : structuredClone(answers);
+  const base = buildHolidayPlan(scheduleAnswers, {
+    priorityMeals, allowChildOnly: Boolean(group), ...(alreadyPlanned ? {} : { today: today(), currentMinute: nowMinute() }),
   });
   const changedTrips = new Set((plan?.days || []).flatMap(day => day.items).filter(item => {
     if (!item.placeId) return false;
     const before = excursionSettings(plan.answers, item.placeId);
-    const after = excursionSettings(answers, item.placeId);
+    const after = excursionSettings(scheduleAnswers, item.placeId);
     return before.excursionDate !== after.excursionDate || before.excursionTime !== after.excursionTime;
   }).map(item => item.id));
   planEdits = planEdits.filter(edit => edit.type !== 'move' || !changedTrips.has(edit.itemId));
@@ -718,7 +764,7 @@ function continueLabel() {
   const sequence = steps();
   const next = sequence[sequence.indexOf(current) + 1];
   return {
-    dates: 'Указать даты и гостей', party: 'Указать гостей', lodging: 'Выбрать размещение', rhythm: 'Выбрать ритм',
+    dates: 'Указать даты и гостей', party: plannedParty ? 'Посмотреть состав гостей' : 'Указать гостей', lodging: 'Выбрать размещение', rhythm: 'Выбрать ритм',
     outings: 'Выбрать занятия', routes: 'Настроить поездки', services: 'Выбрать услуги', review: 'Проверить программу',
   }[next] || 'Продолжить';
 }
@@ -752,14 +798,6 @@ function renderAssistant(activePlan, { applyEdit, preparePdf } = {}) {
     getEvents: dates => loadHotelEvents(draftCity, dates, holidayApiBase),
     getGuideDates: activePlan ? undefined : guideDates,
     preparePdf,
-    openPlanSection: id => {
-      showPlannerView('plan');
-      const target = document.getElementById(id);
-      if (!target) return;
-      target.tabIndex = -1;
-      target.focus({ preventScroll: true });
-      target.scrollIntoView({ block: 'center' });
-    },
     interpretMessage: activePlan && localBookingHost ? interpretChatMessage : undefined,
     applyEdit,
   });
@@ -774,13 +812,16 @@ function renderQuestion(focus = true) {
   const sequence = steps(), index = sequence.indexOf(current);
   const history = previousSteps();
   const stickyActions = ['lodging', 'outings', 'routes', 'services', 'review'].includes(current);
-  const title = current === 'outings' && !quickEdit ? 'Выберите фишки отдыха' : current === 'party'
-    ? quickEdit ? 'Как проведём семейный отдых?' : stayCompact ? 'Сколько из гостей — дети?' : questions.party
+  const title = current === 'outings' && !quickEdit ? 'Выберите активность' : current === 'party'
+    ? quickEdit ? 'Как проведём семейный отдых?' : plannedParty ? 'Состав гостей' : stayCompact ? 'Сколько из гостей — дети?' : questions.party
     : questions[current];
   root.innerHTML = `<div class="planner-layout">
     <section class="planner-conversation holiday-board-surface" aria-labelledby="planner-question">
       <div class="planner-step-header">
-        ${!quickEdit ? '<button type="button" class="planner-edit" data-back-to-board>Вернуться к доске</button>' : ''}
+        ${!quickEdit ? `<button type="button" class="planner-button planner-button-light planner-board-back" data-back-from-auto>
+          <img src="./assets/holiday-icons/chevron-left.svg" width="18" height="18" alt="">
+          <span>Назад</span>
+        </button>` : ''}
         <div class="planner-progress">${quickEdit ? '<span>Настройка плана</span>' : `<span>Шаг ${index + 1} из <b data-step-count>${sequence.length}</b></span><progress value="${index + 1}" max="${sequence.length}" aria-label="Ход составления программы"></progress>`}</div>
       </div>
       <h2 id="planner-question" tabindex="-1">${title}</h2>
@@ -806,7 +847,7 @@ function renderQuestion(focus = true) {
       <dl class="planner-summary-values" data-trip-summary>${summaryValuesMarkup()}</dl>
     </aside>
   </div>`;
-  root.querySelector('[data-back-to-board]')?.addEventListener('click', () => { capture(); persistDraft(); returnToBoard(); });
+  root.querySelector('[data-back-from-auto]')?.addEventListener('click', backFromAutomatic);
   const form = root.querySelector('form');
   const lodgingAvailability = mountLodgingAvailability(form);
   bindBookingEdits(form, current === 'review' ? 'review' : 'question');
@@ -919,7 +960,7 @@ function pageLink(item, day) {
   url.searchParams.set('city', 'mozhaysk');
   if (['banya', 'restaurant'].includes(item.service)) {
     url.searchParams.set('from', 'holiday-plan'); url.searchParams.set('date', day.date);
-    url.searchParams.set('time', clock(item.start)); url.searchParams.set('guests', answers.adults + answers.children);
+    url.searchParams.set('time', clock(item.start)); url.searchParams.set('guests', plan.answers.adults + plan.answers.children);
     url.hash = 'reservation';
   }
   const text = item.service === 'barbecue' ? 'Уточнить мангальную зону' : item.service ? 'Проверить время отдельно' : 'Подробнее о занятии';
@@ -1059,16 +1100,82 @@ async function interpretChatMessage(message) {
 
 function closeItemEditor(restoreFocus = false) {
   if (!itemEditor) return;
-  const { panel, button } = itemEditor;
+  const { panel, button, animation, restoreTimeline } = itemEditor;
+  animation?.cancel();
   panel.replaceChildren();
   panel.hidden = true;
+  panel.removeAttribute('data-slot-palette');
+  panel.removeAttribute('tabindex');
+  restoreTimeline?.();
   button.setAttribute('aria-expanded', 'false');
-  root.querySelector('[data-pdf]').disabled = Boolean(pdfPreparation);
+  root.querySelector('[data-pdf]').disabled = pdfPreparation.size > 0;
   if (restoreFocus) button.focus();
   itemEditor = undefined;
 }
 
-function openItemEditor(button, item, day) {
+function showItemEditor(panel, button) {
+  panel.hidden = false;
+  button.setAttribute('aria-expanded', 'true');
+  root.querySelector('[data-pdf]').disabled = true;
+  itemEditor = { panel, button };
+}
+
+function splitTimelineAt(button, panel) {
+  const row = button.closest('.planner-event');
+  const list = row.parentElement;
+  const day = list.parentElement;
+  const timeline = day.closest('.holiday-timeline');
+  const footer = timeline.querySelector('.holiday-schedule-footer');
+  const rows = [...list.children];
+  const remaining = rows.slice(rows.indexOf(row) + 1);
+  const upper = document.createElement('div');
+  const lower = document.createElement('div');
+  const remainingList = document.createElement('ol');
+  for (const section of [upper, lower]) section.className = 'holiday-board-surface holiday-day-section';
+  upper.append(...day.children);
+  if (remaining.length) {
+    remainingList.append(...remaining);
+    lower.append(remainingList);
+  }
+  lower.append(footer);
+  day.append(upper, panel, lower);
+  timeline.setAttribute('data-day-split', '');
+
+  return () => {
+    list.append(...remainingList.children);
+    day.prepend(...upper.children);
+    button.after(panel);
+    timeline.append(footer);
+    upper.remove();
+    lower.remove();
+    timeline.removeAttribute('data-day-split');
+  };
+}
+
+function openSlotPalette(button, gap, day) {
+  const alreadyOpen = itemEditor?.button === button;
+  closeItemEditor();
+  if (alreadyOpen) return;
+  const panel = document.getElementById(button.getAttribute('aria-controls'));
+  panel.setAttribute('data-slot-palette', '');
+  panel.tabIndex = -1;
+  panel.innerHTML = boardPalette(scheduleReplacementOptions(plan, day.date), {
+    slotId: panel.id,
+    slotOptions: scheduleReplacementOptions(plan, day.date, { windowStart: gap.start, windowEnd: gap.end }),
+  });
+  const restoreTimeline = splitTimelineAt(button, panel);
+  showItemEditor(panel, button);
+  itemEditor.restoreTimeline = restoreTimeline;
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    itemEditor.animation = panel.animate([
+      { height: '0px', opacity: .25, overflow: 'clip' },
+      { height: `${panel.offsetHeight}px`, opacity: 1, overflow: 'clip' },
+    ], { duration: 240, easing: 'ease-out' });
+  }
+  panel.focus({ preventScroll: true });
+}
+
+function openItemEditor(button, item, day, { initialReplacement } = {}) {
   const alreadyOpen = itemEditor?.button === button;
   closeItemEditor();
   if (alreadyOpen) return;
@@ -1102,10 +1209,7 @@ function openItemEditor(button, item, day) {
       <button type="button" class="planner-button planner-button-light" data-cancel-item>Отмена</button>
     </div>
   </form>`;
-  panel.hidden = false;
-  button.setAttribute('aria-expanded', 'true');
-  root.querySelector('[data-pdf]').disabled = true;
-  itemEditor = { panel, button };
+  showItemEditor(panel, button);
   const form = panel.querySelector('form');
   const alert = form.querySelector('.planner-errors');
   form.addEventListener('input', () => { alert.hidden = true; });
@@ -1118,7 +1222,7 @@ function openItemEditor(button, item, day) {
       for (const input of custom.querySelectorAll('input')) input.disabled = custom.hidden;
     }
     function renderOptions() {
-      const selected = replacement.value;
+      const selected = replacement.value || initialReplacement;
       const options = scheduleReplacementOptions(plan, adding ? day.date : date.value, gap);
       replacement.innerHTML = '<option value="">Выберите занятие</option>' + options.map(option =>
         `<option value="${esc(option.id)}">${esc(option.title)}${option.id !== 'custom' ? ` · ${option.duration} мин` : ''}</option>`
@@ -1151,91 +1255,20 @@ function openItemEditor(button, item, day) {
     alert.hidden = false;
     alert.focus();
   });
-  (adding ? form.elements['item-time'] : form.elements.date).focus();
-}
-
-function lodgingResult() {
-  const lodging = lodgingChoice();
-  if (!lodging) return '';
-  const booked = isBookedLodging(lodging.id);
-  const local = !booked && localBookingHost;
-  const bookingUrl = new URL(lodging.bookingHref);
-  if (!booked && !local) {
-    bookingUrl.hash = new URLSearchParams({
-      plan: '1', checkIn: answers.startDate, checkOut: answers.endDate, roomId: lodging.id, guests: String(guestCount()),
-    }).toString();
-  }
-  return `<section class="planner-lodging-result" aria-label="Выбранное размещение">
-    <div><p class="planner-eyebrow">Выбранное размещение</p><strong>${esc(lodging.label)}</strong><p${local ? ' data-plan-booking-status role="status"' : ''}>${booked ? 'Категория перенесена из бронирования' : `До ${lodging.capacity} гостей · доступность проверяется отдельно`}</p></div>
-    <div class="planner-lodging-links">
-      <a href="${esc(lodging.detailsHref)}" target="_blank" rel="noopener">О хаусботе ↗</a>
-      ${local ? '<button type="button" class="planner-edit" data-plan-booking hidden>Перейти к бронированию</button>'
-        : booked ? '' : `<a href="${esc(bookingUrl.href)}" target="_blank" rel="noopener">Перейти к бронированию ↗</a>`}
-    </div>
-  </section>`;
-}
-
-async function mountPlanBooking() {
-  const button = root.querySelector('[data-plan-booking]');
-  if (!button) return;
-  const status = root.querySelector('[data-plan-booking-status]');
-  const lodging = lodgingChoice();
-  bookingConfigRequest ??= fetch('/api/local-booking/config', { cache: 'no-store' })
-    .then(response => response.ok ? response.json() : null)
-    .catch(() => null)
-    .finally(() => { bookingConfigRequest = undefined; });
-  const config = await bookingConfigRequest;
-  if (!button.isConnected) return;
-  if (config?.mode !== 'local-demo' || !Array.isArray(config.roomCategories)) {
-    status.textContent = 'Локальный календарь бронирования сейчас недоступен.';
-    return;
-  }
-  if (answers.startDate < today()) {
-    status.textContent = 'Дата приезда уже прошла. Для бронирования выберите новые даты в плане.';
-    return;
-  }
-  const capacity = config.roomCapacities?.[draftCity]?.[lodging.id];
-  if (!config.roomCategories.some(room => room?.id === lodging.id) || !Number.isInteger(capacity) || capacity < 1) {
-    status.textContent = 'Эта категория недоступна в локальном бронировании.';
-    return;
-  }
-  if (capacity < guestCount()) {
-    status.textContent = `Для этой категории в локальном бронировании доступно до ${capacity} гостей.`;
-    return;
-  }
-  button.hidden = false;
-  status.textContent = 'Даты, хаусбот и число гостей перенесём в бронирование.';
-  button.addEventListener('click', () => {
-    if (!persistDraft(true)) {
-      status.textContent = 'Браузер не смог сохранить программу. Она остаётся открытой на этой странице.';
-      return;
-    }
-    try {
-      const token = crypto.randomUUID();
-      const { startDate: checkIn, endDate: checkOut } = answers;
-      const scope = draftScope === bookingScope ? { bookingToken } : {};
-      sessionStorage.setItem(`amore-holiday-plan-to-booking:${token}`, JSON.stringify({
-        city: draftCity, checkIn, checkOut, roomId: lodging.id, guests: guestCount(), ...scope,
-      }));
-      const url = new URL(lodging.bookingHref);
-      url.searchParams.set('plan', token);
-      location.assign(url.href);
-    } catch {
-      status.textContent = 'Не удалось перенести данные в бронирование. Программа остаётся открытой.';
-    }
-  });
+  const focus = initialReplacement === 'custom' ? form.elements['item-title'] : adding ? form.elements['item-time'] : form.elements.date;
+  focus.focus();
 }
 
 function releasePreparedPdf() {
-  preparedPdf?.release();
-  preparedPdf = undefined;
-  pdfPreparation = undefined;
+  for (const file of preparedPdf.values()) file.release();
+  preparedPdf.clear();
+  pdfPreparation.clear();
 }
 
 function setBoardHeading(tab) {
   document.body.dataset.holidayView = tab;
   viewSwitch.hidden = tab === 'choose';
-  const title = { map: 'Карта отдыха', badges: 'Достижения', pick: 'Подбор отдыха', family: 'Раздельный отдых' }[tab] || 'План отдыха';
+  const title = { map: 'Карта отдыха', badges: 'Достижения', pick: 'Подбор отдыха' }[tab] || 'План отдыха';
   masthead.querySelector('h1').textContent = title;
   document.title = `${title} — A’MORE Collection`;
 }
@@ -1246,7 +1279,7 @@ function revealBoardDay(date, tab = boardTab) {
   selectedDay = day.date;
   boardTab = tab;
   setBoardHeading(tab);
-  const dayTabs = root.querySelector('.holiday-day-tabs');
+  const dayTabs = root.querySelector('[data-board-days]');
   if (dayTabs) {
     dayTabs.hidden = tab === 'badges';
     const active = dayTabs.querySelector(`[data-board-day="${day.date}"]`);
@@ -1350,12 +1383,13 @@ function bindBoard(date) {
       : 'В этот день нет подходящего окна. Выберите другой день или освободите время.';
   }
 
-  function commit(selection, day, gap) {
+  function commit(selection, day, gap, notice = feedback) {
     const edit = editFor(selection, day, gap);
     if (edit.type === 'add') edit.itemId = `added:${crypto.randomUUID()}`;
     const error = saveItemEdit(edit, day.date);
     if (error) {
-      feedback.textContent = error;
+      notice.textContent = error;
+      notice.hidden = false;
       refreshTargets();
     }
   }
@@ -1374,7 +1408,7 @@ function bindBoard(date) {
     const button = event.target.closest('button');
     if (!button) return;
     const day = activeDay();
-    const row = rowFor(button);
+    const row = rowFor(button.closest('[data-slot-palette]') ? itemEditor.button : button);
     const item = row && itemFor(day, row);
     if (button.hasAttribute('data-board-auto')) return openAutomatic();
     if (button.hasAttribute('data-board-choose-room')) return openQuickEdit('lodging', 'result');
@@ -1390,8 +1424,18 @@ function bindBoard(date) {
     }
     if (button.dataset.boardAdd || button.dataset.mapAdd) {
       const id = button.dataset.boardAdd || button.dataset.mapAdd;
+      const selection = { id, title: button.dataset.tileTitle };
+      if (button.closest('[data-slot-palette]')) {
+        return commit(selection, day, gapFor(day, row), itemEditor.panel.querySelector('[data-slot-feedback]'));
+      }
       if (boardTab === 'map') switchDay(selectedDay, 'schedule');
-      return startPlacement({ id, title: button.dataset.tileTitle });
+      return startPlacement(selection);
+    }
+    if (button.hasAttribute('data-close-slot')) return closeItemEditor(true);
+    if (button.hasAttribute('data-slot-custom')) {
+      const trigger = itemEditor.button;
+      closeItemEditor();
+      return openItemEditor(trigger, gapFor(day, row), day, { initialReplacement: 'custom' });
     }
     if (button.dataset.mapScheduleItem) return focusSchedule(button.dataset.mapScheduleItem, day.date);
     if (button.hasAttribute('data-board-details')) {
@@ -1409,7 +1453,8 @@ function bindBoard(date) {
       const type = button.dataset.itemAction;
       if (type === 'add') {
         const gap = gapFor(day, row);
-        return placement ? commit(placement, day, gap) : openItemEditor(button, gap, day);
+        if (placement) return commit(placement, day, gap);
+        return mobileSchedule.matches ? openSlotPalette(button, gap, day) : openItemEditor(button, gap, day);
       }
       if (!item) return;
       if (type === 'remove') {
@@ -1439,7 +1484,7 @@ function bindBoard(date) {
     }
   });
   const dayTabs = [...result.querySelectorAll('[data-board-day]')];
-  result.querySelector('.holiday-day-tabs')?.addEventListener('keydown', event => {
+  result.querySelector('[data-board-days]')?.addEventListener('keydown', event => {
     const index = dayTabs.indexOf(event.target);
     if (index < 0) return;
     const last = dayTabs.length - 1;
@@ -1450,10 +1495,14 @@ function bindBoard(date) {
     dayTabs[next].focus({ preventScroll: true });
   });
   result.addEventListener('keydown', event => {
-    if (event.key === 'Escape' && placement && !itemEditor) result.querySelector('[data-board-cancel-placement]').click();
+    if (event.key !== 'Escape') return;
+    if (itemEditor?.panel.hasAttribute('data-slot-palette')) {
+      event.preventDefault();
+      closeItemEditor(true);
+    } else if (placement && !itemEditor) result.querySelector('[data-board-cancel-placement]').click();
   });
   schedule.addEventListener('pointerdown', event => {
-    if (!event.isPrimary || event.button !== 0 || event.target.closest('a, input, select, textarea, .holiday-event-detail, .holiday-row-remove')) return;
+    if (!event.isPrimary || event.button !== 0 || event.target.closest('a, input, select, textarea, .holiday-event-detail, .holiday-row-remove, [data-slot-palette]')) return;
     const tile = event.target.closest('[data-board-add]');
     const row = event.target.closest('[data-board-movable]');
     if (!tile && !row) return;
@@ -1522,23 +1571,330 @@ function bindBoard(date) {
   revealBoardDay(date);
 }
 
+function bookingPartyParams(trip) {
+  const party = new URLSearchParams();
+  if (trip.children > 0) {
+    party.set('partyAdults', trip.adults);
+    for (const age of trip.ages) party.append('partyAge', String(age));
+  }
+  return party;
+}
+
+function bookingCheckoutURL(trip) {
+  const booking = new URL('https://amora-med1ag-booking.ai-vipsup.chatgpt.site/booking');
+  booking.searchParams.set('city', draftCity);
+  const guests = trip.adults + trip.children;
+  if (trip.endDate <= trip.startDate || !holidayLodgings.some(room => room.id === trip.lodging && room.capacity >= guests)) return booking;
+
+  const stay = bookingPartyParams(trip);
+  stay.set('plan', '1');
+  stay.set('checkIn', trip.startDate);
+  stay.set('checkOut', trip.endDate);
+  stay.set('roomId', trip.lodging);
+  stay.set('guests', guests);
+  booking.searchParams.set('step', 'checkout');
+  booking.hash = stay.toString();
+  return booking;
+}
+
+function loadBoardSchedule() {
+  const group = activeGuestGroup();
+  const schedule = group ? guestGroups.plans[guestGroupKey(group)] : boardRecord;
+  planEdits = [...(schedule?.edits || [])];
+  marks = new Set(schedule?.marks);
+  plan = undefined;
+  rebuildPlan({ alreadyPlanned: true });
+}
+
+function redrawGuestSchedule(selector) {
+  selectedMapItem = undefined;
+  chatState = {};
+  loadBoardSchedule();
+  renderPlan({ scroll: false });
+  root.querySelector(selector)?.focus({ preventScroll: true });
+}
+
+function guestCardContent(guest) {
+  const name = guestGroups.names[guest.id]?.trim() || guest.label;
+  const age = guestAgeLabel(guest.age);
+  return `<span class="holiday-guest-figure" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="4.5" r="2.5"></circle>
+      <path d="M5 10.5 9 9h6l4 1.5M9 9v6l-1 7m7-13v6l1 7"></path>
+    </svg>
+  </span>
+  <span class="holiday-guest-caption">
+    <strong>${esc(name)}</strong>
+    ${age ? `<span>${age}</span>` : ''}
+  </span>`;
+}
+
+function guestGroupControls() {
+  const modes = [
+    ['together', 'Совместный отдых'],
+    ['separate', 'Раздельный отдых'],
+  ];
+  const tab = (id, type, value, label, selected) => `<button type="button" id="${id}" role="tab"
+    data-${type}="${esc(value)}" aria-controls="holiday-current-plan" aria-selected="${selected}"
+    tabindex="${selected ? 0 : -1}">${esc(label)}</button>`;
+  const modeTabs = `<div class="holiday-day-tabs holiday-scope-tabs" role="tablist" aria-label="Формат отдыха" data-group-tablist>
+    ${modes.map(([id, label]) => tab(`holiday-scope-${id}`, 'schedule-mode', id, label, guestGroups.mode === id)).join('')}
+  </div>`;
+  if (!activeGuestGroup()) return modeTabs;
+
+  const guests = tripGuests(answers);
+  const freeIds = new Set(guestGroups.groups.filter(group => group.length === 1).map(([id]) => id));
+  const freeGuests = guests.filter(guest => freeIds.has(guest.id));
+  const groupLabel = group => guestGroupLabel(group, guests, guestGroups.names);
+  const total = stayCompact ? stayGuestCount() : 0;
+  const groupTabs = guestGroups.groups.map(group => {
+    const key = guestGroupKey(group);
+    return tab(`holiday-guest-${key}`, 'guest-schedule', key, groupLabel(group), guestGroups.active === key);
+  }).join('');
+  const jointCards = guestGroups.groups.filter(group => group.length > 1).map(group => {
+    const key = guestGroupKey(group);
+    const label = esc(groupLabel(group));
+    return `<li class="holiday-joint-entry">
+      <button type="button" class="holiday-guest-card holiday-joint-card" data-open-joint-group="${key}"
+        aria-pressed="${guestGroups.active === key}">
+        <strong>Совместно</strong><span>${label}</span>
+      </button>
+      <button type="button" class="holiday-joint-remove" data-remove-joint-group="${key}"
+        aria-label="Удалить группу «${label}»">${boardIcon('trash')}</button>
+    </li>`;
+  }).join('');
+  const canCreateGroup = freeGuests.length >= 2 && guests.length > 2;
+  const addGroup = canCreateGroup ? `<li><button type="button" class="holiday-guest-card holiday-joint-add" data-create-joint-group
+    aria-expanded="false" aria-controls="holiday-joint-picker">${boardIcon('plus')}<strong>Совместно</strong></button></li>` : '';
+  const cards = freeGuests.map(guest => `<li><button type="button" class="holiday-guest-card holiday-guest-pick" data-guest-type="${guest.type}"
+      data-pick-guest="${guest.id}" aria-label="${esc(groupLabel([guest.id]))}" aria-pressed="false" disabled>
+      ${guestCardContent(guest)}
+    </button></li>`).join('');
+  return `${modeTabs}
+    <div class="holiday-day-tabs holiday-scope-tabs holiday-guest-tabs" role="tablist" aria-label="Планы гостей" data-group-tablist>
+      ${groupTabs}
+    </div>
+    <details class="holiday-guest-settings holiday-board-surface"${groupSettingsOpen ? ' open' : ''} data-guest-settings>
+      <summary>Ручная настройка</summary>
+      ${canCreateGroup ? '<p class="holiday-joint-hint" data-joint-hint aria-live="polite" hidden>Выберите минимум двух гостей</p>' : ''}
+      <ul class="holiday-guest-cards" role="list" aria-label="Гости и совместные группы">${cards}${jointCards}${addGroup}</ul>
+      ${canCreateGroup ? `<div id="holiday-joint-picker" class="holiday-joint-picker" hidden>
+        <button type="button" class="planner-button" data-save-joint-group disabled>Создать группу</button>
+        <button type="button" class="planner-button planner-button-light" data-cancel-joint-group>Отмена</button>
+      </div>` : ''}
+      ${!plannedStay ? `<form class="holiday-guest-roster" data-guest-roster novalidate>
+        <div class="planner-fields">
+          ${field('group-adults', 'Взрослые', 'number', answers.adults, `min="1" max="20" step="1" inputmode="numeric"${total ? ' readonly' : ''}`)}
+          ${field('group-children', 'Дети до 18 лет', 'number', answers.children, `min="0" max="${total ? Math.min(10, total - 1) : 10}" step="1" inputmode="numeric"`)}
+        </div>
+        <div data-guest-ages>${agesMarkup()}</div>
+        <p class="planner-errors" role="alert" data-guest-errors hidden></p>
+        <button class="planner-button planner-button-light" type="submit">Сохранить состав гостей</button>
+      </form>` : ''}
+    </details>`;
+}
+
+function bindJointGroupControls(settings) {
+  const guests = tripGuests(answers);
+  function openGroup(key) {
+    guestGroups.active = key;
+    groupSettingsOpen = true;
+    redrawGuestSchedule(`[data-open-joint-group="${key}"]`);
+    const tab = document.getElementById(`holiday-guest-${key}`);
+    const tabs = tab.parentElement;
+    tabs.scrollLeft += Math.max(0, tab.getBoundingClientRect().right - tabs.getBoundingClientRect().right);
+  }
+  for (const card of settings.querySelectorAll('[data-open-joint-group]')) {
+    card.addEventListener('click', () => openGroup(card.dataset.openJointGroup));
+  }
+  for (const button of settings.querySelectorAll('[data-remove-joint-group]')) {
+    button.addEventListener('click', () => {
+      const key = button.dataset.removeJointGroup;
+      const groups = guestGroups.groups.filter(group => guestGroupKey(group) !== key);
+      guestGroups = restoreGuestGroups({ ...guestGroups, groups }, guests);
+      groupSettingsOpen = true;
+      redrawGuestSchedule(guests.length > 2 ? '[data-create-joint-group]' : '[data-guest-settings] > summary');
+    });
+  }
+  const add = settings.querySelector('[data-create-joint-group]');
+  if (!add) return;
+  const picker = settings.querySelector('#holiday-joint-picker');
+  const hint = settings.querySelector('[data-joint-hint]');
+  const save = picker.querySelector('[data-save-joint-group]');
+  const choices = [...settings.querySelectorAll('[data-pick-guest]')];
+  const selected = new Set();
+  const selectionHint = hint.textContent;
+  function updatePicker() {
+    const everyoneSelected = selected.size === guests.length;
+    hint.textContent = everyoneSelected ? 'Для всех гостей есть вкладка «Совместный отдых».' : selectionHint;
+    save.disabled = selected.size < 2 || everyoneSelected;
+  }
+  function togglePicker(open) {
+    picker.hidden = hint.hidden = !open;
+    add.setAttribute('aria-expanded', String(open));
+    selected.clear();
+    updatePicker();
+    for (const choice of choices) {
+      choice.disabled = !open;
+      choice.setAttribute('aria-pressed', 'false');
+    }
+    if (open) choices[0].focus();
+    else add.focus({ preventScroll: true });
+  }
+  add.addEventListener('click', () => togglePicker(picker.hidden));
+  picker.querySelector('[data-cancel-joint-group]').addEventListener('click', () => togglePicker(false));
+  for (const choice of choices) {
+    choice.addEventListener('click', () => {
+      const id = choice.dataset.pickGuest;
+      if (!selected.delete(id)) selected.add(id);
+      choice.setAttribute('aria-pressed', String(selected.has(id)));
+      updatePicker();
+    });
+  }
+  save.addEventListener('click', () => {
+    if (selected.size < 2 || selected.size >= guests.length) return;
+    const members = [...selected];
+    const key = guestGroupKey(members);
+    const groups = [...guestGroups.groups, members];
+    guestGroups = restoreGuestGroups({ ...guestGroups, groups, active: key }, guests);
+    openGroup(key);
+  });
+}
+
+function bindGuestGroupControls() {
+  const settings = root.querySelector('[data-guest-settings]');
+  const roster = root.querySelector('[data-guest-roster]');
+  for (const tabs of root.querySelectorAll('[data-group-tablist]')) {
+    tabs.addEventListener('click', event => {
+      const tab = event.target.closest('[role="tab"]');
+      if (!tab || tab.getAttribute('aria-selected') === 'true') return;
+      if (tab.dataset.scheduleMode) {
+        guestGroups.mode = tab.dataset.scheduleMode;
+      } else guestGroups.active = tab.dataset.guestSchedule;
+      redrawGuestSchedule(`[id="${tab.id}"]`);
+    });
+    tabs.addEventListener('keydown', event => {
+      const movement = ['ArrowLeft', 'ArrowRight', 'Home', 'End'].indexOf(event.key);
+      if (movement === -1) return;
+      const buttons = [...tabs.querySelectorAll('button')];
+      const index = buttons.indexOf(event.target);
+      if (index === -1) return;
+      event.preventDefault();
+      const next = [((index - 1 + buttons.length) % buttons.length), ((index + 1) % buttons.length), 0, buttons.length - 1][movement];
+      buttons[next].click();
+    });
+  }
+  if (!settings) return;
+  settings.addEventListener('toggle', () => { if (settings.isConnected) groupSettingsOpen = settings.open; });
+  bindJointGroupControls(settings);
+  if (!roster) return;
+  const adultField = roster.elements['group-adults'];
+  const childField = roster.elements['group-children'];
+  const ageArea = roster.querySelector('[data-guest-ages]');
+  const notice = roster.querySelector('[data-guest-errors]');
+  const values = () => [...ageArea.querySelectorAll('input')].map(input => input.valueAsNumber);
+  const selectedTotal = stayCompact ? stayGuestCount() : 0;
+  childField.addEventListener('input', () => {
+    const count = childField.valueAsNumber;
+    if (!Number.isInteger(count) || count < 0 || count > Number(childField.max)) return;
+    if (selectedTotal) adultField.value = selectedTotal - count;
+    ageArea.innerHTML = agesMarkup({ children: count, ages: values().map(age => Number.isFinite(age) ? age : '') });
+  });
+  roster.addEventListener('submit', event => {
+    event.preventDefault();
+    const adults = adultField.valueAsNumber, children = childField.valueAsNumber, ages = values();
+    const childActivities = answers.childActivities.filter(id => childActivityOptions.some(option =>
+      option.id === id && ages.some(age => age >= option.minAge)));
+    const next = { ...answers, adults, children, ages, childActivities };
+    const errors = validateAnswers(next);
+    if (selectedTotal && adults + children !== selectedTotal) errors.children = 'Число гостей должно совпадать с выбранным при бронировании.';
+    const issue = errors.adults || errors.children || errors.ages;
+    if (issue) {
+      notice.textContent = issue;
+      notice.hidden = false;
+      return;
+    }
+    Object.assign(answers, next);
+    if (!lodgingChoice()) answers.lodging = '';
+    guestGroups = restoreGuestGroups(guestGroups, tripGuests(answers));
+    groupSettingsOpen = true;
+    redrawGuestSchedule('[data-guest-roster] button[type="submit"]');
+  });
+}
+
+function boardLodgingPhoto(showPrice) {
+  const lodging = lodgingChoice();
+  const nights = plan.days.length - 1;
+  const photo = lodging?.photo || holidayLodgings.find(room => room.id === 'panorama').photo;
+  const caption = lodging?.label || (nights ? 'Хаусбот не выбран' : 'Без ночёвки');
+  return `<figure class="holiday-board-photo">
+    <img src="${esc(photo)}" alt="" loading="lazy" decoding="async">
+    <figcaption>
+      <strong>${esc(caption)}</strong>
+      ${nights ? `<span>${nights} ${nightForms[nightPlural.select(nights)]}</span>` : ''}
+      ${showPrice ? '<span class="holiday-board-price" data-stay-price role="status">Уточняем стоимость аренды…</span>' : ''}
+    </figcaption>
+  </figure>`;
+}
+
+async function showBoardStayPrice() {
+  const label = root.querySelector('[data-stay-price]');
+  if (!label) return;
+  const selection = { city: draftCity, checkin: answers.startDate, checkout: answers.endDate, guests: guestCount(), categoryId: answers.lodging };
+  const url = new URL(lodgingAvailabilityUrl);
+  url.search = new URLSearchParams(selection);
+  if (localBookingHost) url.searchParams.set('kind', 'stay');
+  const key = url.href;
+  if (stayPriceRequest?.key !== key) {
+    const promise = fetch(url, { cache: 'no-store', credentials: 'omit', signal: AbortSignal.timeout(5000) })
+      .then(async response => {
+        if (!response.ok) return null;
+        const result = await response.json();
+        if (result?.currency !== 'RUB' || !Object.entries(selection).every(([field, value]) => result[field] === value)
+          || !Number.isSafeInteger(result.totalMinor) || result.totalMinor < 0) return null;
+        return result.totalMinor;
+      }).catch(() => null);
+    stayPriceRequest = { key, promise };
+  }
+  const request = stayPriceRequest;
+  const total = await request.promise;
+  if (stayPriceRequest === request && total === null) stayPriceRequest = undefined;
+  if (label.isConnected) {
+    label.textContent = total === null ? 'Стоимость уточняется при бронировании' : `${rubles.format(total / 100)} за весь период`;
+  }
+}
+
+function groupProgrammes(groups, activeGroup) {
+  const activeKey = guestGroupKey(activeGroup);
+  const guests = tripGuests(answers);
+  return groups.map(group => {
+    const key = guestGroupKey(group);
+    const title = guestGroupLabel(group, guests, guestGroups.names);
+    if (key === activeKey) return { title, plan };
+    const schedule = buildHolidayPlan(answersForGuestGroup(answers, group), { priorityMeals, allowChildOnly: true });
+    return { title, plan: replayScheduleEdits(schedule, guestGroups.plans[key]?.edits).plan };
+  });
+}
+
 function renderPlan({ scroll = true, message = '', save = true } = {}) {
   releasePreparedPdf();
   root.dataset.boardScreen = 'board';
   itemEditor = undefined;
   if (save) persistDraft(true);
   const lodging = lodgingLabel();
-  const text = planToText(plan, { lodging });
-  const hasExcursions = plan.days.some(day => day.items.some(item => item.kind === 'excursion'));
-  const format = !stayingAtHotel() && !hasExcursions ? 'Без выездов к достопримечательностям' : outingModeLabel();
+  const group = activeGuestGroup();
+  const programmeCount = group ? guestGroups.groups.length : 1;
+  const currentPlanLabel = group ? `holiday-guest-${guestGroups.active}` : 'holiday-scope-together';
   const activeDay = plan.days.find(day => day.date === selectedDay) || plan.days[0];
+  const alreadyBooked = isBookedLodging(answers.lodging);
+  const booking = alreadyBooked ? null : bookingCheckoutURL(answers);
+  const continueWithoutPlan = booking?.href || './hotel.html?city=mozhaysk';
   root.innerHTML = `<section class="planner-result" aria-labelledby="planner-result-title">
     <h2 id="planner-result-title" class="planner-sr-only" tabindex="-1">Ваш план</h2>
     <div class="holiday-placement-status">
       <p class="planner-feedback" role="status">${esc(message)}</p>
       <button type="button" class="planner-edit" data-board-cancel-placement hidden>Отменить выбор фишки</button>
     </div>
-    <p class="planner-feedback" data-pdf-ready hidden><a data-pdf-link>Скачать готовый PDF</a></p>
     <div class="holiday-board-toolbar">
       <div class="holiday-board-tabs" role="group" aria-label="Разделы доски">
         <button type="button" data-board-tab="schedule" aria-controls="holiday-board-schedule">Расписание</button>
@@ -1546,14 +1902,15 @@ function renderPlan({ scroll = true, message = '', save = true } = {}) {
         <button type="button" data-board-tab="badges" aria-controls="holiday-board-badges">${boardIcon('achievement')}Достижения</button>
       </div>
       <div class="holiday-board-top-actions">
-        <button type="button" class="planner-button holiday-primary" data-board-auto>Спланируй отдых за меня</button>
         <div class="holiday-trip-controls">
-          <button type="button" class="planner-button planner-button-light" data-edit>Изменить даты</button>
-          <button type="button" class="planner-button planner-button-light" data-open-family>Раздельный отдых</button>
+          <button type="button" class="planner-button planner-button-light" data-board-auto${group ? ' aria-label="Спланируй совместный отдых за меня"' : ''}>Спланируй отдых за меня</button>
+          <a class="planner-button planner-button-light" href="${esc(continueWithoutPlan)}" rel="noreferrer">Продолжить без плана</a>
         </div>
       </div>
     </div>
-    ${plan.days.length > 1 ? `<div class="holiday-day-tabs" role="tablist" aria-label="Дни отдыха">
+    ${guestGroupControls()}
+    <div id="holiday-current-plan" role="tabpanel" aria-labelledby="${currentPlanLabel}">
+    ${plan.days.length > 1 ? `<div class="holiday-day-tabs" data-board-days role="tablist" aria-label="Дни отдыха">
       ${plan.days.map((day, index) => `<button type="button" role="tab" id="holiday-tab-${day.date}" data-board-day="${day.date}" aria-controls="holiday-day-content" aria-selected="${activeDay === day}" tabindex="${activeDay === day ? 0 : -1}">
         <strong>День ${index + 1}</strong><span>${esc(dateLabel(day.date))}</span>
       </button>`).join('')}
@@ -1571,14 +1928,20 @@ function renderPlan({ scroll = true, message = '', save = true } = {}) {
             <ol>${day.items.map((item, entry) => eventMarkup(item, day, entry)).join('')}</ol>
           </article>`).join('')}
         </div>
-        <p class="holiday-board-note">${esc(breakfastNotice)}</p>
+        <div class="holiday-schedule-footer">
+          <p class="holiday-board-note">${esc(breakfastNotice)}</p>
+          <div class="holiday-programme-download">
+            <button type="button" class="planner-button" data-pdf>${programmeCount > 1 ? 'Скачать программы' : 'Скачать программу'}</button>
+            <p class="planner-feedback" data-pdf-status role="status"></p>
+            <a data-pdf-link hidden></a>
+          </div>
+        </div>
       </div>
       <aside class="holiday-board-sidebar">
-        <img class="holiday-board-photo" src="./images/mozhaysk-render-photos-20261106/panorama/exterior.jpg" width="1672" height="941" alt="Хаусбот на Можайском водохранилище">
+        ${boardLodgingPhoto(Boolean(lodgingAvailabilityUrl && booking?.hash && answers.startDate >= today()))}
         <div class="holiday-board-surface holiday-coordination">
           <h3>Согласовать с отелем</h3>
           <div class="holiday-coordination-list" data-board-confirmations role="region" aria-label="Пункты для согласования" tabindex="0"></div>
-          ${holidayApiBase ? '<button type="button" class="planner-button" data-plan-request aria-expanded="false" aria-controls="planner-plan-request">Открыть заявки на согласование</button>' : ''}
         </div>
       </aside>
     </div>
@@ -1588,28 +1951,7 @@ function renderPlan({ scroll = true, message = '', save = true } = {}) {
       <h3 id="holiday-badge-title">Достижения</h3><p>Отмечайте занятия в расписании. Достижения сохраняются в этом браузере.</p>
       <div data-board-badges></div>
     </section>
-    ${holidayApiBase ? '<section id="planner-plan-request" class="planner-item-editor planner-request" data-plan-request-panel aria-labelledby="planner-request-title" hidden></section>' : ''}
-    <details class="holiday-board-tools"><summary>Экспорт, размещение и настройки программы</summary>
-      <div class="holiday-trip-controls">
-        <button class="planner-button" data-pdf>Скачать PDF</button>
-        <button type="button" class="planner-button planner-button-light planner-chat-trigger" data-open-holiday-chat aria-controls="planner-chat">Написать помощнику</button>
-        <button class="planner-button planner-button-light" data-copy>Скопировать текст</button>
-        <button class="planner-edit" data-edit-outings>Изменить занятия и поездки</button>
-        <button class="planner-edit" data-edit-services>Изменить услуги</button>
-        ${stayCompact ? bookingEditButtons() : lodgingEditButton()}
-      </div>
-      ${lodgingResult()}
-      <p class="planner-note">${format}. Время услуг и сопровождение детей подтверждаются отдельно.</p>
-    </details>
-    ${holidayApiBase ? `<section class="planner-afisha" data-hotel-events aria-labelledby="planner-afisha-title">
-      <div class="planner-afisha-heading">
-        <div><p class="planner-eyebrow">Мероприятия отеля</p><h3 id="planner-afisha-title">Афиша на ваши даты</h3></div>
-        <button type="button" class="planner-edit" data-events-refresh>Обновить афишу</button>
-      </div>
-      <p class="planner-afisha-status" role="status" data-events-status></p>
-      <p class="planner-afisha-notice" role="status" data-events-notice hidden></p>
-      <ul class="planner-afisha-list" data-events-list hidden></ul>
-    </section>` : ''}
+    </div>
     ${unappliedEdits.length ? `<section class="planner-unplaced">
       <h3>Правки, которые не удалось применить</h3>
       <p>После пересчёта изменились даты или время занятий. Эти пункты можно поправить в новом расписании.</p>
@@ -1621,58 +1963,50 @@ function renderPlan({ scroll = true, message = '', save = true } = {}) {
       <ul>${plan.unplaced.map(item => `<li><strong>${esc(item.title)}</strong> — ${esc(item.reason)}</li>`).join('')}</ul>
     </section>` : ''}
     ${plan.notes.length ? `<div class="planner-plan-notes">${plan.notes.map(note => `<p>${esc(note)}</p>`).join('')}</div>` : ''}
-    <details class="planner-text">
-      <summary>Вся программа обычным текстом</summary>
-      <label for="planner-plain-text" class="planner-sr-only">Текст программы для копирования</label>
-      <textarea id="planner-plain-text" readonly rows="18">${esc(text)}</textarea>
-      <button class="planner-button planner-button-light" data-download>Скачать .txt</button>
-    </details>
+    ${booking ? `<div class="holiday-programme-booking" data-board-pane="schedule">
+      <a class="planner-button holiday-booking-button" href="${esc(booking.href)}" rel="noreferrer">Забронировать</a>
+    </div>` : ''}
   </section>`;
   bindBoard(activeDay.date);
-  const feedback = root.querySelector('.planner-feedback');
+  bindGuestGroupControls();
+  void showBoardStayPrice();
   const pdfButton = root.querySelector('[data-pdf]');
-  const pdfReady = root.querySelector('[data-pdf-ready]');
+  const pdfStatus = root.querySelector('[data-pdf-status]');
   const pdfLink = root.querySelector('[data-pdf-link]');
-  async function preparePdf() {
+  async function preparePdf(key) {
     if (!pdfButton.isConnected) return null;
-    if (preparedPdf) return preparedPdf;
-    if (pdfPreparation) return pdfPreparation;
+    if (preparedPdf.has(key)) return preparedPdf.get(key);
+    if (pdfPreparation.has(key)) return pdfPreparation.get(key);
     const schedule = plan;
+    const programmes = group ? groupProgrammes(key === 'active' ? [group] : guestGroups.groups, group) : undefined;
     pdfButton.disabled = true;
-    pdfPreparation = (async () => {
+    const job = (async () => {
       try {
-        const { prepareHolidayPdfDownload } = await import('./collection-holiday-pdf.js?v=20261109-career-type-1');
-        const result = await prepareHolidayPdfDownload(schedule, { lodging });
+        const { prepareHolidayPdfDownload } = await import('./collection-holiday-pdf.js?v=20261120-programme-layout-3');
+        const result = await prepareHolidayPdfDownload(schedule, { lodging, programmes });
         if (!pdfButton.isConnected) {
           result.release();
           return null;
         }
-        preparedPdf = result;
-        pdfLink.href = result.url;
-        pdfLink.download = result.filename;
+        preparedPdf.set(key, result);
         return result;
       } finally {
         if (pdfButton.isConnected) {
-          pdfPreparation = undefined;
-          pdfButton.disabled = Boolean(itemEditor);
+          pdfPreparation.delete(key);
+          pdfButton.disabled = Boolean(itemEditor) || pdfPreparation.size > 0;
         }
       }
     })();
-    return pdfPreparation;
+    pdfPreparation.set(key, job);
+    return job;
   }
   renderAssistant(plan, {
-    preparePdf,
+    preparePdf: () => preparePdf(programmeCount > 1 ? 'active' : 'board'),
     applyEdit: edit => {
       const source = plan.days.find(day => day.items.some(item => item.id === edit.itemId));
       return saveItemEdit(edit, source?.date || edit.date, { focus: false }) || '';
     },
   });
-  root.querySelector('[data-open-holiday-chat]').addEventListener('click', () => showPlannerView('chat', { focus: true, scroll: true }));
-  void mountPlanBooking();
-  if (holidayApiBase) {
-    mountPlanRequests(root, plan, holidayApiBase);
-    mountHotelEvents(root.querySelector('[data-hotel-events]'), plan, draftCity, edit => saveItemEdit(edit, edit.date), holidayApiBase);
-  }
   for (const undoButton of root.querySelectorAll('[data-undo-item]')) undoButton.addEventListener('click', () => {
     const { plan: previous, itemId, date } = undoEdit;
     plan = previous;
@@ -1682,35 +2016,22 @@ function renderPlan({ scroll = true, message = '', save = true } = {}) {
     focusSchedule(itemId, date);
   });
   pdfButton.addEventListener('click', async () => {
-    if (!preparedPdf) feedback.textContent = 'Готовим PDF…';
+    if (!preparedPdf.has('board')) pdfStatus.textContent = 'Готовим PDF…';
     try {
-      const result = preparedPdf ?? await preparePdf();
+      const result = preparedPdf.get('board') ?? await preparePdf('board');
       if (!result || !pdfButton.isConnected) return;
-      pdfReady.hidden = false;
-      feedback.textContent = 'PDF готов. Если скачивание не началось, воспользуйтесь ссылкой ниже.';
+      pdfLink.href = result.url;
+      pdfLink.download = result.filename;
       pdfLink.click();
+      pdfStatus.textContent = 'PDF готов. Чтобы скачать ещё раз, нажмите кнопку.';
     } catch (error) {
       console.error('Holiday plan PDF export failed', error);
-      feedback.textContent = 'PDF не удалось подготовить. Можно повторить попытку или скачать текстовый файл.';
+      pdfStatus.textContent = 'PDF не удалось подготовить. Попробуйте ещё раз.';
     }
   });
-  bindBookingEdits(root, 'result');
-  root.querySelector('[data-edit]').addEventListener('click', () => openQuickEdit('dates', 'result'));
-  root.querySelector('[data-edit-outings]').addEventListener('click', () => editOutings('result'));
-  root.querySelector('[data-edit-services]').addEventListener('click', () => openQuickEdit('services', 'result'));
-  root.querySelector('[data-open-family]').addEventListener('click', openFamily);
   for (const button of root.querySelectorAll('[data-edit-place]')) {
     button.addEventListener('click', () => openQuickEdit('routes', 'result', button.dataset.editPlace));
   }
-  root.querySelector('[data-copy]').addEventListener('click', async () => {
-    try { await navigator.clipboard.writeText(text); feedback.textContent = 'Программа скопирована. Её можно отправить близким или администратору.'; }
-    catch { const details = root.querySelector('.planner-text'); details.open = true; const area = details.querySelector('textarea'); area.focus(); area.select(); feedback.textContent = 'Автоматическое копирование недоступно. Текст выделен ниже — скопируйте его вручную.'; }
-  });
-  root.querySelector('[data-download]').addEventListener('click', () => {
-    const url = URL.createObjectURL(new Blob(['\ufeff', text], { type: 'text/plain;charset=utf-8' }));
-    const link = document.createElement('a'); link.href = url; link.download = `amore-plan-${answers.startDate}.txt`; link.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-  });
   if (scroll) {
     root.querySelector('#planner-result-title').focus({ preventScroll: true });
     root.scrollIntoView({ block: 'start', behavior: 'auto' });
@@ -1723,7 +2044,22 @@ function setPlannerRoute(mode, replace = false) {
     url.searchParams.set('mode', mode);
     url.searchParams.delete('assistant');
   } else url.searchParams.delete('mode');
-  if (url.href !== location.href) history[replace ? 'replaceState' : 'pushState'](history.state, '', url);
+  if (url.href === location.href) return;
+  const state = { ...history.state };
+  if (mode === 'auto' && !replace) state.plannerAutoBack = true;
+  else delete state.plannerAutoBack;
+  history[replace ? 'replaceState' : 'pushState'](state, '', url);
+}
+
+function backFromAutomatic() {
+  capture();
+  persistDraft();
+  if (history.state?.plannerAutoBack || window.navigation?.canGoBack || (document.referrer && history.length > 1)) {
+    history.back();
+  } else if (plannedStay) {
+    setPlannerRoute('choose', true);
+    renderModeChoice({ focus: true });
+  } else returnToBoard({ replace: true });
 }
 
 function renderModeChoice({ focus = false } = {}) {
@@ -1732,29 +2068,19 @@ function renderModeChoice({ focus = false } = {}) {
   root.dataset.boardScreen = 'choose';
   showPlannerView('plan');
   const trip = boardRecord.answers;
-  const booking = new URL('https://amora-med1ag-booking.ai-vipsup.chatgpt.site/booking');
+  const booking = bookingCheckoutURL(trip);
   const change = new URL(booking);
-  const stay = new URLSearchParams({
-    plan: '1', checkIn: trip.startDate, checkOut: trip.endDate, roomId: trip.lodging, guests: trip.adults + trip.children,
-  });
-  booking.search = new URLSearchParams({ city: draftCity, step: 'checkout' });
   change.search = new URLSearchParams({
     city: draftCity, from: 'hotel-planner', startDate: trip.startDate, endDate: trip.endDate,
     arrival: trip.arrival, departure: trip.departure, room: trip.lodging, guests: trip.adults + trip.children,
   });
-  if (trip.children > 0) {
-    const party = new URLSearchParams({ partyAdults: trip.adults });
-    for (const age of trip.ages) party.append('partyAge', String(age));
-    change.hash = party.toString();
-    for (const [key, value] of party) stay.append(key, value);
-  }
-  booking.hash = stay.toString();
+  change.hash = bookingPartyParams(trip).toString();
   const lodging = holidayLodgings.find(room => room.id === trip.lodging);
   const partyLabel = trip.children > 0 ? `Взрослых: ${trip.adults} · Детей: ${trip.children}` : `Гостей: ${trip.adults}`;
   const modes = [
     ['manual', 'map', 'Спланировать отдых самостоятельно', 'Соберите своё расписание на доске.'],
     ['auto', 'achievement', 'Спланируй отдых за меня', 'Выберите интересы, а помощник предложит три программы.'],
-    ['family', 'family', 'Спланировать раздельный отдых', 'Подберите разные занятия для взрослых и, если едут дети, отдельную программу для них.'],
+    ['family', 'family', 'Спланировать раздельный отдых', 'Создайте расписания для отдельных гостей и групп.'],
   ];
   root.innerHTML = `<section class="holiday-mode-choice" aria-labelledby="planner-question">
     <h2 id="planner-question" tabindex="-1">Как спланируем отдых?</h2>
@@ -1771,12 +2097,10 @@ function renderModeChoice({ focus = false } = {}) {
   for (const button of root.querySelectorAll('[data-plan-mode]')) {
     button.addEventListener('click', () => {
       const mode = button.dataset.planMode;
-      if (mode === 'manual') returnToBoard();
-      else {
-        setPlannerRoute(mode);
-        if (mode === 'auto') showAutomatic({ resume: true });
-        else renderFamily();
-      }
+      if (mode === 'auto') {
+        setPlannerRoute('auto');
+        showAutomatic({ resume: true });
+      } else returnToBoard({ mode: mode === 'family' ? 'separate' : 'together' });
       if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
         root.animate?.([{ opacity: 0, transform: 'translateY(36px)' }, { opacity: 1, transform: 'translateY(0)' }],
           { duration: 420, easing: 'cubic-bezier(.22, 1, .36, 1)' });
@@ -1789,6 +2113,11 @@ function renderModeChoice({ focus = false } = {}) {
 function showAutomatic({ resume = false, focus = true } = {}) {
   const saved = autoRecord || loadHolidayDraft(`${draftScope}:auto`, defaultAnswers);
   Object.assign(answers, structuredClone(saved?.answers || boardRecord?.answers || defaultAnswers));
+  if (plannedParty) {
+    Object.assign(answers, structuredClone(plannedParty));
+    const allowed = childActivityChoices();
+    answers.childActivities = answers.childActivities.filter(id => allowed.some(item => item.id === id));
+  }
   const boardDates = boardRecord?.answers;
   if (!resume && boardDates && Object.keys(validateTripDates(answers, today(), nowMinute())).length) {
     for (const field of stepFields.dates) answers[field] = boardDates[field];
@@ -1805,168 +2134,20 @@ function openAutomatic() {
   showAutomatic();
 }
 
-function openFamily() {
-  persistDraft(true);
-  setPlannerRoute('family');
-  renderFamily();
-}
-
-function renderFamily({ focus = true } = {}) {
-  releasePreparedPdf();
-  const previous = boardRecord.answers;
-  const savedEdits = boardRecord.edits;
-  Object.assign(answers, structuredClone(previous));
-  stayCompact = canUseCompactStay();
-  quickEdit = undefined;
-  const selectedTotal = stayCompact ? stayGuestCount() : 0;
-  const adultChoices = familyAdultInterests.map(item => ({
-    ...item, disabled: !availableInterestInStay(item.id, previous.startDate, previous.endDate),
-  }));
-  const adultChoice = adultChoices.some(item => item.id === previous.adultActivity && !item.disabled) ? previous.adultActivity : '';
-  const secondChoice = adultChoices.some(item => item.id === previous.secondAdultActivity && !item.disabled) ? previous.secondAdultActivity : 'auto';
-  const childIcons = { creative: 'garden', games: 'ball-games', quest: 'learning-games', walk: 'walk' };
-  const tile = (name, item, type, selected, icon = item.id) => `<label class="holiday-tile">
-    <input type="${type}" name="${name}" value="${item.id}"${checked(selected)}${item.disabled ? ' disabled' : ''}>
-    ${boardIcon(icon)}<strong>${esc(item.title)}</strong>${item.disabled ? '<small>Вне сезона</small>' : ''}${'minAge' in item && item.minAge ? `<small>От ${item.minAge} лет</small>` : ''}
-  </label>`;
-  setBoardHeading('family');
-  root.dataset.boardScreen = 'family';
-  showPlannerView('plan');
-  renderAssistant();
-  root.innerHTML = `<form class="holiday-family" novalidate aria-labelledby="planner-question">
-    <p id="planner-question" class="holiday-family-intro" tabindex="-1">Выберите отдельные занятия для взрослых и при необходимости для детей. Планировщик подберёт общий интервал.</p>
-    <div class="planner-errors" role="alert" tabindex="-1" hidden></div>
-    <section class="holiday-board-surface holiday-family-party" aria-labelledby="family-party-title">
-      <h2 id="family-party-title">Кто едет</h2>
-      <div class="planner-fields">${field('adults', 'Взрослые', 'number', previous.adults, `min="1" max="20" inputmode="numeric" required${selectedTotal ? ' readonly' : ''}`)}
-      ${field('children', 'Дети до 18 лет', 'number', previous.children, `min="0" max="${selectedTotal ? Math.min(10, selectedTotal - 1) : 10}" inputmode="numeric" required`)}</div>
-      <div data-family-ages>${agesMarkup(previous)}</div>
-      <fieldset class="holiday-family-mode"><legend>Формат отдыха</legend><div class="planner-choices">
-        ${choice('familyMode', 'separate', 'Раздельно', '', true)}
-        ${choice('familyMode', 'together', 'Вместе', '', false)}
-      </div></fieldset>
-    </section>
-    <div class="holiday-family-programmes">
-      <fieldset class="holiday-board-surface holiday-family-programme" data-family-adults>
-        <legend>Для взрослых</legend>
-        <div class="holiday-family-options">
-          ${tile('adultActivity', { id: '', title: 'Подобрать занятие' }, 'radio', !adultChoice, 'achievement')}
-          ${adultChoices.map(item => tile('adultActivity', item, 'radio', item.id === adultChoice)).join('')}
-        </div>
-      </fieldset>
-      <fieldset class="holiday-board-surface holiday-family-programme" data-family-second>
-        <legend>Для второго взрослого</legend>
-        <div class="holiday-family-options">
-          ${tile('secondAdultActivity', { id: 'auto', title: 'Подобрать занятие' }, 'radio', secondChoice === 'auto', 'achievement')}
-          ${adultChoices.map(item => tile('secondAdultActivity', item, 'radio', item.id === secondChoice)).join('')}
-        </div>
-      </fieldset>
-      <fieldset class="holiday-board-surface holiday-family-programme" data-family-children>
-        <legend>Для детей</legend>
-        <div class="holiday-family-options">${childActivityOptions.map(item => tile('childActivities', item, 'checkbox', previous.childActivities.includes(item.id), childIcons[item.id])).join('')}</div>
-        <p class="planner-help" data-family-child-help></p>
-      </fieldset>
-    </div>
-    <p class="planner-note" data-family-support aria-live="polite"></p>
-    <div class="holiday-family-actions">
-      <button type="button" class="planner-button planner-button-light" data-family-back>К плану отдыха</button>
-      <button type="submit" class="planner-button holiday-primary">Сохранить программу</button>
-    </div>
-  </form>`;
-  const form = root.querySelector('form');
-  const fields = form.elements;
-  const errors = form.querySelector('.planner-errors');
-  const ageFields = form.querySelector('[data-family-ages]');
-  const childFields = [...form.querySelectorAll('[name="childActivities"]')];
-  const readNumber = input => input.value === '' ? NaN : Number(input.value);
-  const readAges = () => [...ageFields.querySelectorAll('input')].map(readNumber);
-  const childCount = () => Math.max(0, Math.min(10, readNumber(fields.children) || 0));
-  function syncFamily() {
-    const ages = readAges();
-    const known = ages.filter(age => Number.isInteger(age) && age >= 0 && age <= 17);
-    const separate = fields.familyMode.value === 'separate';
-    const adults = readNumber(fields.adults);
-    const withToddler = known.some(age => age < 3);
-    const second = separate && adults >= 2 && !withToddler;
-    const adultPanel = form.querySelector('[data-family-adults]');
-    adultPanel.hidden = adultPanel.disabled = !separate || (adults < 2 && !childCount());
-    adultPanel.querySelector('legend').textContent = second ? 'Для первого взрослого' : 'Для взрослых';
-    const secondPanel = form.querySelector('[data-family-second]');
-    secondPanel.hidden = secondPanel.disabled = !second;
-    secondPanel.querySelector('legend').textContent = adults > 2 ? 'Для остальных взрослых' : 'Для второго взрослого';
-    const childPanel = form.querySelector('[data-family-children]');
-    childPanel.hidden = childPanel.disabled = !childCount();
-    for (const input of childFields) {
-      const age = childActivityOptions.find(item => item.id === input.value).minAge;
-      input.disabled = !known.some(value => value >= age);
-      if (input.disabled) input.checked = false;
-    }
-    form.querySelector('[data-family-child-help]').textContent = known.length ? 'Можно выбрать несколько занятий или доверить выбор планировщику.' : 'Укажите возраст детей, чтобы выбрать подходящие занятия.';
-    const support = form.querySelector('[data-family-support]');
-    support.hidden = !separate || !childCount();
-    support.textContent = withToddler ? (readNumber(fields.adults) > 1 ? 'С ребёнком до трёх лет один взрослый остаётся с детьми на весь интервал.' : 'Если взрослый один и ребёнку меньше трёх лет, планировщик предложит совместное занятие.') : 'Сопровождение детей аниматором нужно подтвердить у отеля на весь интервал.';
-  }
-  form.addEventListener('input', event => {
-    errors.hidden = true;
-    if (event.target === fields.children && Number.isInteger(childCount())) {
-      const ages = readAges();
-      if (ages.length !== childCount()) ageFields.innerHTML = agesMarkup({ children: childCount(), ages: ages.map(age => Number.isFinite(age) ? age : '') });
-      if (selectedTotal) fields.adults.value = selectedTotal - childCount();
-    }
-    syncFamily();
-  });
-  form.querySelector('[data-family-back]').addEventListener('click', () => returnToBoard({ replace: true }));
-  form.addEventListener('submit', event => {
-    event.preventDefault();
-    const data = new FormData(form);
-    const next = { ...structuredClone(previous), adults: readNumber(fields.adults), children: readNumber(fields.children),
-      ages: readAges(), familyMode: data.get('familyMode'), adultActivity: data.get('adultActivity') || '',
-      secondAdultActivity: data.get('secondAdultActivity') || '', childActivities: data.getAll('childActivities') };
-    const issues = validateAnswers(next);
-    if (next.familyMode === 'separate' && next.adults + next.children < 2) issues.children = 'Для раздельного отдыха нужны хотя бы два гостя.';
-    if (selectedTotal && next.adults + next.children !== selectedTotal) issues.children = 'Число взрослых и детей должно совпадать с числом гостей.';
-    let result;
-    if (!Object.keys(issues).length) {
-      if (next.lodging && holidayLodgings.find(item => item.id === next.lodging)?.capacity < next.adults + next.children) next.lodging = '';
-      result = replayScheduleEdits(buildHolidayPlan(next, { priorityMeals: boardRecord.priorityMeals }), savedEdits);
-      if (result.errors.length) issues.edits = `Новые занятия пересекаются с правками в плане: ${result.errors.map(({ edit }) => edit.itemTitle).join(', ')}. Выберите другое занятие или освободите время.`;
-    }
-    if (Object.keys(issues).length) {
-      errors.innerHTML = `<ul>${Object.values(issues).map(message => `<li>${esc(message)}</li>`).join('')}</ul>`;
-      errors.hidden = false;
-      errors.focus();
-      return;
-    }
-    Object.assign(answers, next);
-    priorityMeals = boardRecord.priorityMeals;
-    planEdits = [...savedEdits];
-    marks = new Set(boardRecord.marks);
-    plan = result.plan;
-    unappliedEdits = [];
-    undoEdit = undefined;
-    boardTab = 'schedule';
-    setPlannerRoute('', true);
-    renderPlan({ message: 'Программа отдыха обновлена.' });
-  });
-  syncFamily();
-  if (focus) {
-    root.querySelector('#planner-question').focus({ preventScroll: true });
-    masthead.scrollIntoView({ block: 'start' });
-  }
-}
-
-function returnToBoard({ replace = false, focus = true } = {}) {
+function returnToBoard({ replace = false, focus = true, mode } = {}) {
   setPlannerRoute('', replace);
   const record = boardRecord;
+  const previousGroup = guestGroupKey(activeGuestGroup() || []);
   Object.assign(answers, structuredClone(record.answers));
   priorityMeals = record.priorityMeals;
-  marks = new Set(record.marks);
-  planEdits = [...record.edits];
-  plan = quickEdit = undefined;
+  guestGroups = restoreGuestGroups(record.guestGroups, tripGuests(answers));
+  if (mode) guestGroups.mode = mode;
+  quickEdit = undefined;
+  if (previousGroup !== guestGroupKey(activeGuestGroup() || [])) chatState = {};
   stayCompact = canUseCompactStay();
-  rebuildPlan({ alreadyPlanned: true });
+  loadBoardSchedule();
   showPlannerView('plan');
-  renderPlan({ scroll: focus, save: false });
+  renderPlan({ scroll: focus, save: Boolean(mode) });
 }
 
 function renderAlternatives() {
@@ -1985,6 +2166,7 @@ function renderAlternatives() {
     choice.addEventListener('click', () => {
       const proposal = proposalList.find(item => item.id === choice.dataset.chooseVariant);
       Object.assign(answers, structuredClone(proposal.input));
+      guestGroups = restoreGuestGroups({ ...guestGroups, mode: 'together' }, tripGuests(answers));
       plan = proposal.plan;
       priorityMeals = true;
       planEdits = [];
@@ -2029,13 +2211,18 @@ function restoreDraft() {
     if (bookingHandoff) showDraftStatus(bookingStatus, false);
     else if (bookingScope && draftScope === draftCity) showDraftStatus(bookingFallbackStatus, false);
   }
+  guestGroups = restoreGuestGroups(boardRecord.guestGroups, tripGuests(boardRecord.answers));
+  receiveBookingGuestNames();
   if (isChoiceRoute() && plannedStay) renderModeChoice();
   else if (isAutoRoute()) showAutomatic({ resume: true, focus: false });
-  else if (isFamilyRoute()) renderFamily({ focus: false });
+  else if (isFamilyRoute()) returnToBoard({ replace: true, focus: false, mode: 'separate' });
   else returnToBoard({ focus: false });
 }
 
 if (root) {
+  mobileSchedule.addEventListener('change', ({ matches }) => {
+    if (!matches && itemEditor?.panel.hasAttribute('data-slot-palette')) closeItemEditor(true);
+  });
   let statusBeforeReset;
   viewSwitch.hidden = false;
   viewSwitch.addEventListener('click', event => {
@@ -2075,7 +2262,7 @@ if (root) {
   window.addEventListener('popstate', () => {
     if (isChoiceRoute() && plannedStay) renderModeChoice({ focus: true });
     else if (isAutoRoute()) showAutomatic({ resume: true });
-    else if (isFamilyRoute()) renderFamily();
+    else if (isFamilyRoute()) returnToBoard({ replace: true, mode: 'separate' });
     else returnToBoard();
   });
   restoreDraft();

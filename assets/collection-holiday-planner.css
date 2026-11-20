@@ -156,8 +156,6 @@ body.holiday-planner-page .home-header { display: flex; justify-content: space-b
 .planner-catalog a, .planner-lodging-links a { display: inline-flex; align-items: center; min-height: 44px; font-size: 12px; text-decoration: underline; text-underline-offset: 4px; }
 .planner-hint { color: var(--planner-secondary); font-size: 12px; line-height: 1.7; margin: 10px 0 24px; }
 .planner-note { font-size: 12px; line-height: 1.8; padding: 18px 20px; background: #f4f0e8; color: #686155; margin: 24px 0 0; }
-.planner-booking-summary { margin: 0 0 20px; }
-.planner-booking-actions { display: flex; flex-wrap: wrap; gap: 0 18px; }
 .planner-question-actions { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding-top: 28px; margin-top: 28px; border-top: 1px solid #e3e4e8; }
 .planner-question-actions .planner-next { margin-inline-start: auto; }
 .planner-button { display: inline-flex; justify-content: center; align-items: center; gap: 20px; padding: 14px 20px; min-height: 48px; border: 1px solid #303442; color: #fff; background: #303442; font: 500 12px/1.5 var(--body-font); cursor: pointer; }
@@ -165,6 +163,20 @@ body.holiday-planner-page .home-header { display: flex; justify-content: space-b
 .planner-button:disabled { cursor: wait; opacity: .65; }
 .planner-button-light { color: #303442; border-color: #d4d5db; background: #fff; }
 .planner-button-light:hover { background: #f4f0e8; }
+.planner-board-back {
+  gap: 8px;
+  min-height: 44px;
+  padding: 9px 14px 9px 10px;
+  border-color: #d5c6b1;
+  border-radius: 14px;
+  background: #fffdf8;
+  box-shadow: 0 3px 7px #5a402725, inset 0 1px #fff;
+  font-size: .875rem;
+  font-weight: 600;
+}
+.planner-board-back img { flex: none; }
+.planner-board-back:hover { border-color: #a48662; background: #f8ecda; }
+.planner-board-back:active { box-shadow: inset 0 2px 4px #5a402725; }
 .planner-question-actions .planner-button { border-radius: 8px; font-size: 14px; font-weight: 600; }
 .planner-question-actions button[type="submit"]:not(.planner-button-light) {
   min-height: 52px; padding-inline: 24px; border-color: #9a702f; background: var(--planner-action); color: #282a30;
