@@ -2,6 +2,7 @@ import { answerHolidayChat } from './collection-holiday-chat-intents.js?v=202611
 import { answerHolidayChatFollowup } from './collection-holiday-chat-followups.js?v=20261119-quarter-hour-1';
 import { answerHolidayChatEvents } from './collection-holiday-chat-events.js?v=20261120-programme-download-1';
 import { answerHolidayChatHotel } from './collection-holiday-chat-hotel.js?v=20261112-chat-3';
+import { minutes } from './collection-time-slots.js?v=20261119-quarter-hour-1';
 
 const family = { label: 'Для детей', description: 'Игры и прогулки', icon: 'family', query: 'Что есть в отеле для детей?' };
 const examples = [
@@ -197,8 +198,9 @@ export function mountHolidayChat(host, { state, getPlan, getClock, getEvents, ge
     input.focus();
   }
 
-  function confirmProposal() {
-    const { selected, plan } = state.pending ?? {};
+  async function confirmProposal() {
+    const pending = state.pending;
+    const { selected, plan } = pending ?? {};
     if (waiting || !getPlan() || !selected) return;
     if (plan !== getPlan()) {
       state.pending = null;
@@ -209,13 +211,59 @@ export function mountHolidayChat(host, { state, getPlan, getClock, getEvents, ge
       return;
     }
 
+    const { edit } = selected;
+    let issue = '';
+    let retry = false;
+    if (edit.type === 'hotel-event') {
+      waiting = send.disabled = true;
+      processing.textContent = 'Проверяю событие в афише…';
+      processing.hidden = false;
+      renderOptions();
+      try {
+        const events = await getEvents({ dateFrom: edit.date, dateTo: edit.date });
+        if (!Array.isArray(events)) throw new Error('Invalid events');
+        const current = events.find(event => event.id === edit.event.id);
+        const matches = current && ['date', 'time', 'endTime', 'title', 'type', 'location', 'description']
+          .every(field => (current[field] ?? '') === (edit.event[field] ?? ''));
+        if (!matches) issue = 'Афиша изменилась. Посмотрите события заново и выберите актуальное время.';
+      } catch {
+        issue = 'Не удалось проверить афишу. Нажмите «Применить», чтобы повторить проверку.';
+        retry = true;
+      } finally {
+        waiting = send.disabled = false;
+        processing.textContent = 'Подбираю ответ…';
+        processing.hidden = true;
+      }
+      if (!panel.isConnected || state.pending !== pending) return;
+      if (plan !== getPlan()) {
+        issue = 'План изменился. Повторите просьбу, чтобы я проверил новое расписание.';
+        retry = false;
+      }
+    }
+
+    const now = getClock();
+    const start = minutes(edit.time);
+    const timePassed = edit.type !== 'remove' && (edit.date < now.date
+      || (edit.date === now.date && (edit.type === 'hotel-event' ? start <= now.minute : start < now.minute)));
+    if (!issue && timePassed) issue = 'Предложенное время уже наступило. Попросите подобрать новое свободное окно.';
+    if (issue) {
+      if (!retry) {
+        state.pending = null;
+        state.suggestions = [];
+      }
+      addMessage('assistant', issue);
+      renderOptions();
+      options.querySelector('button')?.focus();
+      return;
+    }
+
     // A successful edit rebuilds the chat from its message history.
     state.pending = null;
     state.suggestions = [];
     state.focusEditResult = true;
     const success = { role: 'assistant', text: 'План обновлён.', pdf: true };
     rememberMessage(success);
-    const error = applyEdit(selected.edit);
+    const error = applyEdit(edit);
     if (error) {
       success.text = error;
       success.pdf = false;

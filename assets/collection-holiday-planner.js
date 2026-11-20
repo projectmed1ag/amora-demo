@@ -6,7 +6,7 @@ import { loadHolidayDraft, saveHolidayDraft, clearHolidayDraft } from './collect
 import { tripGuests, restoreGuestGroups, guestGroupKey, guestAgeLabel, guestGroupLabel, answersForGuestGroup } from './collection-holiday-groups.js?v=20261120-joint-selection-1';
 import { hotelEventLabels, loadHotelEvents } from './collection-holiday-events.js?v=20261112-chat-3';
 import { destinationDateParts, destinationLocalDate } from './collection-destinations.js?v=20261024-all-hotels-1';
-import { mountHolidayChat } from './collection-holiday-chat.js?v=20261120-programme-download-1';
+import { mountHolidayChat } from './collection-holiday-chat.js?v=20261121-confirmation-check-1';
 import { activityTiles, alternativesMarkup, badgesMarkup, boardIcon, boardMark, boardPalette, boardPhoto, buildBoardAlternatives, isBoardActivity } from './collection-holiday-board.js?v=20261120-mobile-slot-1';
 import { hasBoardLocation, mountBoardMap } from './collection-holiday-board-map.js?v=20261119-row-actions-1';
 import { ceilQuarterHour, isQuarterHour, quarterHourOptions } from './collection-time-slots.js?v=20261119-quarter-hour-1';
