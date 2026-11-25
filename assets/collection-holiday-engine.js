@@ -1,4 +1,4 @@
-import { onsiteInterests, services, attractions, childActivityOptions, outingTransports, routeIdeas, mapRoute, demoOrigin, demoOriginLabel, estimateOutingTravel, demoLocalRoute, localRouteDescriptions } from './collection-holiday-data.js?v=20261108-route-pdf-1';
+import { onsiteInterests, services, attractions, childActivityOptions, outingTransports, routeIdeas, mapRoute, demoOrigin, demoOriginLabel, estimateOutingTravel, demoLocalRoute, localRouteDescriptions } from './collection-holiday-data.js?v=20261125-restaurant-meals-1';
 import { getSeasonForDate, seasonLabels } from './collection-seasons.js';
 import { clock, minutes } from './collection-time-slots.js?v=20261119-quarter-hour-1';
 
@@ -68,6 +68,23 @@ export function excursionSettings(a, id) {
 
 export const outingDurationMinutes = ({ travelMinutes }) => travelMinutes * 2 + visitReserveMinutes + outingReserveMinutes;
 
+const restaurantMeals = ['lunch', 'dinner'];
+const legacyRestaurantMeal = answers => minutes(answers.preferred?.restaurant) < 15 * 60 ? 'lunch' : 'dinner';
+
+export function restaurantMealSelections(answers) {
+  return Array.isArray(answers.restaurantMeals)
+    ? [...new Set(answers.restaurantMeals.filter(meal => restaurantMeals.includes(meal)))]
+    : [legacyRestaurantMeal(answers)];
+}
+
+export function restaurantMealPreferred(answers, meal) {
+  const preferred = answers.preferred || {};
+  const field = meal === 'lunch' ? 'restaurantLunch' : 'restaurantDinner';
+  if (Object.hasOwn(preferred, field)) return preferred[field];
+  if (meal === legacyRestaurantMeal(answers) && Object.hasOwn(preferred, 'restaurant')) return preferred.restaurant;
+  return meal === 'lunch' ? '13:00' : '19:00';
+}
+
 export function validateTripDates(a, today = '', currentMinute = -1) {
   const errors = {};
   const start = dateNumber(a.startDate), end = dateNumber(a.endDate);
@@ -102,7 +119,15 @@ export function validateAnswers(a, today = '', currentMinute = -1) {
   if (a.outingMode != null && !['stay', 'visit'].includes(a.outingMode)) errors.outingMode = 'Выберите отдых на территории или выезды к достопримечательностям.';
   if (!Number.isFinite(minutes(a.wake)) || !Number.isFinite(minutes(a.rest)) || minutes(a.rest) - minutes(a.wake) < 120) errors.wake = 'Между началом дня и вечерним отдыхом должно быть хотя бы 2 часа.';
   if (a.services?.some(id => !services.some(item => item.id === id))) errors.services = 'Проверьте выбранные услуги.';
-  for (const id of a.services || []) if (!Number.isFinite(minutes(a.preferred?.[id]))) errors[id] = 'Укажите предпочтительное время.';
+  for (const id of a.services || []) {
+    if (id === 'restaurant' && a.restaurantMeals !== undefined) {
+      if (!Array.isArray(a.restaurantMeals) || !a.restaurantMeals.length || a.restaurantMeals.some(meal => !restaurantMeals.includes(meal))) {
+        errors.restaurant = 'Выберите обед, ужин или оба приёма пищи.';
+      } else if (restaurantMealSelections(a).some(meal => !Number.isFinite(minutes(restaurantMealPreferred(a, meal))))) {
+        errors.restaurant = 'Укажите предпочтительное время для каждого выбранного приёма пищи.';
+      }
+    } else if (!Number.isFinite(minutes(a.preferred?.[id]))) errors[id] = 'Укажите предпочтительное время.';
+  }
   if (includesSightseeing(a)) {
     const selected = Array.isArray(a.places) ? [...new Set(a.places)] : [];
     const destinations = attractions.filter(place => selected.includes(place.id));
@@ -318,8 +343,8 @@ export function notesForSchedule({ answers, days }) {
 
 function addMealBreaks(days, priorityMeals) {
   for (const day of days) {
-    if (!day.items.some(item => item.service === 'restaurant' && item.start < 15 * 60)) insert(day, { kind: 'meal', meal: 'lunch', title: 'Обед в своём ритме', duration: 45, detail: 'Свободное время на обед; столик автоматически не бронируется.' }, 13 * 60, 12 * 60, 15 * 60);
-    if (!day.items.some(item => ['restaurant', 'barbecue'].includes(item.service) && (!priorityMeals || item.start >= 15 * 60) && item.end > 17 * 60)) insert(day, { kind: 'meal', meal: 'dinner', title: 'Свободное время на ужин', duration: 45, detail: 'Выберите удобный формат ужина.' }, 19 * 60, 18 * 60, 21 * 60);
+    if (!day.items.some(item => item.meal === 'lunch' || (item.service === 'restaurant' && !item.meal && item.start < 15 * 60))) insert(day, { kind: 'meal', meal: 'lunch', title: 'Обед в своём ритме', duration: 45, detail: 'Свободное время на обед; столик автоматически не бронируется.' }, 13 * 60, 12 * 60, 15 * 60);
+    if (!day.items.some(item => item.meal === 'dinner' || (['restaurant', 'barbecue'].includes(item.service) && !item.meal && (!priorityMeals || item.start >= 15 * 60) && item.end > 17 * 60))) insert(day, { kind: 'meal', meal: 'dinner', title: 'Свободное время на ужин', duration: 45, detail: 'Выберите удобный формат ужина.' }, 19 * 60, 18 * 60, 21 * 60);
   }
 }
 
@@ -357,7 +382,32 @@ export function buildHolidayPlan(a, { today = '', currentMinute = -1, priorityMe
       Math.max(start, breakfastStart), breakfastStart, breakfastEnd);
   }
 
+  function placeRestaurantMeal(meal) {
+    const preferredTime = restaurantMealPreferred(a, meal);
+    const preferred = minutes(preferredTime);
+    const service = createServiceItem(a, 'restaurant');
+    const item = {
+      ...service, meal,
+      id: meal === legacyRestaurantMeal(a) ? 'service:restaurant' : `service:restaurant:${meal}`,
+      title: meal === 'lunch' ? 'Обед в ресторане' : 'Ужин в ресторане',
+      baseDetail: service.detail,
+      detail: `${service.detail} Ваше пожелание по времени — ${preferredTime}.`,
+    };
+    const from = (meal === 'lunch' ? 11 : 16) * 60;
+    const to = (meal === 'lunch' ? 16 : 21) * 60;
+    for (const day of days) {
+      const exactTime = preferred >= from && preferred + item.duration <= to
+        && insert(day, item, preferred, preferred, preferred + item.duration);
+      if (exactTime || insert(day, item, preferred, from, to)) return;
+    }
+    unplaced.push({ id: item.id, title: item.title, reason: 'Для этого приёма пищи не нашлось свободного времени в выбранные дни. Увеличьте длительность отдыха или уберите одно из занятий.' });
+  }
+
   function placeService(id) {
+    if (id === 'restaurant' && Array.isArray(a.restaurantMeals)) {
+      restaurantMealSelections(a).forEach(placeRestaurantMeal);
+      return;
+    }
     const preferred = minutes(a.preferred[id]);
     const service = createServiceItem(a, id);
     const item = {

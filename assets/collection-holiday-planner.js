@@ -1,13 +1,13 @@
-import { onsiteInterests, services, attractions, mapRoute, demoOrigin, demoOriginLabel, outingTransports, childActivityOptions } from './collection-holiday-data.js?v=20261108-route-pdf-1';
-import { breakfastNotice, buildHolidayPlan, validateAnswers, validateTripDates, addDays, dateLabel, dateNumber, clock, excursionSettings, outingDurationMinutes, availableInterestInStay, interestSeasonLabel } from './collection-holiday-engine.js?v=20261120-guest-plans-1';
+import { onsiteInterests, services, attractions, mapRoute, demoOrigin, demoOriginLabel, outingTransports, childActivityOptions } from './collection-holiday-data.js?v=20261125-restaurant-meals-1';
+import { breakfastNotice, buildHolidayPlan, validateAnswers, validateTripDates, addDays, dateLabel, dateNumber, clock, excursionSettings, outingDurationMinutes, availableInterestInStay, interestSeasonLabel, restaurantMealSelections, restaurantMealPreferred } from './collection-holiday-engine.js?v=20261125-restaurant-meals-1';
 import { holidayLodgings } from './collection-holiday-lodging.js?v=20261120-stay-photo-1';
 import { canEditScheduleItem, canMoveScheduleItem, scheduleReplacementOptions, applyScheduleEdit, replayScheduleEdits } from './collection-holiday-edits.js?v=20261120-guest-plans-1';
-import { loadHolidayDraft, saveHolidayDraft, clearHolidayDraft } from './collection-holiday-draft.js?v=20261120-guest-plans-1';
+import { loadHolidayDraft, saveHolidayDraft, clearHolidayDraft } from './collection-holiday-draft.js?v=20261125-restaurant-meals-1';
 import { tripGuests, restoreGuestGroups, guestGroupKey, guestAgeLabel, guestGroupLabel, answersForGuestGroup } from './collection-holiday-groups.js?v=20261120-joint-selection-1';
 import { hotelEventLabels, loadHotelEvents } from './collection-holiday-events.js?v=20261112-chat-3';
 import { destinationDateParts, destinationLocalDate } from './collection-destinations.js?v=20261024-all-hotels-1';
 import { mountHolidayChat } from './collection-holiday-chat.js?v=20261121-confirmation-check-1';
-import { activityTiles, alternativesMarkup, badgesMarkup, boardIcon, boardMark, boardPalette, boardPhoto, buildBoardAlternatives, isBoardActivity } from './collection-holiday-board.js?v=20261120-mobile-slot-1';
+import { activityTiles, alternativesMarkup, badgesMarkup, boardIcon, boardMark, boardPalette, boardPhoto, buildBoardAlternatives, isBoardActivity } from './collection-holiday-board.js?v=20261125-restaurant-meals-1';
 import { hasBoardLocation, mountBoardMap } from './collection-holiday-board-map.js?v=20261119-row-actions-1';
 import { ceilQuarterHour, isQuarterHour, quarterHourOptions } from './collection-time-slots.js?v=20261119-quarter-hour-1';
 
@@ -24,7 +24,7 @@ const initialDate = addDays(today(), 1);
 const defaultAnswers = {
   startDate: initialDate, endDate: initialDate, arrival: '09:00', departure: '20:00', lodging: '',
   adults: 2, children: 0, ages: [], childActivities: [], familyMode: 'together', adultActivity: '', secondAdultActivity: '', pace: 'balanced', wake: '09:00', rest: '21:00',
-  interests: [], suggestActivities: false, services: [], preferred: Object.fromEntries(services.map(s => [s.id, s.preferred])),
+  interests: [], suggestActivities: false, services: [], restaurantMeals: undefined, preferred: Object.fromEntries(services.map(s => [s.id, s.preferred])),
   outingMode: 'stay', places: [], outings: {}, origin: demoOrigin,
   transport: 'auto',
 };
@@ -381,8 +381,14 @@ function summaryLines() {
       const originNote = travelEstimateSource === 'default-origin' ? ' от Горетова' : '';
       return [place.title, preference, `Дорога${originNote} около ${travelMinutes} мин в одну сторону · на посещение заложено ${visitMinutes} мин`];
     }) : []),
-    ['Пожелания', answers.services.map(id => services.find(item => item.id === id)?.title).join(', ') || 'Без дополнительных услуг', ''],
+    ['Пожелания', servicesLabel(), ''],
   ];
+}
+
+function servicesLabel() {
+  return answers.services.length ? answers.services.flatMap(id => id === 'restaurant'
+    ? restaurantMealSelections(answers).map(meal => `${meal === 'lunch' ? 'Обед' : 'Ужин'} в ресторане, около ${restaurantMealPreferred(answers, meal)}`)
+    : [`${services.find(item => item.id === id).title}, около ${answers.preferred[id]}`]).join('; ') : 'Без дополнительных бронирований';
 }
 
 function answerLabel(step) {
@@ -392,7 +398,7 @@ function answerLabel(step) {
   if (step === 'rhythm') return `${{ calm: 'Спокойный', balanced: 'Сбалансированный', active: 'Активный' }[answers.pace]} · день ${answers.wake}–${answers.rest}`;
   if (step === 'outings') return `${interestsLabel()} · ${outingModeLabel()}`;
   if (step === 'routes') return selectedPlaces().map(place => `${place.title} · ${outingTransports[excursionSettings(answers, place.id).transport].title}`).join('; ');
-  return answers.services.length ? answers.services.map(id => `${services.find(item => item.id === id).title}, около ${answers.preferred[id]}`).join('; ') : 'Без дополнительных бронирований';
+  return servicesLabel();
 }
 
 function lodgingMarkup() {
@@ -624,6 +630,21 @@ function familyModeNote() {
   return 'Раздельные занятия возможны при подтверждённом сопровождении детей на весь интервал.';
 }
 
+function restaurantMealsMarkup() {
+  const selected = restaurantMealSelections(answers);
+  return `<fieldset class="planner-restaurant-meals">
+    <legend>Когда хотите поесть в ресторане?</legend>
+    <p class="planner-hint">Можно выбрать и обед, и ужин.</p>
+    <div class="planner-choices planner-choices-inline">
+      ${choice('restaurantMeals', 'lunch', 'Обед', '', selected.includes('lunch'), 'checkbox')}
+      ${choice('restaurantMeals', 'dinner', 'Ужин', '', selected.includes('dinner'), 'checkbox')}
+    </div>
+    <div class="planner-fields planner-restaurant-times">
+      ${['lunch', 'dinner'].map(meal => `<div data-restaurant-meal-time="${meal}"${selected.includes(meal) ? '' : ' hidden'}>${field(`preferred-restaurant-${meal}`, meal === 'lunch' ? 'Время обеда' : 'Время ужина', 'time', restaurantMealPreferred(answers, meal))}</div>`).join('')}
+    </div>
+  </fieldset>`;
+}
+
 function questionMarkup() {
   if (current === 'dates') return `<p class="planner-help">Можно приехать одним днём или остаться с ночёвкой. Учитываю время приезда и отъезда. Всё расписание — по московскому времени.</p><div class="planner-fields">${field('startDate', 'Дата приезда', 'date', answers.startDate, `min="${today()}" required`)}${field('endDate', 'Дата отъезда', 'date', answers.endDate, `min="${answers.startDate}" required`)}${field('arrival', 'Время приезда', 'time', answers.arrival, 'required')}${field('departure', 'Время отъезда', 'time', answers.departure, 'required')}</div>`;
   if (current === 'party') return partyMarkup();
@@ -631,7 +652,7 @@ function questionMarkup() {
   if (current === 'lodging') return lodgingMarkup();
   if (current === 'outings') return outingsMarkup();
   if (current === 'routes') return `${quickEdit ? '<button type="button" class="planner-edit" data-change-outing-mode>Изменить занятия и поездки</button>' : ''}${routesMarkup()}`;
-  if (current === 'services') return `<p class="planner-help">Помощник включит выбранные услуги в предварительное расписание.</p><div class="planner-service-options holiday-pick-grid">${services.map(item => `<div class="planner-service-option">${activityTiles([{ ...item, selected: answers.services.includes(item.id) }])}<div class="planner-service-time" data-service-time="${item.id}"${answers.services.includes(item.id) ? '' : ' hidden'}>${field(`preferred-${item.id}`, 'Предпочтительное время', 'time', answers.preferred[item.id])}</div></div>`).join('')}</div><p class="planner-note">Ресторан и баню можно согласовать с отелем из готового плана. Условия аренды мангальной зоны уточняются отдельно.</p>`;
+  if (current === 'services') return `<p class="planner-help">Помощник включит выбранные услуги в предварительное расписание.</p><div class="planner-service-options holiday-pick-grid">${services.map(item => `<div class="planner-service-option">${activityTiles([{ ...item, selected: answers.services.includes(item.id) }])}<div class="planner-service-time" data-service-time="${item.id}"${answers.services.includes(item.id) ? '' : ' hidden'}>${item.id === 'restaurant' ? restaurantMealsMarkup() : field(`preferred-${item.id}`, 'Предпочтительное время', 'time', answers.preferred[item.id])}</div></div>`).join('')}</div><p class="planner-note">Ресторан и баню можно согласовать с отелем из готового плана. Условия аренды мангальной зоны уточняются отдельно.</p>`;
   return `<p class="planner-help">Соберу дни без пересечений: оставлю время на дорогу, еду, сборы и свободные паузы. Если всё не поместится, покажу, что осталось за рамками программы.</p><dl class="planner-review">${summaryLines().map(([label, text, sub]) => `<div><dt>${esc(label)}</dt><dd>${esc(text)}${sub ? `<small>${esc(sub)}</small>` : ''}</dd></div>`).join('')}</dl>
     <button type="button" class="planner-edit" data-edit-outings>Изменить занятия и поездки</button>
     <button type="button" class="planner-edit" data-edit-services>Изменить услуги</button>
@@ -660,7 +681,14 @@ function capture() {
     answers.suggestActivities = data.has('suggestActivities') && !answers.interests.length;
   }
   if (current === 'routes') answers.places = data.getAll('places');
-  if (current === 'services') answers.services = data.getAll('services');
+  if (current === 'services') {
+    answers.services = data.getAll('services');
+    answers.restaurantMeals = data.getAll('restaurantMeals');
+    for (const meal of ['lunch', 'dinner']) {
+      const name = `preferred-restaurant-${meal}`;
+      if (data.has(name)) answers.preferred[meal === 'lunch' ? 'restaurantLunch' : 'restaurantDinner'] = data.get(name);
+    }
+  }
   if (current === 'routes') {
     for (const { id } of attractions) {
       const value = name => data.get(outingField(id, name));
@@ -888,6 +916,7 @@ function renderQuestion(focus = true) {
   });
   const syncForm = () => {
     form.querySelectorAll('[data-service-time]').forEach(element => { element.hidden = !answers.services.includes(element.dataset.serviceTime); });
+    form.querySelectorAll('[data-restaurant-meal-time]').forEach(element => { element.hidden = !restaurantMealSelections(answers).includes(element.dataset.restaurantMealTime); });
     form.querySelector('[data-continue-label]').textContent = continueLabel();
     const firstPlan = form.querySelector('[data-first-plan]');
     if (firstPlan) firstPlan.hidden = !canBuildFirstPlan();
@@ -1004,7 +1033,7 @@ function eventLinks(item, day) {
     ${item.route ? `<a href="${esc(item.route)}" target="_blank" rel="noopener noreferrer">${esc(routeLabel)} ↗</a>` : ''}
     ${item.source ? `<a href="${esc(item.source)}" target="_blank" rel="noopener noreferrer">Условия посещения ↗</a>` : ''}
     ${pageLink(item, day)}
-    ${['lunch', 'dinner'].includes(item.meal) ? pageLink({ ...item, page: 'restaurant.html', service: 'restaurant' }, day).replace('Проверить время отдельно', 'Запросить столик') : ''}
+    ${item.service !== 'restaurant' && ['lunch', 'dinner'].includes(item.meal) ? pageLink({ ...item, page: 'restaurant.html', service: 'restaurant' }, day).replace('Проверить время отдельно', 'Запросить столик') : ''}
     ${item.placeId && !stayingAtHotel() && answers.places.includes(item.placeId) ? `<button type="button" class="planner-event-edit" data-edit-place="${esc(item.placeId)}">Настройки поездки</button>` : ''}
   </div>`;
 }
@@ -1332,9 +1361,9 @@ function revealBoardDay(date, tab = boardTab) {
       palette.innerHTML = boardPalette(scheduleReplacementOptions(plan, day.date));
     }
     const confirmations = day.items.filter(item => item.confirmation);
-    const meal = day.items.find(item => item.meal === 'dinner') || day.items.find(item => item.meal === 'lunch');
+    const meals = day.items.filter(item => item.service !== 'restaurant' && ['lunch', 'dinner'].includes(item.meal));
     root.querySelector('[data-board-confirmations]').innerHTML = `<ul>${confirmations.map(item => `<li>${boardIcon(item.interest || item.service || item.kind)}<div><strong>${esc(item.title)}</strong><small>${timeRange(item)} · ${esc(item.confirmation)}</small>${item.interest === 'bike' ? '<a href="./contacts.html?city=mozhaysk">Согласовать маршрут</a>' : pageLink(item, day)}</div></li>`).join('')}
-      ${meal && !confirmations.some(item => item.service === 'restaurant') ? `<li>${boardIcon('restaurant')}<div><strong>Столик на ${meal.meal === 'dinner' ? 'ужин' : 'обед'}</strong>${pageLink({ ...meal, page: 'restaurant.html', service: 'restaurant' }, day).replace('Проверить время отдельно', 'Запросить столик')}</div></li>` : ''}</ul>`;
+      ${meals.map(meal => `<li>${boardIcon('restaurant')}<div><strong>Столик на ${meal.meal === 'dinner' ? 'ужин' : 'обед'}</strong>${pageLink({ ...meal, page: 'restaurant.html', service: 'restaurant' }, day).replace('Проверить время отдельно', 'Запросить столик')}</div></li>`).join('')}</ul>`;
   }
   if (tab === 'badges') root.querySelector('[data-board-badges]').innerHTML = badgesMarkup(plan, marks);
   if (tab === 'map') {

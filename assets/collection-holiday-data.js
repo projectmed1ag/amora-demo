@@ -123,7 +123,7 @@ export const outingTransports = {
   guided: { title: 'Экскурсия с перевозкой', detail: 'Попросите отель уточнить возможность экскурсии с гидом и транспортом.' },
 };
 export const services = [
-  { id: 'restaurant', title: 'Ресторан', detail: 'Ужин или обед за общим столом', duration: 60, preferred: '19:00', page: 'restaurant.html' },
+  { id: 'restaurant', title: 'Ресторан', detail: 'Обед, ужин или оба приёма пищи', duration: 60, preferred: '19:00', page: 'restaurant.html' },
   { id: 'banya', title: 'Баня', detail: 'Два часа с перерывами на отдых', duration: 120, preferred: '16:00', page: 'banya.html' },
   { id: 'barbecue', title: 'Мангалы и беседки', detail: 'Два часа для неспешного пикника', duration: 120, preferred: '18:00', page: 'spaces.html#barbecue' },
 ];
