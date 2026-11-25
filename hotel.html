@@ -29,12 +29,12 @@
   <link rel="icon" type="image/svg+xml" sizes="any" href="./assets/favicon.svg?v=20261105-emblem-1">
   <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon-32.png?v=20261105-emblem-1">
   <link rel="apple-touch-icon" sizes="180x180" href="./assets/apple-touch-icon.png?v=20261105-emblem-1">
-    <link rel="stylesheet" href="./assets/collection-aero.css?v=20261121-rounded-menu-selection-1">
+    <link rel="stylesheet" href="./assets/collection-aero.css?v=20261125-header-line-1">
     <link rel="stylesheet" href="./assets/collection-aero-home.css?v=20261121-sunlight-3">
     <script type="module" src="./assets/collection-aero-home.js?v=20261120-booking-planner-1"></script>
     <link rel="stylesheet" href="./assets/collection-body-copy.css?v=20261118-2">
-<link rel="stylesheet" href="./assets/collection-planner-showcase.css?v=20261121-benefits-2">
-<script type="module" src="./assets/collection-planner-showcase.js?v=20261119-inline-video-2"></script>
+<link rel="stylesheet" href="./assets/collection-planner-showcase.css?v=20261125-desktop-video-fit-1">
+<script type="module" src="./assets/collection-planner-showcase.js?v=20261125-high-resolution-1"></script>
 </head>
   <body data-page="home" class="collection-home-page collection-site-page collection-aero-home" data-collection-static="">
     <a class="skip-link" href="#content">К содержанию</a>
@@ -99,10 +99,12 @@
     </div>
     <figure class="planner-showcase-film">
       <video id="planner-showcase-video" class="planner-showcase-video" width="1000" height="800" muted loop playsinline
-        preload="none" poster="./images/holiday-board/planner-tour-poster.webp"
+        preload="none" poster="./images/holiday-board/planner-tour-poster.webp?v=20261125-high-resolution-1"
+        data-source-hd="./images/holiday-board/planner-tour-hd.mp4"
+        data-source-high="./images/holiday-board/planner-tour-high.mp4"
         aria-label="Как работает планировщик отдыха" aria-describedby="planner-showcase-transcript">
-        <source src="./images/holiday-board/planner-tour.mp4" type="video/mp4">
-        <a href="./images/holiday-board/planner-tour.mp4">Открыть ролик о планировщике</a>
+        <source src="./images/holiday-board/planner-tour.mp4?v=20261125-high-resolution-1" type="video/mp4">
+        <a href="./images/holiday-board/planner-tour-high.mp4">Открыть ролик о планировщике</a>
       </video>
       <button type="button" class="planner-showcase-playback" aria-controls="planner-showcase-video" hidden><span>Смотреть ролик</span></button>
       <p id="planner-showcase-transcript" hidden>В ролике прогулку, велосипед, отдых у воды и баню расставляют между приёмами пищи. Карта показывает пример пути из хаусбота к прокату и бане. За первое выполненное занятие дают «Первое впечатление», за велопрогулку — «На двух колёсах», за пешую прогулку — «По берегу», за три занятия — «День удался».</p>

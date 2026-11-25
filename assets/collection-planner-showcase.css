@@ -85,6 +85,22 @@ html body.collection-aero-home[data-page="home"] #content .planner-showcase-copy
 }
 .planner-showcase-playback:focus-visible { outline: 2px solid #665333; outline-offset: -2px; }
 .planner-showcase-playback:focus-visible span { opacity: 1; }
+@media (min-width: 791px) {
+  html body.collection-aero-home[data-page="home"] main#content > .planner-showcase {
+    --showcase-layout-padding: clamp(20px, 3svh, 40px);
+    /* The document already reserves the fixed header in scroll-padding-top. */
+    scroll-margin-top: 12px;
+  }
+  .planner-showcase-layout { padding: var(--showcase-layout-padding); }
+  .planner-showcase-film {
+    --showcase-frame-size: calc(var(--showcase-film-padding) * 2 + 2px);
+    /* Keep the complete 5:4 frame below the header, with 12px above and below. */
+    --showcase-video-height: calc(100svh - var(--header-height, 80px) - 24px
+      - var(--showcase-layout-padding) * 2 - 2px - var(--showcase-frame-size));
+    width: min(100%, calc(var(--showcase-video-height) * 1.25 + var(--showcase-frame-size)));
+    justify-self: center;
+  }
+}
 @media (max-width: 790px) {
   .planner-showcase-layout { grid-template-columns: minmax(0, 1fr); gap: 14px; }
   .planner-showcase-copy p { margin: 10px 0 14px; }

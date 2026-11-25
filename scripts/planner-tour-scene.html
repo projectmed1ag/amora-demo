@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>Исходник видеовизитки планировщика</title>
+  <style>
+    @font-face { font-family: Tour; src: url('fonts/tiktok-sans-cyrillic.woff2') format('woff2'); font-weight: 300 900; font-display: block; }
+    @font-face { font-family: Tour; src: url('fonts/tiktok-sans-latin.woff2') format('woff2'); font-weight: 300 900; font-display: block; unicode-range: U+0000-00FF,U+2000-206F,U+2190-21FF; }
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    html, body { width: 1000px; height: 800px; margin: 0; overflow: hidden; }
+    body { background: #f7f0e4; color: #303442; font-family: Tour, Arial, sans-serif; font-synthesis: none; }
+    .frame { position: absolute; inset: 10px; border: 1px solid #ded5c5; border-radius: 34px; background: #f5efe3; box-shadow: 0 3px 8px #54462e0b; }
+    .scene { position: absolute; inset: 0; visibility: hidden; }
+    .scene.active { visibility: visible; }
+    header { position: absolute; left: 36px; right: 36px; top: 28px; }
+    h1 { margin: 0; font-size: 52px; font-weight: 700; line-height: 1.1; letter-spacing: -.6px; white-space: nowrap; }
+    header p { margin: 8px 0 0; font-size: 30px; line-height: 1.25; color: #625949; }
+    .surface { border: 1px solid #d9cdb5; border-radius: 22px; background: #fffaf0; }
+    .palette { position: absolute; left: 36px; top: 158px; width: 336px; height: 564px; padding: 14px 12px; background: #eee7d3; }
+    .palette h2 { margin: 0; font-size: 34px; line-height: 1.2; font-weight: 700; }
+    .tile { width: 148px; height: 132px; border: 1.5px solid #bba26b; border-radius: 24px; background: linear-gradient(150deg, #fcf5e3, #f0e7cb); box-shadow: 0 7px 0 #aa925e, inset 0 1px #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: #303442; font-size: 26px; font-weight: 650; line-height: 1.1; letter-spacing: -.4px; }
+    .tile .icon { width: 54px; height: 54px; }
+    .palette .tile { position: absolute; }
+    .tile[data-key="walk"] { left: 12px; top: 84px; }
+    .tile[data-key="bike"] { left: 174px; top: 84px; }
+    .tile[data-key="beach"] { left: 12px; top: 232px; }
+    .tile[data-key="banya"] { left: 174px; top: 232px; }
+    .tile.empty { border-color: #d6c8a7; background: #ece3cf; box-shadow: none; }
+    .tile.empty > * { visibility: hidden; }
+    .service-note { position: absolute; left: 12px; right: 12px; bottom: 16px; height: 110px; display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid #cbb88e; border-radius: 20px; background: #f5edda; }
+    .service-note .icon { width: 38px; height: 38px; }
+    .service-note strong { display: block; font-size: 29px; font-weight: 650; }
+    .service-note small { display: block; margin-top: 4px; font-size: 22px; color: #625949; white-space: nowrap; letter-spacing: -.3px; }
+    .schedule { position: absolute; left: 386px; top: 158px; width: 578px; height: 564px; }
+    .tabs { position: absolute; left: 18px; top: 14px; display: flex; gap: 10px; }
+    .tab { padding: 5px 20px; border: 1px solid #ddd0ba; border-radius: 13px; color: #625949; background: #f6f0e5; font-size: 28px; line-height: 1.1; }
+    .tab.active { color: #303442; background: #ebddb8; border-color: #b59b62; font-weight: 700; }
+    .rail { position: absolute; left: 23px; top: 104px; bottom: 42px; width: 2px; background: #bea16b; }
+    .row { position: absolute; left: 16px; right: 16px; height: 58px; display: flex; gap: 14px; align-items: center; }
+    .row::before { content: ''; position: absolute; left: 1px; top: 24px; width: 12px; height: 12px; border-radius: 50%; background: #ad8e59; }
+    .time { width: 110px; flex: 0 0 110px; padding-left: 18px; font-size: 30px; line-height: 1; font-weight: 700; white-space: nowrap; }
+    .event { height: 58px; min-width: 0; flex: 1; display: flex; align-items: center; gap: 12px; padding: 4px; border: 1px solid #bfae8b; border-radius: 16px; background: #fffcf5; }
+    .event img.photo { width: 94px; height: 48px; object-fit: cover; border-radius: 10px; }
+    .event strong { font-size: 30px; line-height: 1.05; font-weight: 650; letter-spacing: -.3px; white-space: nowrap; }
+    .event .grip { margin-left: auto; width: 24px; height: 30px; flex: none; }
+    .event.free { justify-content: center; color: #6a604d; background: #f5eddd; font-size: 30px; }
+    .event.target { background: #e7efd6; border-color: #91a46b; }
+    .event .plus { font-size: 30px; margin-right: 5px; }
+    .footer { position: absolute; left: 36px; right: 36px; top: 744px; margin: 0; font-size: 30px; line-height: 1.1; color: #625949; }
+    .progress { position: absolute; left: 36px; right: 36px; bottom: 19px; display: flex; gap: 16px; }
+    .progress i { flex: 1; height: 6px; border-radius: 5px; background: #d7d0c1; }
+    .progress i.active { background: #a3855a; }
+    #floating-tile { position: absolute; z-index: 20; visibility: hidden; box-shadow: 0 7px 18px #332a3c55, 0 6px 0 #aa925e; transform: rotate(-2deg); }
+    #cursor { position: absolute; width: 39px; height: 46px; z-index: 25; visibility: hidden; filter: drop-shadow(0 2px 2px #3338); }
+    .map { position: absolute; left: 50px; top: 136px; width: 900px; height: 600px; border-radius: 26px; overflow: hidden; }
+    .map > img, .map > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+    #scene-map .footer { top: 744px; font-size: 29px; }
+    #scene-map .progress { bottom: 12px; }
+    #scene-map header { top: 28px; }
+    #scene-map h1 { font-size: 52px; }
+    #scene-map header p { margin-top: 5px; }
+    .map-label { position: absolute; transform: translate(-50%, -100%); padding: 9px 16px; border: 2px solid #f8edd4; border-radius: 25px; background: #314b40; color: #fff9e8; box-shadow: 0 2px 5px #182b2b44; white-space: nowrap; font-size: 29px; font-weight: 700; line-height: 1.1; }
+    .map-label::after { content: ''; position: absolute; left: calc(50% - 7px); bottom: -22px; width: 14px; height: 14px; border: 2px solid #faf0d5; border-radius: 50%; background: #314b40; }
+    .map-label.selected { background: #f5e5b1; border-color: #f5e5b1; color: #303442; }
+    .map-label.selected::after { background: #f5e5b1; }
+    .map-label[data-point="house"] { transform: translate(-50%, 10px); }
+    .map-label[data-point="house"]::after { top: -24px; bottom: auto; }
+    .achievements-checks { position: absolute; left: 36px; right: 36px; top: 154px; display: flex; gap: 14px; }
+    .check-chip { display: flex; align-items: center; flex: 1; gap: 8px; padding: 10px 13px; white-space: nowrap; background: #fffbf3; border: 1px solid #d4c7ae; border-radius: 18px; color: #625949; font-size: 31px; font-weight: 650; line-height: 1.1; }
+    .check-chip .check { display: grid; place-items: center; width: 34px; height: 34px; flex: none; border-radius: 50%; background: #e9e4d8; color: #aaa38e; font-size: 24px; }
+    .check-chip.complete { background: #e7efd8; border-color: #91a378; color: #425438; }
+    .check-chip.complete .check { background: #425438; color: #fff; }
+    .awards { position: absolute; left: 36px; right: 36px; top: 242px; display: grid; gap: 12px; }
+    .award { height: 100px; display: flex; gap: 14px; align-items: center; padding: 10px 14px; border: 1px solid #d4c7ae; border-radius: 24px; background: #fffbf3; box-shadow: 0 5px 0 #e6dfcf; }
+    .award-medal { width: 78px; height: 78px; flex: none; display: grid; place-items: center; background: #e9e5d9; border: 1px solid #d2c7af; border-radius: 50%; }
+    .award-medal .icon { width: 49px; height: 49px; }
+    .award strong { font-size: 36px; font-weight: 650; line-height: 1.1; }
+    .award p { margin: 3px 0 0; color: #625949; font-size: 29px; line-height: 1.1; }
+    .award.earned { border-color: #b49b60; }
+    .award.earned .award-medal { background: #eddb9a; border-color: #b2944f; }
+    .earned-label { margin-left: auto; padding: 7px 24px; border-radius: 25px; background: #e7efd8; color: #425438; font-size: 29px; font-weight: 650; visibility: hidden; }
+    .award.earned .earned-label { visibility: visible; }
+    #scene-awards h1 { font-size: 46px; line-height: 1.24; }
+    .icon svg { display: block; width: 100%; height: 100%; }
+  </style>
+</head>
+<body>
+  <div class="frame"></div>
+  <section class="scene active" id="scene-plan">
+    <header><h1>Соберите день по фишкам</h1><p>Перетащите занятие на свободное время.</p></header>
+    <div class="palette surface">
+      <h2>Фишки отдыха</h2>
+      <div class="tile" data-key="walk"><span class="icon" data-icon="trees"></span><span>Прогулка</span></div>
+      <div class="tile" data-key="bike"><span class="icon" data-icon="bike"></span><span>Велосипед</span></div>
+      <div class="tile" data-key="beach"><span class="icon" data-icon="beach"></span><span>У воды</span></div>
+      <div class="tile" data-key="banya"><span class="icon" data-icon="bath"></span><span>Баня</span></div>
+      <div class="service-note" hidden><span class="icon" data-icon="bath"></span><div><strong>Баня</strong><small>Согласовать с отелем</small></div></div>
+    </div>
+    <div class="schedule surface">
+      <div class="tabs"><span class="tab active">День 1</span><span class="tab">День 2</span></div>
+      <div class="rail"></div><div id="rows"></div>
+    </div>
+    <p class="footer">Завтрак, обед и ужин уже в расписании.</p>
+    <div class="progress"><i class="active"></i><i></i><i></i></div>
+  </section>
+  <section class="scene" id="scene-map">
+    <header><h1>От домика до занятия</h1><p>Откройте карту и выберите следующую точку.</p></header>
+    <div class="map">
+      <img id="map-art" src="images/holiday-board-map.webp" alt="Схема территории">
+      <svg viewBox="0 0 1440 960" aria-hidden="true"><path id="route-under" fill="none" stroke="#fff9e8" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><path id="route" fill="none" stroke="#314b40" stroke-width="6" stroke-dasharray="13 9" stroke-linecap="round" stroke-linejoin="round"/><circle id="route-end" r="13" fill="#f5e5b1" stroke="#314b40" stroke-width="3"/></svg>
+    </div>
+    <p class="footer" id="map-caption">Хаусбот → Прокат велосипедов</p>
+    <div class="progress"><i></i><i class="active"></i><i></i></div>
+  </section>
+  <section class="scene" id="scene-awards">
+    <header><h1>Достижения за выполненное</h1><p>Отмечайте занятия после отдыха.</p></header>
+    <div class="achievements-checks">
+      <div class="check-chip"><span class="check">•</span>Прогулка</div>
+      <div class="check-chip"><span class="check">•</span>Велосипед</div>
+      <div class="check-chip"><span class="check">•</span>Отдых у воды</div>
+    </div>
+    <div class="awards">
+      <div class="award"><span class="award-medal"><span class="icon" data-icon="star"></span></span><div><strong>Первое впечатление</strong><p>Первое выполненное занятие</p></div><span class="earned-label">Получено</span></div>
+      <div class="award"><span class="award-medal"><span class="icon" data-icon="trees"></span></span><div><strong>По берегу</strong><p>Выполнена пешая прогулка</p></div><span class="earned-label">Получено</span></div>
+      <div class="award"><span class="award-medal"><span class="icon" data-icon="bike"></span></span><div><strong>На двух колёсах</strong><p>Выполнена велопрогулка</p></div><span class="earned-label">Получено</span></div>
+      <div class="award"><span class="award-medal"><span class="icon" data-icon="trophy"></span></span><div><strong>День удался</strong><p>Выполнены три занятия</p></div><span class="earned-label">Получено</span></div>
+    </div>
+    <p class="footer" id="awards-caption">Сначала отметьте выполненное занятие.</p>
+    <div class="progress"><i></i><i></i><i class="active"></i></div>
+  </section>
+  <div class="tile" id="floating-tile"></div>
+  <svg id="cursor" viewBox="0 0 32 38" aria-hidden="true"><path d="M3 2L3 29L10 23L16 36L22 33L16 21L27 20Z" fill="#fffdf3" stroke="#303442" stroke-width="2.4" stroke-linejoin="round"/></svg>
+  <script>
+    const iconNames = ['trees', 'bike', 'beach', 'bath', 'star', 'trophy', 'grip-vertical'];
+    const icons = {};
+    const points = {
+      house: { label: 'Хаусбот', xy: [21, 69], route: [[21, 69], [29, 67], [37, 63], [39, 58]] },
+      restaurant: { label: 'Ресторан', xy: [59, 39], route: [[59, 39], [58, 42], [49, 47], [45, 57], [39, 58]] },
+      banya: { label: 'Баня', xy: [85, 35], route: [[85, 35], [79, 37], [75, 41], [69, 42], [58, 42], [49, 47], [45, 57], [39, 58]] },
+      rental: { label: 'Прокат', xy: [70, 62], route: [[70, 62], [63, 63], [56, 65], [50, 60], [45, 57], [39, 58]] },
+      pier: { label: 'Причал', xy: [49, 78], route: [[49, 78], [50, 72], [53, 69], [56, 65], [50, 60], [45, 57], [39, 58]] },
+    };
+    const activities = [
+      { key: 'walk', tile: 'Прогулка', title: 'Прогулка', icon: 'trees', photo: 'images/gallery/ruza/forest-trail.jpg', start: 1.0, end: 2.35, row: 1, source: [122, 308] },
+      { key: 'bike', tile: 'Велосипед', title: 'Велопрогулка', icon: 'bike', photo: 'images/fast-v1/rental-01-b186eac3f70d-1536.webp', start: 3.0, end: 4.45, row: 2, source: [284, 308] },
+      { key: 'beach', tile: 'У воды', title: 'Отдых у воды', icon: 'beach', photo: 'images/fast-v1/leisure-nature-c46809a481f6-1200.webp', start: 5.4, end: 6.8, row: 4, source: [122, 456] },
+      { key: 'banya', tile: 'Баня', title: 'Баня', icon: 'bath', photo: 'images/mozhaysk-render-photos-20261106/banya/steam-room.jpg', start: 7.6, end: 8.95, row: 5, source: [284, 456] },
+    ];
+    const meals = {
+      0: { title: 'Завтрак', photo: 'images/mozhaysk-render-photos-20261106/restaurant/dining-room.jpg' },
+      3: { title: 'Обед', photo: 'images/mozhaysk-render-photos-20261106/restaurant/private-room.jpg' },
+      6: { title: 'Ужин', photo: 'images/home/mozhaysk/restaurant.jpg' },
+    };
+    const times = ['09:00', '10:00', '11:00', '13:00', '15:00', '17:00', '19:00'];
+    const rows = document.getElementById('rows');
+    const floating = document.getElementById('floating-tile');
+    const cursor = document.getElementById('cursor');
+    const map = document.querySelector('.map');
+    for (const [key, point] of Object.entries(points)) {
+      const label = document.createElement('div');
+      label.className = 'map-label'; label.dataset.point = key;
+      label.textContent = point.label; label.style.left = `${point.xy[0]}%`; label.style.top = `${point.xy[1]}%`;
+      map.append(label);
+    }
+    const routePath = destination => {
+      const from = points.house.route.map(x => [...x]), to = points[destination].route.map(x => [...x]);
+      while (from.length > 1 && to.length > 1 && from.at(-2).join() === to.at(-2).join()) { from.pop(); to.pop(); }
+      return [...from, ...to.reverse().slice(1)];
+    };
+    const paths = Object.fromEntries(['rental', 'banya'].map(key => [key, routePath(key)]));
+    const smooth = n => { n = Math.max(0, Math.min(1, n)); return n * n * (3 - 2 * n); };
+    function eventMarkup(event) {
+      return `<img class="photo" src="${event.photo}" alt=""><strong>${event.title}</strong><span class="grip">${icons['grip-vertical']}</span>`;
+    }
+    let planKey = '';
+    function renderPlan(time) {
+      const completed = activities.filter(a => time >= a.end);
+      const moving = activities.find(a => time >= a.start && time < a.end);
+      const key = completed.map(a => a.key).join() + ':' + (moving?.key || '');
+      if (key !== planKey) {
+        rows.innerHTML = times.map((clock, index) => {
+          const event = meals[index] || completed.find(a => a.row === index);
+          return `<div class="row" style="top:${76 + index * 66}px"><span class="time">${clock}</span><div class="event${event ? '' : ' free'}${moving?.row === index ? ' target' : ''}">${event ? eventMarkup(event) : '<span class="plus">+</span> Свободно'}</div></div>`;
+        }).join('');
+        document.querySelectorAll('.palette .tile').forEach(tile => tile.classList.toggle('empty', completed.some(a => a.key === tile.dataset.key) || moving?.key === tile.dataset.key));
+        document.querySelector('.service-note').hidden = !completed.some(a => a.key === 'banya');
+        planKey = key;
+      }
+      if (moving) {
+        const progress = smooth((time - moving.start) / (moving.end - moving.start));
+        const target = [734, 158 + 76 + moving.row * 66 + 29];
+        const x = moving.source[0] + (target[0] - moving.source[0]) * progress;
+        const y = moving.source[1] + (target[1] - moving.source[1]) * progress;
+        floating.innerHTML = `<span class="icon">${icons[moving.icon]}</span><span>${moving.tile}</span>`;
+        floating.style.left = `${x - 74}px`; floating.style.top = `${y - 66}px`; floating.style.visibility = 'visible';
+        cursor.style.left = `${x + 40}px`; cursor.style.top = `${y + 36}px`; cursor.style.visibility = 'visible';
+      } else { floating.style.visibility = 'hidden'; cursor.style.visibility = 'hidden'; }
+      return moving ? `plan:${key}:${Math.round(time * 24)}` : `plan:${key}`;
+    }
+    function renderMap(time) {
+      const destination = time < 14 ? 'rental' : 'banya';
+      const path = paths[destination];
+      const duration = destination === 'rental' ? time - 10 : time - 14;
+      const progress = smooth(duration / 1.25);
+      const length = path.length - 1;
+      const index = Math.min(length - 1, Math.floor(progress * length));
+      const amount = Math.min(1, progress * length - index);
+      const end = path[index].map((n, axis) => n + (path[index + 1][axis] - n) * amount);
+      const visiblePath = [...path.slice(0, index + 1), end];
+      const d = visiblePath.map(([x, y], i) => `${i ? 'L' : 'M'}${x * 14.4},${y * 9.6}`).join(' ');
+      document.getElementById('route-under').setAttribute('d', d); document.getElementById('route').setAttribute('d', d);
+      const dot = document.getElementById('route-end'); dot.setAttribute('cx', end[0] * 14.4); dot.setAttribute('cy', end[1] * 9.6);
+      document.querySelectorAll('.map-label').forEach(label => label.classList.toggle('selected', ['house', destination].includes(label.dataset.point)));
+      document.getElementById('map-caption').textContent = `Хаусбот → ${destination === 'rental' ? 'Прокат велосипедов' : 'Баня'}`;
+      return progress < 1 ? `map:${destination}:${Math.round(time * 24)}` : `map:${destination}`;
+    }
+    function renderAwards(time) {
+      const count = time < 19 ? 0 : time < 20.5 ? 1 : time < 22 ? 2 : 3;
+      document.querySelectorAll('.check-chip').forEach((chip, i) => { chip.classList.toggle('complete', i < count); chip.querySelector('.check').textContent = i < count ? '✓' : '•'; });
+      document.querySelectorAll('.award').forEach((award, i) => award.classList.toggle('earned', i === 0 || i === 1 ? count >= 1 : i === 2 ? count >= 2 : count >= 3));
+      document.getElementById('awards-caption').textContent = count ? `Выполнено ${count} ${count === 1 ? 'занятие' : 'занятия'}` : 'Сначала отметьте выполненное занятие.';
+      return `awards:${count}`;
+    }
+    window.renderFrame = time => {
+      time = Math.max(0, Math.min(26.999, Number(time)));
+      const scene = time < 10 ? 'plan' : time < 18 ? 'map' : 'awards';
+      document.querySelectorAll('.scene').forEach(el => el.classList.toggle('active', el.id === `scene-${scene}`));
+      if (scene !== 'plan') { floating.style.visibility = 'hidden'; cursor.style.visibility = 'hidden'; }
+      return scene === 'plan' ? renderPlan(time) : scene === 'map' ? renderMap(time) : renderAwards(time);
+    };
+    window.ready = (async () => {
+      await Promise.all(iconNames.map(async name => { const response = await fetch(`assets/holiday-icons/${name}.svg`); if (!response.ok) throw new Error(`Missing icon: ${name}`); icons[name] = await response.text(); }));
+      document.querySelectorAll('[data-icon]').forEach(el => { el.innerHTML = icons[el.dataset.icon]; });
+      // Keep every photograph decoded before deterministic captures begin.
+      const photoUrls = [...new Set([...activities.map(a => a.photo), ...Object.values(meals).map(a => a.photo)])];
+      await Promise.all(photoUrls.map(src => new Promise((resolve, reject) => { const image = new Image(); image.onload = resolve; image.onerror = () => reject(new Error(`Missing image: ${src}`)); image.src = src; })));
+      await Promise.all([...document.images].map(image => image.decode()));
+      await document.fonts.ready;
+      window.renderFrame(0);
+      return true;
+    })();
+  </script>
+</body>
+</html>

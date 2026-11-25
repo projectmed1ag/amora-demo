@@ -213,7 +213,7 @@ html.collection-aero {
   .collection-aero body .home-header:has(> .home-nav--document-tabs) {
     --tab-header-inset: 18px;
     padding-block: var(--tab-header-inset);
-    border-bottom-color: var(--aero-line);
+    border-bottom-color: transparent;
   }
   .collection-aero body .home-header > .home-nav--document-tabs {
     align-self: end;
@@ -225,7 +225,7 @@ html.collection-aero {
   .collection-aero body .home-header .home-nav--document-tabs > a:not(.mobile-hotels-link) {
     padding-inline: clamp(7px, calc(1.5vw - 9px), 16px);
     border: 1px solid #ffffff26;
-    border-bottom-color: var(--aero-line);
+    border-bottom-color: transparent;
     border-radius: 12px 12px 0 0;
     background: linear-gradient(#4a5061, #363b4b);
     box-shadow: 0 -3px 9px #14182455, inset 0 1px #ffffff1f;
