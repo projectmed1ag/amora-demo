@@ -1,5 +1,5 @@
-import { onsiteInterests, services } from './collection-holiday-data.js?v=20261108-route-pdf-1';
-import { availableInterestInStay, buildHolidayPlan, clock, dateLabel, interestSeasonLabel } from './collection-holiday-engine.js?v=20261120-split-stay-1';
+import { onsiteInterests, services } from './collection-holiday-data.js?v=20261125-restaurant-meals-1';
+import { availableInterestInStay, buildHolidayPlan, clock, dateLabel, interestSeasonLabel } from './collection-holiday-engine.js?v=20261125-restaurant-meals-1';
 
 export const boardEscape = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
 const esc = boardEscape;

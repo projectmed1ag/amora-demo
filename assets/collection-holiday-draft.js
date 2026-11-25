@@ -1,5 +1,5 @@
-import { attractions, childActivityOptions, interests, outingTransports, services } from './collection-holiday-data.js?v=20261108-route-pdf-1';
-import { dateNumber, minutes, familyAdultInterests } from './collection-holiday-engine.js?v=20261120-split-stay-1';
+import { attractions, childActivityOptions, interests, outingTransports, services } from './collection-holiday-data.js?v=20261125-restaurant-meals-1';
+import { dateNumber, minutes, familyAdultInterests } from './collection-holiday-engine.js?v=20261125-restaurant-meals-1';
 import { isHotelEventEdit } from './collection-holiday-edits.js?v=20261108-route-pdf-1';
 import { holidayLodgings } from './collection-holiday-lodging.js';
 
@@ -41,6 +41,9 @@ function restoreAnswers(saved, defaults) {
       answers[field] = [...new Set(saved[field].filter(id => catalog.some(item => item.id === id)))];
     }
   }
+  if (Array.isArray(saved.restaurantMeals)) {
+    answers.restaurantMeals = [...new Set(saved.restaurantMeals.filter(meal => ['lunch', 'dinner'].includes(meal)))];
+  }
   if (!Object.hasOwn(saved, 'suggestActivities') && saved.outingMode === 'stay') {
     // Earlier questionnaires retained these selections when switching to a hotel-only stay.
     answers.interests = (answers.interests || []).filter(id => !['walk', 'bike', 'buggy'].includes(id));
@@ -49,6 +52,9 @@ function restoreAnswers(saved, defaults) {
   answers.preferred ||= {};
   for (const { id } of services) {
     if (timeValue(saved.preferred?.[id])) answers.preferred[id] = saved.preferred[id];
+  }
+  for (const field of ['restaurantLunch', 'restaurantDinner']) {
+    if (timeValue(saved.preferred?.[field])) answers.preferred[field] = saved.preferred[field];
   }
   answers.outings ||= {};
   for (const { id } of attractions) {

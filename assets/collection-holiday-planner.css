@@ -225,6 +225,12 @@ body.holiday-planner-page .home-header { display: flex; justify-content: space-b
 .planner-selection-count { margin: 0; padding: 3px 10px; border-radius: 5px; background: #f1e7d6; color: #564630; font-size: 12px; font-weight: 600; }
 .planner-service-options { display: grid; gap: 16px; }
 .planner-service-time { margin-top: 12px; padding-left: 18px; max-width: 260px; }
+.planner-service-option:has([data-service-time="restaurant"]:not([hidden])) { grid-column: 1 / -1; }
+.planner-service-time[data-service-time="restaurant"] { max-width: none; padding-left: 0; }
+.planner-restaurant-meals { min-width: 0; margin: 0; padding: 0; border: 0; }
+.planner-restaurant-meals > legend { padding: 0; font-size: 16px; font-weight: 600; }
+.planner-restaurant-meals > .planner-hint { margin: 6px 0 12px; }
+.planner-restaurant-times { margin-top: 14px; }
 .planner-review { margin: 24px 0; }
 .planner-review > div { padding: 16px 0; border-bottom: 1px solid #e3e4e8; }
 .planner-review dt { font-size: 11px; color: var(--planner-secondary); margin-bottom: 7px; }
